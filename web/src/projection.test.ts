@@ -20,3 +20,24 @@ test("one unavailable dependency yields indeterminate state", async () => {
   const projection = new HttpMembershipProjection("https://projection.test", "did:plc:community", async () => { throw new Error("PDS unavailable"); });
   assert.deepEqual(await projection.membership("did:plc:user"), { state: "indeterminate", projection: "unavailable", reason: "projection_unavailable" });
 });
+
+test("discussion projection retains only the bounded public view", async () => {
+  const projection = new HttpMembershipProjection("https://projection.test", "did:plc:community", async () => response({
+    communityDid: "did:plc:community",
+    discussions: [{ authorDid: "did:plc:author", status: "visible", post: { text: "Hello", extra: "not retained" }, authority: { private: true } }],
+    cursor: null,
+    snapshot: { generation: "g1", observerSequence: 7 },
+  }));
+  assert.deepEqual(await projection.discussions(), {
+    generation: "g1",
+    discussions: [{ authorDid: "did:plc:author", text: "Hello", status: "visible" }],
+  });
+});
+
+test("malformed discussion projection refuses rather than inventing content", async () => {
+  const projection = new HttpMembershipProjection("https://projection.test", "did:plc:community", async () => response({
+    discussions: [{ authorDid: "did:plc:author", status: "visible", post: {} }],
+    snapshot: { generation: "g1" },
+  }));
+  await assert.rejects(projection.discussions(), /projection_invalid/);
+});

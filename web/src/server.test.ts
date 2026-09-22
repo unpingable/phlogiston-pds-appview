@@ -60,7 +60,10 @@ async function fixture(membership: MembershipView) {
   const sessions = new WebSessionStore(join(root, "sessions"));
   const oauth = new OAuthFake();
   const config: AppConfig = { publicUrl: "http://127.0.0.1:8092", runtimeDirectory: root, projectionOrigin: "http://127.0.0.1:9", communityDid: "did:plc:communitycommunitycomm", port: 8092 };
-  const handler = createHandler({ config, oauth, sessions, projection: { membership: async () => membership }, now: () => new Date("2026-09-22T12:00:00Z") });
+  const handler = createHandler({ config, oauth, sessions, projection: {
+    membership: async () => membership,
+    discussions: async () => ({ generation: "g1", discussions: [{ authorDid: DID, text: "Synthetic discussion", status: "visible" }] }),
+  }, now: () => new Date("2026-09-22T12:00:00Z") });
   return { sessions, oauth, invoke: async (method: string, path: string, fields: Record<string, string> = {}, cookie?: string) => {
     const body = method === "POST" ? new URLSearchParams(fields).toString() : "";
     const request = new RequestFixture(method, path, body, cookie);
@@ -69,6 +72,14 @@ async function fixture(membership: MembershipView) {
     return response;
   } };
 }
+
+test("public community route renders the bounded read-only projection", async () => {
+  const app = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" });
+  const result = await app.invoke("GET", "/community/");
+  assert.equal(result.statusCode, 200);
+  assert.match(result.body, /Synthetic discussion/);
+  assert.match(result.body, /Projection generation: <code>g1<\/code>/);
+});
 
 test("PDS unavailability during enrollment is classified without a local session", async () => {
   const app = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" });

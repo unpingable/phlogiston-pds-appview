@@ -40,6 +40,11 @@ async function route(deps: Dependencies, request: IncomingMessage, response: Ser
   const url = new URL(request.url ?? "/", deps.config.publicUrl);
   if (method === "GET" && url.pathname === "/healthz") return text(response, 200, "ok\n");
   if (method === "GET" && url.pathname === "/oauth-client-metadata.json") return json(response, 200, clientMetadata(deps.config));
+  if (method === "GET" && url.pathname === "/community/") {
+    const listing = await deps.projection.discussions();
+    const items = listing.discussions.map((item) => `<li><article><h2>${escape(item.authorDid)}</h2><p>${escape(item.text)}</p><p>Community state: <strong>${escape(item.status)}</strong></p></article></li>`).join("");
+    return html(response, 200, page("Phlogiston community", `<p>Author-owned posts admitted into this community view.</p><ol>${items || "<li>No admitted discussions are currently projected.</li>"}</ol><p>Projection generation: <code>${escape(listing.generation)}</code></p>`));
+  }
   if (method === "POST") requireSameOrigin(request, deps.config.publicUrl);
 
   if (method === "POST" && url.pathname === "/oauth/login") {

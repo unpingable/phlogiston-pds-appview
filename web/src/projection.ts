@@ -7,7 +7,13 @@ export type MembershipView = Readonly<{
 
 export interface MembershipProjection {
   membership(did: string): Promise<MembershipView>;
+  discussions(): Promise<DiscussionListing>;
 }
+
+export type DiscussionListing = Readonly<{
+  generation: string;
+  discussions: readonly Readonly<{ authorDid: string; text: string; status: string }>[];
+}>;
 
 export class HttpMembershipProjection implements MembershipProjection {
   public constructor(
@@ -45,6 +51,26 @@ export class HttpMembershipProjection implements MembershipProjection {
     } catch {
       return { state: "indeterminate", projection: "unavailable", reason: "projection_unavailable" };
     }
+  }
+
+  public async discussions(): Promise<DiscussionListing> {
+    const encoded = encodeURIComponent(this.communityDid);
+    const response = await this.request(`${this.origin}/api/v0/communities/${encoded}/discussions`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) throw new Error(`projection_http_${response.status}`);
+    const raw = await response.text();
+    if (Buffer.byteLength(raw) > 256 * 1024) throw new Error("projection_too_large");
+    const value = JSON.parse(raw) as unknown;
+    if (!isObject(value) || !Array.isArray(value.discussions) || !isObject(value.snapshot)
+        || typeof value.snapshot.generation !== "string") throw new Error("projection_invalid");
+    const discussions = value.discussions.map((item) => {
+      if (!isObject(item) || typeof item.authorDid !== "string" || typeof item.status !== "string"
+          || !isObject(item.post) || typeof item.post.text !== "string") throw new Error("projection_invalid");
+      return Object.freeze({ authorDid: item.authorDid, text: item.post.text, status: item.status });
+    });
+    return Object.freeze({ generation: value.snapshot.generation, discussions: Object.freeze(discussions) });
   }
 }
 
