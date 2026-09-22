@@ -4,7 +4,7 @@ Result: **qualified off-host; not deployed**.
 
 ## Bound identities
 
-- Phlogiston source: `a301edf86e940e1bf77cb566902c1812d80b9a4c`
+- Phlogiston source: `a8f17c7ac50994bc3e21606e6f03aed9ff7b6c0d`
 - community source: `89d04dafc8aaa55f0e327241fbb7b3521c0042f0`
 - PDS image retained by the release manifest:
   `ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a`
@@ -37,12 +37,13 @@ release builder then:
 6. emits an embedded manifest for every regular payload file; and
 7. normalizes ordering, timestamps, ownership, hardlinks, and gzip metadata.
 
-The same command was run once against the original clean store and once
+The builder also verified that the supplied community commit exists in the
+declared community Git repository. The same command was run once against the original clean store and once
 against a separately extracted immutable store bundle. Both produced the same
-3,445,138-byte archive:
+3,445,131-byte archive:
 
 ```text
-d0746f9793a97202e20fc8253e49b2f8bfff2cefbccc438346babc772b62dd16
+13461c7efad9c9aed63ddbc02419d78e4f4f724f3fdc765a064677688ee52c19
 ```
 
 `cmp` confirmed byte identity. `deploy/verify-release.py` then verified 6,541
