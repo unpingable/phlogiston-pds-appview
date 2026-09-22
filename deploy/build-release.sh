@@ -62,7 +62,7 @@ cp -a "$scratch/source/web/dist" "$scratch/source/web/node_modules" "$release/we
 cp "$scratch/source/web/package.json" "$scratch/source/web/pnpm-lock.yaml" "$release/web/"
 cp -a "$scratch/source/src/phlogiston_appview" "$release/python/"
 cp -a "$scratch/source/deploy/production/." "$release/deploy/"
-cp "$scratch/source/LICENSE" "$release/"
+cp "$scratch/source/README.md" "$scratch/source/PROVENANCE.md" "$release/"
 python3 "$scratch/source/deploy/build_release_manifest.py" \
   --root "$release" \
   --phlogiston-commit "$phlogiston_commit" \
