@@ -195,3 +195,11 @@ def test_activation_templates_keep_pds_and_authority_separate() -> None:
     assert "operation_journal_path" in authority_config
     assert "authority_socket_path" in authority_config
     assert "/admin/" not in authority_config
+
+
+def test_production_config_manifest_matches_bytes() -> None:
+    manifest = json.loads((ROOT / "deploy/production/config-manifest.json").read_text())
+    assert manifest["schema"] == "phlogiston.production-config-manifest.v1"
+    for relative, expected in manifest["files"].items():
+        actual = hashlib.sha256((ROOT / "deploy/production" / relative).read_bytes()).hexdigest()
+        assert actual == expected, relative
