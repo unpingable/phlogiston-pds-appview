@@ -1,0 +1,18 @@
+# Qualification-only job. It has no network namespace and no published port.
+# It renders a local fixture then exits; it is not a production deployment.
+services:
+  render:
+    # Operator must supply an immutable, locally admitted image reference.
+    # A floating image is intentionally not accepted as qualification input.
+    image: ${PHLOGISTON_RENDER_IMAGE:?set a validated immutable image digest}
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - ../fixtures:/input:ro
+      - ../src:/app/src:ro
+      - ./output:/output
+    environment:
+      PYTHONPATH: /app/src
+    command: ["python", "-m", "phlogiston_appview.render", "--snapshot", "/input/synthetic-snapshot.json", "--output", "/output"]

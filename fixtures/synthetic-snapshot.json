@@ -1,0 +1,19 @@
+{
+  "schema": "phlogiston.synthetic-snapshot.v1",
+  "snapshot_id": "phlogiston-fixture-20260921-001",
+  "subject": "did:example:phlogiston-fixture",
+  "items": [
+    {
+      "id": "fixture-001",
+      "uri": "at://did:example:phlogiston-fixture/app.bsky.feed.post/fixture-001",
+      "text": "Synthetic snapshot item; no network repository was queried.",
+      "observed_at": "2026-09-21T00:00:00Z"
+    },
+    {
+      "id": "fixture-002",
+      "uri": "at://did:example:phlogiston-fixture/app.bsky.feed.post/fixture-002",
+      "text": "Static rendering proves only this declared fixture contract.",
+      "observed_at": "2026-09-21T00:01:00Z"
+    }
+  ]
+}
