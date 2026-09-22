@@ -53,7 +53,9 @@ git -C "$root" archive "$phlogiston_commit" | tar -x -C "$scratch/source"
   cd "$scratch/source/web"
   pnpm install --offline --frozen-lockfile --ignore-scripts --store-dir "$store"
   pnpm run build
+  rm -rf node_modules
   pnpm install --prod --offline --frozen-lockfile --ignore-scripts --store-dir "$store"
+  rm -f node_modules/.modules.yaml node_modules/.pnpm-workspace-state-v1.json
 )
 
 release="$scratch/release/phlogiston"
@@ -72,5 +74,5 @@ python3 "$scratch/source/deploy/build_release_manifest.py" \
   --output "$release/release-manifest.json"
 
 tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner \
-  -C "$scratch/release" -czf "$output" phlogiston
+  --hard-dereference -C "$scratch/release" -cf - phlogiston | gzip -n >"$output"
 sha256sum "$output"
