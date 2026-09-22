@@ -55,6 +55,16 @@ def test_caddy_packet_exposes_only_the_app_surface() -> None:
         raise AssertionError("duplicate route was accepted")
 
 
+def test_on_demand_tls_dispatch_preserves_pds_ownership() -> None:
+    dispatch = (ROOT / "deploy/production/Caddyfile.on-demand-dispatch.fragment").read_text()
+    assert "127.0.0.1:3000" in dispatch
+    assert "127.0.0.1:3002" in dispatch
+    assert dispatch.count("rewrite * /tls-check") == 2
+    assert 'endsWith(".juche.social")' in dispatch
+    assert 'endsWith(".phlogiston.social")' in dispatch
+    assert "respond 403" in dispatch
+
+
 def test_release_verifier_binds_inventory_and_sources(tmp_path: Path) -> None:
     payload = tmp_path / "release"
     payload.mkdir()

@@ -60,9 +60,10 @@ Fresh read-only DNS showed both intended names resolving only to the intended
 shared-host IPv4 address. DNS was not changed. No TLS certificate currently
 exists for either name. Both Caddy fragments validate with the production-
 version Caddy 2.10.0 image digest retained in private evidence. Automatic
-HTTPS, renewal and redirect behavior remain owned by existing Caddy. The PDS
-wildcard/on-demand route cannot be activated until its ask-policy verification
-is correctly bound to the independent PDS.
+HTTPS, renewal and redirect behavior remain owned by existing Caddy. The
+prepared local ask dispatcher routes Juche and Phlogiston domains to their
+respective PDS `/tls-check` endpoints and rejects other domains; it avoids
+both cross-PDS decisions and an unconditional wildcard gate.
 
 ## J–L. Deployment, rollback and verification
 

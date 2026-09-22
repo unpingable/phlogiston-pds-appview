@@ -1,0 +1,23 @@
+# Replace the existing global on_demand_tls ask URL with:
+#   ask http://127.0.0.1:3099
+# Keep every other global option byte-for-byte unchanged.
+
+http://127.0.0.1:3099 {
+	@juche expression `{query.domain} == "juche.social" || {query.domain}.endsWith(".juche.social")`
+	handle @juche {
+		rewrite * /tls-check
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	@phlogiston expression `{query.domain} == "phlogiston.social" || {query.domain}.endsWith(".phlogiston.social")`
+	handle @phlogiston {
+		rewrite * /tls-check
+		reverse_proxy 127.0.0.1:3002
+	}
+
+	respond 403
+}
+
+# This dispatcher does not itself admit a certificate. It selects the correct
+# PDS and preserves the original domain query; that PDS still decides whether
+# the base hostname or hosted handle is valid.

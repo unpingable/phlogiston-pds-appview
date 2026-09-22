@@ -2,7 +2,8 @@
   "schema": "phlogiston.production-config-manifest.v1",
   "files": {
     "Caddyfile.fragment": "5e356ccea106aecf66da73b51069e21f0b1ed4b448efc8301a82bcec3786f56d",
-    "Caddyfile.pds.fragment": "f8cc598733ce1116bb9435dfce057f532f35f00d26d79972d234df4658910f7c",
+    "Caddyfile.on-demand-dispatch.fragment": "1cec95c714a6876ebac3eb50d390cd2d021bcf73f08bbe9c0901d75f824738cd",
+    "Caddyfile.pds.fragment": "f8ce8abfc2dcd27b4a4d43d29df131cef1783d93a16b9184dfec5ac46fea11ae",
     "backup-probe.sh": "1861eabe238769b037193fb6c020fbddccb73e7546f478a1b4ee7613f26301eb",
     "communityd.toml.example": "0bb6c2e750b22ff8b13737289bf4de72abf2e81982c1d54feebc5abed3c29834",
     "communitywatch.toml.example": "1a32a10c7bee504a155432456b501e2a6157f756a6756f07491482381877bbc9",
