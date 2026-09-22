@@ -147,6 +147,29 @@ def create_record(origin, session, collection, record):
     return xrpc(origin, "com.atproto.repo.createRecord", body={"repo": session["did"], "collection": collection, "record": record}, token=session["accessJwt"])
 
 
+def operator_post(app, cookie, path, csrf, fields):
+    body = urllib.parse.urlencode({"csrf": csrf, **fields}).encode()
+    response = app.handle("POST", path, cookie=cookie, body=body)
+    if response.status != 200:
+        raise RuntimeError(f"Phlogiston operator route {path} refused with {response.status}")
+    return response
+
+
+def confirm_effect(app, cookie, csrf, review, fields):
+    marker = 'name="confirmation" value="'
+    text = review.body.decode()
+    if marker not in text:
+        raise RuntimeError("Phlogiston did not render an explicit confirmation")
+    token = text.split(marker, 1)[1].split('"', 1)[0]
+    return operator_post(
+        app,
+        cookie,
+        "/admin/confirm",
+        csrf,
+        {"confirmation": token, "confirm": "yes", **fields},
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pds-origin", required=True)
@@ -254,18 +277,35 @@ def main():
             raise RuntimeError("communityd socket did not appear")
 
         authority = UnixCommunityAuthorityClient(str(socket_path))
-        authority.membership(
-            operation_id="smoke-member",
-            operator_did=operator["did"],
-            subject_did=participant.reference or "",
-            action="add",
-            reason="isolated qualification",
+        codec = SessionCodec(b"s" * 32, clock=lambda: 1000)
+        cookie = f"phlogiston_operator={codec.issue(operator['did'], 'smoke-csrf')}"
+        write_app = OperatorApp(
+            sessions=codec,
+            operator_dids=frozenset({operator["did"]}),
+            pds=pds,
+            community=authority,
+            projection=None,  # type: ignore[arg-type] - write routes never consult projection
         )
-        admission = authority.admit(
-            operation_id="smoke-admit",
-            operator_did=operator["did"],
-            uri=submission["uri"],
-            cid=submission["cid"],
+        membership_fields = {
+            "path": "/admin/community/membership",
+            "subject_did": participant.reference or "",
+            "action": "add",
+            "reason": "isolated qualification",
+        }
+        review = operator_post(
+            write_app,
+            cookie,
+            membership_fields["path"],
+            "smoke-csrf",
+            {key: value for key, value in membership_fields.items() if key != "path"},
+        )
+        confirm_effect(write_app, cookie, "smoke-csrf", review, membership_fields)
+        operator_post(
+            write_app,
+            cookie,
+            "/admin/community/admit",
+            "smoke-csrf",
+            {"uri": submission["uri"], "cid": submission["cid"]},
         )
 
         for did, document in documents.items():
@@ -303,6 +343,8 @@ def main():
             "zone.neutral.community.replyPolicy",
         ), cursor)
         admission_event_key = None
+        admission_reference = None
+        admission_cid = None
         verdicts = []
         for claim in participant_claims + community_claims:
             for verified in VerifyingEventSource(One(claim), **verifier_args).verify_delivery(claim):
@@ -317,6 +359,11 @@ def main():
                 })
                 if isinstance(envelope, Mapping) and envelope.get("collection") == "zone.neutral.community.admission" and verified.verification_outcome == "verified":
                     admission_event_key = ingested.key
+                    admission_reference = (
+                        f"at://{community['did']}/zone.neutral.community.admission/"
+                        f"{envelope['rkey']}"
+                    )
+                    admission_cid = envelope.get("cid")
         subject = RecordRef(uri=post_ref["uri"], cid=post_ref["cid"])
         if admission_event_key is None:
             raise RuntimeError("verified admission event was not produced: " + json.dumps(verdicts, sort_keys=True))
@@ -334,7 +381,7 @@ def main():
             origin = f"http://127.0.0.1:{server.server_address[1]}"
             projection = HttpCommunityProjectionClient(origin, community["did"])
             app = OperatorApp(
-                sessions=SessionCodec(b"s" * 32, clock=lambda: 1000),
+                sessions=codec,
                 operator_dids=frozenset({operator["did"]}),
                 pds=pds,
                 community=authority,
@@ -343,22 +390,33 @@ def main():
             before = app.handle("GET", "/community/").body.decode()
             if "real isolated Phlogiston community post" not in before:
                 raise RuntimeError("Phlogiston did not render admitted post")
-            admission_record = xrpc(args.pds_origin, "com.atproto.repo.getRecord", query={
-                "repo": community["did"],
-                "collection": "zone.neutral.community.admission",
-                "rkey": (admission.reference or "").rsplit("/", 1)[1],
-            })
-            removed = authority.remove(
-                operation_id="smoke-remove",
-                operator_did=operator["did"],
-                uri=admission.reference or "",
-                cid=admission_record["cid"],
-                reason="isolated removal",
+            if not isinstance(admission_reference, str) or not isinstance(admission_cid, str):
+                raise RuntimeError("verified admission omitted its exact reference")
+            removal_fields = {
+                "path": "/admin/community/remove",
+                "uri": admission_reference,
+                "cid": admission_cid,
+                "reason": "isolated removal",
+            }
+            review = operator_post(
+                app,
+                cookie,
+                removal_fields["path"],
+                "smoke-csrf",
+                {key: value for key, value in removal_fields.items() if key != "path"},
             )
+            confirm_effect(app, cookie, "smoke-csrf", review, removal_fields)
             removal_claims, cursor = claims(args.pds_origin, community["did"], ("zone.neutral.community.modAction",), cursor)
+            removal_reference = None
             for claim in removal_claims:
                 for verified in VerifyingEventSource(One(claim), **verifier_args).verify_delivery(claim):
                     store.ingest(verified)
+                    envelope = verified.raw_envelope
+                    if isinstance(envelope, Mapping):
+                        removal_reference = (
+                            f"at://{community['did']}/zone.neutral.community.modAction/"
+                            f"{envelope['rkey']}"
+                        )
             after = app.handle("GET", "/community/").body.decode()
             if "real isolated Phlogiston community post" in after:
                 raise RuntimeError("removed post remained visible")
@@ -373,8 +431,8 @@ def main():
                 "communityDid": community["did"],
                 "participantDid": participant.reference,
                 "membership": projection.members(),
-                "admission": admission.reference,
-                "removal": removed.reference,
+                "admission": admission_reference,
+                "removal": removal_reference,
                 "renderedBeforeRemoval": True,
                 "hiddenAfterRemoval": True,
                 "observerHealth": projection.health(),
