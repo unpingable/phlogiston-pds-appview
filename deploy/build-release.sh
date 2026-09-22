@@ -53,7 +53,7 @@ git -C "$root" archive "$phlogiston_commit" | tar -x -C "$scratch/source"
   cd "$scratch/source/web"
   pnpm install --offline --frozen-lockfile --ignore-scripts --store-dir "$store"
   pnpm run build
-  pnpm prune --prod --offline --ignore-scripts --store-dir "$store"
+  pnpm install --prod --offline --frozen-lockfile --ignore-scripts --store-dir "$store"
 )
 
 release="$scratch/release/phlogiston"
