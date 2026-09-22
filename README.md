@@ -27,6 +27,15 @@ sibling receipt. The v2 receipt binds raw input bytes, renderer implementation
 bytes/revision, claimed source revision, and the exact output-member hashes.
 Its output contains no live endpoint, credential, or mutable action.
 
+## Community integration candidate
+
+The `campaign/community-integration-20260922` line adds a bounded application
+and operator surface over the existing `atproto-community` authority and
+projection interfaces. See [the integration map](docs/COMMUNITY-INTEGRATION.md)
+and [operator contract](docs/OPERATOR-SURFACE.md). It is not activated or
+deployed, and the Horizon 0 recovery evidence remains scoped to the released
+synthetic artifact until integrated state enters that recovery contract.
+
 ## Authority boundary
 
 `deploy/`, `backup/`, `restore/`, `rollback/`, and `uninstall/` are operator
