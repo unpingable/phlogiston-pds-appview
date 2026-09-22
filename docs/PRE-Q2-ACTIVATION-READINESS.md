@@ -9,8 +9,8 @@ receipt plus fresh host, backup and capacity observations.
 
 | Item | Exact identity |
 |---|---|
-| Phlogiston source | `2b0324a6012011a06117ab55c63f09d193d51d3d` |
-| Phlogiston artifact | `phlogiston-2b0324a.tar.gz`, SHA-256 `34663965c015a24ca6a75ad7147dd313c91ee8f2b666db50b1f1a05ee55e1951`, 3,453,672 bytes, 6,556 manifest files |
+| Phlogiston source | `1d43c42e0c35ec42e1bab40d365f4c6571497239` |
+| Phlogiston artifact | `phlogiston-1d43c42.tar.gz`, SHA-256 `05a6cbbd3d27cf584f837036448e0d6cfaf7f1730004f895da2e1c9c9498b687`, 3,454,209 bytes, 6,557 manifest files |
 | Community source | `89d04dafc8aaa55f0e327241fbb7b3521c0042f0` |
 | Community runtime | `community-runtime-89d04da.tar.gz`, SHA-256 `ad954a8b607db9b98714e01471cb1f1e00da1847a6ed513430e0d25f6abcbccf`, 181,067 bytes, six exact wheels |
 | PDS image | `ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a` (`@atproto/pds` 0.5.34) |
