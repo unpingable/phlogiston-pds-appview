@@ -133,7 +133,7 @@ in the companion record rather than this public document.
 
 ## Qualification summary
 
-- Phlogiston Python: 41 passed.
+- Phlogiston Python: 42 passed.
 - Node typecheck and four test files: passed from a clean offline install.
 - artifact builds from two independently populated stores: byte-identical;
   exact artifact start/restart, metadata, inert 503, absent `/admin/`, and
