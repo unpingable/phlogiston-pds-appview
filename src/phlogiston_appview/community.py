@@ -8,7 +8,7 @@ import urllib.parse
 import urllib.request
 from collections.abc import Mapping
 
-from .operator import EffectResult
+from .operator import DependencyUnavailable, EffectResult
 
 
 class UnixCommunityAuthorityClient:
@@ -34,16 +34,19 @@ class UnixCommunityAuthorityClient:
         encoded = json.dumps(value, separators=(",", ":")).encode() + b"\n"
         if len(encoded) > 64 * 1024:
             raise ValueError("community authority request exceeds limit")
-        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
-            connection.settimeout(self.timeout)
-            connection.connect(self.socket_path)
-            connection.sendall(encoded)
-            chunks = bytearray()
-            while b"\n" not in chunks and len(chunks) <= 64 * 1024:
-                chunk = connection.recv(4096)
-                if not chunk:
-                    break
-                chunks.extend(chunk)
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+                connection.settimeout(self.timeout)
+                connection.connect(self.socket_path)
+                connection.sendall(encoded)
+                chunks = bytearray()
+                while b"\n" not in chunks and len(chunks) <= 64 * 1024:
+                    chunk = connection.recv(4096)
+                    if not chunk:
+                        break
+                    chunks.extend(chunk)
+        except (OSError, TimeoutError) as exc:
+            raise DependencyUnavailable("community authority is unavailable") from exc
         if b"\n" not in chunks or len(chunks) > 64 * 1024:
             raise RuntimeError("communityd returned an invalid frame")
         response = json.loads(bytes(chunks).split(b"\n", 1)[0])
@@ -76,8 +79,11 @@ class HttpCommunityProjectionClient:
 
     def _get(self, path: str) -> Mapping[str, object]:
         request = urllib.request.Request(self.origin + path, headers={"Accept": "application/json"})
-        with self._open(request, timeout=10) as response:
-            raw = response.read(256 * 1024 + 1)
+        try:
+            with self._open(request, timeout=10) as response:
+                raw = response.read(256 * 1024 + 1)
+        except (OSError, TimeoutError) as exc:
+            raise DependencyUnavailable("community projection is unavailable") from exc
         if len(raw) > 256 * 1024:
             raise RuntimeError("community projection response exceeds limit")
         value = json.loads(raw)

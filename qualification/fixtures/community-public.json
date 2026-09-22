@@ -1,0 +1,7 @@
+{
+  "schema": "phlogiston.community-recovery-config.v1",
+  "authority": "communityd",
+  "projection": "communitywatch",
+  "oauth_sessions": "reenrollable-excluded",
+  "observer_state": "reconstructible-excluded"
+}

@@ -32,6 +32,12 @@ class FakeCommunity:
         self.calls.append(("remove", values)); return EffectResult("community", "remove", "created", reference="at://did:example:community/removal/1")
 
 
+class UnavailableCommunity(FakeCommunity):
+    def admit(self, **values):
+        from phlogiston_appview.operator import DependencyUnavailable
+        raise DependencyUnavailable("community authority is unavailable")
+
+
 class FakeProjection:
     def health(self): return {"status": "stale", "projectionStatus": "complete", "reasonCodes": ["ingest_stale"]}
     def moderation_queue(self): return {"submissions": [{"uri": "redacted"}]}
@@ -116,6 +122,34 @@ def test_admission_is_direct_but_removal_requires_bound_confirmation(app):
     assert confirmed.status == 200
     assert community.calls[-1][0] == "remove"
     assert "Authoritative disposition" in confirmed.body.decode()
+
+
+def test_duplicate_operator_intent_has_stable_operation_identity(app):
+    surface, codec, _, community = app
+    fields = {"csrf": "csrf-test", "uri": "at://did:example:alice/zone.neutral.community.submit/1", "cid": "bafy-test"}
+    assert request(surface, codec, "POST", "/admin/community/admit", fields).status == 200
+    assert request(surface, codec, "POST", "/admin/community/admit", fields).status == 200
+    assert community.calls[0][1]["operation_id"] == community.calls[1][1]["operation_id"]
+
+
+def test_communityd_unavailable_after_authentication_is_dependency_failure(app):
+    surface, codec, pds, _ = app
+    unavailable = OperatorApp(
+        sessions=codec,
+        operator_dids=frozenset({ADMIN}),
+        pds=pds,
+        community=UnavailableCommunity(),
+        projection=FakeProjection(),
+    )
+    response = request(
+        unavailable,
+        codec,
+        "POST",
+        "/admin/community/admit",
+        {"csrf": "csrf-test", "uri": "at://did:example:alice/zone.neutral.community.submit/1", "cid": "bafy-test"},
+    )
+    assert response.status == 503
+    assert b"Dependency unavailable" in response.body
 
 
 def test_confirmation_cannot_be_retargeted(app):

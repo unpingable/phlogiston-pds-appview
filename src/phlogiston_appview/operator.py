@@ -49,6 +49,10 @@ class Response:
     headers: tuple[tuple[str, str], ...] = ()
 
 
+class DependencyUnavailable(RuntimeError):
+    """A required authority or projection boundary could not be reached."""
+
+
 class PdsAdministration(Protocol):
     def create_invite(self, *, use_count: int, for_account: str | None) -> EffectResult: ...
     def create_account(self, *, handle: str, email: str, password: str, invite_code: str) -> EffectResult: ...
@@ -174,6 +178,8 @@ class XrpcPdsAdminClient:
                 raw = response.read(256 * 1024 + 1)
         except urllib.error.HTTPError as exc:
             raise RuntimeError(f"PDS refused {nsid} with HTTP {exc.code}") from exc
+        except (OSError, TimeoutError) as exc:
+            raise DependencyUnavailable("PDS administration is unavailable") from exc
         if len(raw) > 256 * 1024:
             raise RuntimeError("PDS response exceeds limit")
         value = json.loads(raw)
@@ -207,6 +213,8 @@ class OperatorApp:
             return _page(404, "Not found", "That operator route does not exist.")
         except PermissionError as exc:
             return _page(403, "Operator access refused", str(exc))
+        except DependencyUnavailable as exc:
+            return _page(503, "Dependency unavailable", str(exc))
         except (ValueError, RuntimeError) as exc:
             return _page(400, "Operation refused", str(exc))
 
