@@ -7,14 +7,51 @@ import hashlib
 import html
 import json
 from pathlib import Path
+import re
 
 SCHEMA = "phlogiston.synthetic-snapshot.v1"
+RECEIPT_SCHEMA = "phlogiston.static-render-receipt.v2"
+RENDERER_REVISION = "phlogiston-static-renderer/v2"
 REQUIRED = {"schema", "snapshot_id", "subject", "items"}
 ITEM_REQUIRED = {"id", "uri", "text", "observed_at"}
+RUN_ID = re.compile(r"[a-z0-9][a-z0-9-]{0,63}\Z")
+SOURCE_REVISION = re.compile(r"[0-9a-f]{7,64}\Z")
 
 
 def _canonical(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def canonical_existing_directory(path: Path, label: str) -> Path:
+    """Return an existing absolute, non-symlink directory without lexical escape."""
+    if not path.is_absolute() or path.is_symlink() or not path.is_dir():
+        raise ValueError(f"{label} must be an existing absolute non-symlink directory")
+    resolved = path.resolve(strict=True)
+    if resolved != path:
+        raise ValueError(f"{label} must already be canonical")
+    return resolved
+
+
+def regular_file_under(path: Path, root: Path, label: str) -> Path:
+    if not path.is_absolute() or path.is_symlink() or not path.is_file():
+        raise ValueError(f"{label} must be an absolute regular non-symlink file")
+    resolved = path.resolve(strict=True)
+    try:
+        relative = resolved.relative_to(root)
+    except ValueError as error:
+        raise ValueError(f"{label} escapes its trusted root") from error
+    for parent in (root, *[root / part for part in relative.parts[:-1]]):
+        if parent.is_symlink():
+            raise ValueError(f"{label} has a symlinked parent")
+    return resolved
+
+
+def trusted_fixture_root() -> Path:
+    return canonical_existing_directory(Path(__file__).parents[2] / "fixtures", "fixture root")
 
 
 def validate_snapshot(snapshot: object) -> dict:
@@ -43,12 +80,30 @@ def validate_snapshot(snapshot: object) -> dict:
     return snapshot
 
 
-def render_snapshot(snapshot: dict, output: Path) -> dict:
+def render_snapshot(
+    snapshot_path: Path,
+    output_root: Path,
+    run_id: str,
+    source_revision: str,
+    *,
+    fixture_root: Path | None = None,
+) -> tuple[Path, Path, dict]:
+    """Render a trusted fixture into a run-owned child; never accept arbitrary input."""
+    if not RUN_ID.fullmatch(run_id):
+        raise ValueError("run id must be lowercase alphanumeric/hyphen and at most 64 characters")
+    if not SOURCE_REVISION.fullmatch(source_revision):
+        raise ValueError("source revision must be an exact lowercase hexadecimal commit identifier")
+    fixture_root = canonical_existing_directory(fixture_root or trusted_fixture_root(), "fixture root")
+    output_root = canonical_existing_directory(output_root, "output root")
+    snapshot_path = regular_file_under(snapshot_path, fixture_root, "snapshot")
+    raw_snapshot = snapshot_path.read_bytes()
+    snapshot = validate_snapshot(json.loads(raw_snapshot))
+    output = output_root / run_id
+    receipt_path = output_root / f"{run_id}.receipt.json"
+    if output.exists() or output.is_symlink() or receipt_path.exists() or receipt_path.is_symlink():
+        raise ValueError("run-owned output child or receipt already exists")
+    output.mkdir(mode=0o700)
     snapshot = validate_snapshot(snapshot)
-    if output.exists():
-        raise ValueError("output target must not exist")
-    output.mkdir(parents=True)
-    digest = hashlib.sha256(_canonical(snapshot)).hexdigest()
     cards = "\n".join(
         "<article><h2>{}</h2><p>{}</p><code>{}</code><time>{}</time></article>".format(
             html.escape(item["id"]), html.escape(item["text"]), html.escape(item["uri"]),
@@ -61,30 +116,40 @@ def render_snapshot(snapshot: dict, output: Path) -> dict:
 <p>subject: <code>{subject}</code></p>{cards}</main>""".format(
         subject=html.escape(snapshot["subject"]), cards=cards
     )
-    (output / "index.html").write_text(page, encoding="utf-8")
+    page_bytes = page.encode("utf-8")
+    (output / "index.html").write_bytes(page_bytes)
     receipt = {
-        "schema": "phlogiston.static-render-receipt.v1",
+        "schema": RECEIPT_SCHEMA,
         "snapshot_id": snapshot["snapshot_id"],
-        "snapshot_sha256": digest,
+        "input_snapshot_sha256": _sha256(raw_snapshot),
+        "renderer_revision": RENDERER_REVISION,
+        "source_revision": source_revision,
+        "renderer_sha256": _sha256(Path(__file__).read_bytes()),
+        "run_id": run_id,
+        "output_members": {"index.html": _sha256(page_bytes)},
         "item_count": len(snapshot["items"]),
         "network_contacted": False,
         "production_changed": False,
     }
-    (output / "receipt.json").write_bytes(_canonical(receipt) + b"\n")
-    return receipt
+    receipt_path.write_bytes(_canonical(receipt) + b"\n")
+    receipt_path.chmod(0o600)
+    return output, receipt_path, receipt
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--source-revision", required=True)
     args = parser.parse_args()
-    if not args.snapshot.is_file() or args.snapshot.is_symlink():
-        raise SystemExit("snapshot must be a regular local file")
-    if args.output.is_absolute() and not str(args.output).startswith("/tmp/"):
-        raise SystemExit("absolute output is limited to /tmp for local qualification")
-    receipt = render_snapshot(json.loads(args.snapshot.read_text(encoding="utf-8")), args.output)
-    print(json.dumps(receipt, sort_keys=True))
+    try:
+        output, receipt_path, receipt = render_snapshot(
+            args.snapshot, args.output_root, args.run_id, args.source_revision
+        )
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        raise SystemExit(str(error)) from error
+    print(json.dumps({"output": str(output), "receipt": str(receipt_path), **receipt}, sort_keys=True))
     return 0
 
 

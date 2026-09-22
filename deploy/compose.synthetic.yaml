@@ -4,15 +4,15 @@ services:
   render:
     # Operator must supply an immutable, locally admitted image reference.
     # A floating image is intentionally not accepted as qualification input.
-    image: ${PHLOGISTON_RENDER_IMAGE:?set a validated immutable image digest}
+    image: ${PHLOGISTON_RENDER_IMAGE:?set a validated image@sha256 digest}
     network_mode: none
     read_only: true
     tmpfs:
       - /tmp
     volumes:
-      - ../fixtures:/input:ro
-      - ../src:/app/src:ro
-      - ./output:/output
+      - ..:/app:ro
+      # The parent is deliberately existing; the renderer owns a new child only.
+      - ./output-parent:/output-parent
     environment:
       PYTHONPATH: /app/src
-    command: ["python", "-m", "phlogiston_appview.render", "--snapshot", "/input/synthetic-snapshot.json", "--output", "/output"]
+    command: ["python", "-m", "phlogiston_appview.render", "--snapshot", "/app/fixtures/synthetic-snapshot.json", "--output-root", "/output-parent", "--run-id", "${PHLOGISTON_RUN_ID:?set a new run id}", "--source-revision", "${PHLOGISTON_SOURCE_REVISION:?set exact source revision}"]

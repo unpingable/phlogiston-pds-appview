@@ -1,0 +1,18 @@
+# Template only. Installation, enablement, Caddy, DNS, TLS, and network ingress
+# require a separate exact production approval.
+[Unit]
+Description=Phlogiston synthetic fixture renderer for run %i (not a network AppView)
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+StateDirectory=phlogiston-appview-runs
+StateDirectoryMode=0700
+Environment=PYTHONPATH=/opt/phlogiston-appview/current/src
+# Replace UNSET only in an approved installation transaction with the exact source commit.
+Environment=PHLOGISTON_SOURCE_REVISION=UNSET
+ExecStart=/usr/bin/python3 -m phlogiston_appview.render --snapshot /opt/phlogiston-appview/current/fixtures/synthetic-snapshot.json --output-root /var/lib/phlogiston-appview-runs --run-id %i --source-revision ${PHLOGISTON_SOURCE_REVISION}
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/phlogiston-appview-runs

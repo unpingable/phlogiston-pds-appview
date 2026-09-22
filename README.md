@@ -15,12 +15,17 @@ receive a firehose, or make a repository mutation.
 ```text
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 -m phlogiston_appview.render \
-  --snapshot fixtures/synthetic-snapshot.json --output /tmp/phlogiston-static
+  --snapshot "$PWD/fixtures/synthetic-snapshot.json" \
+  --output-root /tmp --run-id phlogiston-static --source-revision 0123456abcdef
 ```
 
-The renderer refuses non-`did:example:` identities, non-local snapshot paths,
-unknown fields, duplicate item IDs, and a non-empty output target.  Its output
-contains no live endpoint, credential, or mutable action.
+The renderer refuses non-`did:example:` identities, snapshots outside its
+installed `fixtures/` root, unknown fields, duplicate item IDs, symlink/path
+escape, non-canonical parents, reused run children, and placeholder revisions.
+The output root is an existing secure parent; each run owns one new child and a
+sibling receipt. The v2 receipt binds raw input bytes, renderer implementation
+bytes/revision, claimed source revision, and the exact output-member hashes.
+Its output contains no live endpoint, credential, or mutable action.
 
 ## Authority boundary
 

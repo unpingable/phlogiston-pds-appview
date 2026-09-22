@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
-# Restore an archive only into a new /tmp target, then require its receipt.
+# Restore a two-member archive into a new run-owned child and verify every binding.
 set -Eeuo pipefail
-test "$#" = 3
+test "$#" = 6
 test "$1" = --synthetic-only
 archive=$2
-target=$3
-test -f "$archive"
-test ! -e "$target"
-case "$target" in /tmp/*) ;; *) echo 'target must be under /tmp for local qualification' >&2; exit 2;; esac
-install -d -m 0700 "$target"
-tar --extract --file "$archive" --directory "$target"
-test -f "$target/index.html"
-grep -Fq '"production_changed":false' "$target/receipt.json"
+target_root=$3
+run_id=$4
+snapshot=$5
+renderer=$6
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
+PYTHONPATH="$project_dir/src" exec python3 -m phlogiston_appview.archive restore \
+  --archive "$archive" --target-root "$target_root" --run-id "$run_id" --snapshot "$snapshot" --renderer "$renderer"
