@@ -5,7 +5,7 @@ Result: **qualified off-host; not deployed**.
 ## Bound identities
 
 - Phlogiston source: `a301edf86e940e1bf77cb566902c1812d80b9a4c`
-- community source: `89d04da7f37d435d34796f4f8ab17bcf2b611884`
+- community source: `89d04dafc8aaa55f0e327241fbb7b3521c0042f0`
 - PDS image retained by the release manifest:
   `ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a`
 - pnpm: `11.11.0`; Node: `24.13.0`

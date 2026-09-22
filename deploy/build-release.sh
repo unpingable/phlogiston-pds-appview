@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-test "$#" = 10
+test "$#" = 12
 test "$1" = --output
 output=$2
 test "$3" = --store
@@ -12,9 +12,11 @@ test "$7" = --oauth-tarball
 oauth_tarball=$8
 test "$9" = --community-commit
 community_commit=${10}
+test "${11}" = --community-root
+community_root=${12}
 
-case "$output:$store:$store_manifest:$oauth_tarball" in
-  /*:/*:/*:/*) ;;
+case "$output:$store:$store_manifest:$oauth_tarball:$community_root" in
+  /*:/*:/*:/*:/*) ;;
   *) echo "all paths must be absolute" >&2; exit 64 ;;
 esac
 test ! -e "$output"
@@ -25,6 +27,8 @@ case "$community_commit" in
   *[!0-9a-f]*|'') exit 64 ;;
 esac
 test "${#community_commit}" = 40
+test -d "$community_root"
+test "$(git -C "$community_root" rev-parse "$community_commit^{commit}")" = "$community_commit"
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
 test -z "$(git -C "$root" status --porcelain)" || {
