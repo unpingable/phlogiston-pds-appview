@@ -1,0 +1,13 @@
+services:
+  phlogiston-pds:
+    container_name: phlogiston-pds
+    image: ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    volumes:
+      - type: bind
+        source: /var/lib/phlogiston-pds
+        target: /pds
+    env_file:
+      - /etc/phlogiston/pds.env

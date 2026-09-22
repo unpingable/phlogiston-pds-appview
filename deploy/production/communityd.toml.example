@@ -1,0 +1,19 @@
+# Identity values are activation inputs. This file contains no secret.
+community_did = "SET_EXACT_COMMUNITY_DID_AT_ACTIVATION"
+administrator_did = "SET_EXACT_ADMINISTRATOR_DID_AT_ACTIVATION"
+community_pds_url = "https://phlogiston.social"
+allowed_uid = 0 # replace with the installed phlogiston-communityd numeric UID
+web_peer_uid = 0 # replace with the installed Phlogiston web numeric UID
+policy_peer_uid = 0 # replace with the separately enrolled operator/policy UID
+reader_adapter = "pds"
+ledger_adapter = "pds"
+writer_adapter = "pds"
+credential_provider = "env_file"
+credential_ref = "env:COMMUNITYD_CREDENTIAL_FILE"
+request_timeout_ms = 5000
+max_retries = 2
+plc_directory_url = "https://plc.directory"
+did_cache_size = 256
+allow_loopback_public_endpoints = false
+operation_journal_path = "/var/lib/phlogiston-communityd/authority.sqlite3"
+authority_socket_path = "/run/phlogiston-communityd/authority.sock"

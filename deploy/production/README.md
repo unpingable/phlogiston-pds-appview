@@ -20,17 +20,32 @@ authority/projection. `/admin/` remains outside this unit: its application
 logic is qualified, but a production operator-authentication bridge has not
 been authorized or implemented. Do not expose it by manufacturing a session.
 
+The separately activated PDS template pins the qualified upstream image by
+digest, binds only `127.0.0.1:3002`, and stores its independent state under
+`/var/lib/phlogiston-pds`. The community runtime archive contains both the
+read-only projection packages and `communityd`; the latter remains a separate
+unit, Unix-socket authority boundary, credential and journal. Neither PDS nor
+communityd is installed or started by the inert deployment script.
+
 Install an immutable release under `/opt/phlogiston/releases/<sha256>/`, verify
 the archive SHA-256 before extraction, then run `deploy/verify-release.py`
 against the extracted directory with both exact source commits. Atomically
 point `/opt/phlogiston/current` to that directory only after verification.
 Create service user `phlogiston`; install the unit and an owner-only
-environment file at `/etc/phlogiston/phlogiston-web.env`; require the exact
-community DID before startup. `/var/lib/phlogiston` is the only writable web
+environment file at `/etc/phlogiston/phlogiston-web.env`. The inert generation
+must omit `PHLOGISTON_COMMUNITY_DID`; membership is then explicitly
+indeterminate and `/community/` refuses with 503 without contacting the
+observer. Add the exact DID and start communitywatch only through the later
+community-activation authority. `/var/lib/phlogiston` is the only writable web
 state path and contains server-side OAuth/DPoP and opaque web sessions.
 
-Start the read-only communitywatch successor first, then Phlogiston web, then
-validate local `/healthz` and client metadata. Only afterward may a separately
+Immediately before deployment, the off-host backup operator must issue the
+fresh custody receipt described in `docs/PRODUCTION-BACKUP-CONTRACT.md`; the
+production host has no direct NFS mount. Start Phlogiston web without
+communitywatch, then validate local `/healthz`, client metadata, and the
+expected `/community/` refusal. Communitywatch is
+packaged and configured off-host but remains stopped until an exact community
+DID and observer database exist. Only afterward may a separately
 approved transaction add and reload the Caddy fragment. The fragment contains
 no `phlogiston.social` route because PDS installation/identity is a separate
 effect.

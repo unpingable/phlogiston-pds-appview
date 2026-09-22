@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { AppConfig } from "./config.js";
+import { loadConfig, type AppConfig } from "./config.js";
 import { clientMetadata, OAUTH_SCOPE } from "./oauth.js";
 
 const config: AppConfig = {
@@ -23,4 +23,14 @@ test("hosted OAuth metadata is DPoP-bound and requests identity enrollment only"
 test("loopback callback is an explicit isolated-qualification mode", () => {
   const metadata = clientMetadata({ ...config, publicUrl: "http://127.0.0.1:8092" });
   assert.deepEqual(metadata.redirect_uris, ["http://127.0.0.1:8092/oauth/callback"]);
+});
+
+test("inert configuration permits no community authority identity", () => {
+  const inert = loadConfig({
+    PHLOGISTON_PUBLIC_URL: "https://phlogiston.app",
+    PHLOGISTON_RUNTIME_DIR: "/tmp/phlogiston",
+    PHLOGISTON_PROJECTION_ORIGIN: "http://127.0.0.1:8093",
+    PORT: "8092",
+  });
+  assert.equal(inert.communityDid, null);
 });

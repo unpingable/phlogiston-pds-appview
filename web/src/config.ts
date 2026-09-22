@@ -5,7 +5,7 @@ export interface AppConfig {
   publicUrl: string;
   runtimeDirectory: string;
   projectionOrigin: string;
-  communityDid: string;
+  communityDid: string | null;
   port: number;
 }
 
@@ -14,7 +14,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     publicUrl: exactOrigin(required(env.PHLOGISTON_PUBLIC_URL, "PHLOGISTON_PUBLIC_URL")),
     runtimeDirectory: resolve(required(env.PHLOGISTON_RUNTIME_DIR, "PHLOGISTON_RUNTIME_DIR")),
     projectionOrigin: exactOrigin(required(env.PHLOGISTON_PROJECTION_ORIGIN, "PHLOGISTON_PROJECTION_ORIGIN")),
-    communityDid: did(required(env.PHLOGISTON_COMMUNITY_DID, "PHLOGISTON_COMMUNITY_DID")),
+    communityDid: optionalDid(env.PHLOGISTON_COMMUNITY_DID),
     port: boundedPort(env.PORT ?? "8092"),
   };
 }
@@ -36,6 +36,11 @@ function exactOrigin(value: string): string {
 function did(value: string): string {
   if (!/^did:(?:plc|web):[^\s/]+$/.test(value)) throw new Error("PHLOGISTON_COMMUNITY_DID must be a DID");
   return value;
+}
+
+function optionalDid(value: string | undefined): string | null {
+  const normalized = value?.trim();
+  return normalized ? did(normalized) : null;
 }
 
 function boundedPort(value: string): number {

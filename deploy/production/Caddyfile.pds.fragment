@@ -1,0 +1,10 @@
+*.phlogiston.social, phlogiston.social {
+	tls {
+		on_demand
+	}
+	reverse_proxy 127.0.0.1:3002
+}
+
+# Extend the existing global on_demand_tls ask policy only after it can verify
+# the independent Phlogiston PDS hostname/handle. Never point that decision at
+# the Juche PDS or weaken it to unconditional issuance.

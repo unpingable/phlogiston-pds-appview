@@ -18,9 +18,11 @@ No step in this document is authorization to activate production.
 
 ## Secrets and custody
 
-Provision independent PDS signing/rotation material, PDS admin secret, OAuth
-key material, Phlogiston cookie/session secret, and communityd credentials by
-secure references. No admin credential enters a browser session. Backups must
+Provision independent PDS signing/rotation material, PDS admin secret, and
+communityd credentials by secure references. Phlogiston's OAuth/DPoP and
+opaque browser-session material is generated into owner-only server-side
+stores; there is no static cookie/HMAC secret. No admin credential enters a
+browser session. Backups must
 land in the approved durable destination with manifest and restore evidence;
 OAuth/browser sessions remain deliberately re-enrollable.
 

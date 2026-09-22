@@ -21,6 +21,18 @@ test("one unavailable dependency yields indeterminate state", async () => {
   assert.deepEqual(await projection.membership("did:plc:user"), { state: "indeterminate", projection: "unavailable", reason: "projection_unavailable" });
 });
 
+test("inert deployment has explicit unavailable community state", async () => {
+  const projection = new HttpMembershipProjection("https://projection.test", null, async () => {
+    throw new Error("network must not be called");
+  });
+  assert.deepEqual(await projection.membership("did:plc:user"), {
+    state: "indeterminate",
+    projection: "unavailable",
+    reason: "community_not_configured",
+  });
+  await assert.rejects(projection.discussions(), /community_not_configured/);
+});
+
 test("discussion projection retains only the bounded public view", async () => {
   const projection = new HttpMembershipProjection("https://projection.test", "did:plc:community", async () => response({
     communityDid: "did:plc:community",

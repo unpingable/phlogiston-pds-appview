@@ -18,11 +18,12 @@ export type DiscussionListing = Readonly<{
 export class HttpMembershipProjection implements MembershipProjection {
   public constructor(
     readonly origin: string,
-    readonly communityDid: string,
+    readonly communityDid: string | null,
     readonly request: typeof fetch = fetch,
   ) {}
 
   public async membership(did: string): Promise<MembershipView> {
+    if (!this.communityDid) return { state: "indeterminate", projection: "unavailable", reason: "community_not_configured" };
     const encoded = encodeURIComponent(this.communityDid);
     try {
       const response = await this.request(`${this.origin}/api/v0/communities/${encoded}/members`, {
@@ -54,6 +55,7 @@ export class HttpMembershipProjection implements MembershipProjection {
   }
 
   public async discussions(): Promise<DiscussionListing> {
+    if (!this.communityDid) throw new Error("community_not_configured");
     const encoded = encodeURIComponent(this.communityDid);
     const response = await this.request(`${this.origin}/api/v0/communities/${encoded}/discussions`, {
       headers: { Accept: "application/json" },

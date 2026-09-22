@@ -1,0 +1,14 @@
+[Unit]
+Description=Independent Phlogiston ATProto PDS
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/etc/phlogiston
+ExecStart=/usr/bin/docker compose --project-name phlogiston-pds --file /etc/phlogiston/phlogiston-pds.compose.yaml up --detach
+ExecStop=/usr/bin/docker compose --project-name phlogiston-pds --file /etc/phlogiston/phlogiston-pds.compose.yaml down
+
+[Install]
+WantedBy=multi-user.target

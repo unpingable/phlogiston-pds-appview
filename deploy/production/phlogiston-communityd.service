@@ -1,0 +1,26 @@
+[Unit]
+Description=Phlogiston community authority writer
+After=network-online.target phlogiston-pds.service
+Wants=network-online.target
+Requires=phlogiston-pds.service
+
+[Service]
+Type=simple
+User=phlogiston-communityd
+Group=phlogiston-communityd
+Environment=COMMUNITYD_CREDENTIAL_FILE=/etc/phlogiston/communityd-credential.json
+WorkingDirectory=/opt/atproto-community/current
+ExecStart=/opt/atproto-community/current/venv/bin/communityd-serve --config /etc/phlogiston/communityd.toml
+Restart=on-failure
+RestartSec=5s
+UMask=0077
+RuntimeDirectory=phlogiston-communityd
+StateDirectory=phlogiston-communityd
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/phlogiston-communityd /run/phlogiston-communityd
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-ReadOnlyPaths=/var/lib/phlogiston-communitywatch
+ReadWritePaths=/var/lib/phlogiston-communitywatch
 
 [Install]
 WantedBy=multi-user.target

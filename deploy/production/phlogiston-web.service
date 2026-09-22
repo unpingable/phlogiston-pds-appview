@@ -1,8 +1,7 @@
 [Unit]
 Description=Phlogiston OAuth and read-only membership surface
-After=network-online.target phlogiston-communitywatch.service
+After=network-online.target
 Wants=network-online.target
-Requires=phlogiston-communitywatch.service
 
 [Service]
 Type=simple
