@@ -21,8 +21,10 @@ logic is qualified, but a production operator-authentication bridge has not
 been authorized or implemented. Do not expose it by manufacturing a session.
 
 Install an immutable release under `/opt/phlogiston/releases/<sha256>/`, verify
-`release-manifest.json`, and atomically point `/opt/phlogiston/current` to that
-directory. Create service user `phlogiston`; install the unit and an owner-only
+the archive SHA-256 before extraction, then run `deploy/verify-release.py`
+against the extracted directory with both exact source commits. Atomically
+point `/opt/phlogiston/current` to that directory only after verification.
+Create service user `phlogiston`; install the unit and an owner-only
 environment file at `/etc/phlogiston/phlogiston-web.env`; require the exact
 community DID before startup. `/var/lib/phlogiston` is the only writable web
 state path and contains server-side OAuth/DPoP and opaque web sessions.
@@ -37,3 +39,9 @@ Rollback removes the Caddy fragment, reloads the previously captured complete
 Caddyfile, stops/disables the unit, and points `current` back to the retained
 prior immutable release. Preserve `/var/lib/phlogiston`; rollback never treats
 session deletion as database recovery and never touches community/PDS records.
+
+The production-order packet is deliberately inert: observer, web, local health,
+then an independently approved Caddy transaction. Account enrollment,
+membership, publication, and PDS activation are separate effects and remain
+disabled. If the Q2 observation window is active, do not install the release,
+units, configuration, or route because those changes alter the observed host.
