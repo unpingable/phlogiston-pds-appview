@@ -38,9 +38,9 @@ release builder then:
 7. normalizes ordering, timestamps, ownership, hardlinks, and gzip metadata.
 
 The builder also verified that the supplied community commit exists in the
-declared community Git repository. The same command was run once against the original clean store and once
-against a separately extracted immutable store bundle. Both produced the same
-3,445,131-byte archive:
+declared community Git repository. The same command was run once against the
+original clean store and once against a separately extracted immutable store
+bundle. Both produced the same 3,445,131-byte archive:
 
 ```text
 13461c7efad9c9aed63ddbc02419d78e4f4f724f3fdc765a064677688ee52c19
@@ -52,6 +52,28 @@ tree contains no `tsx` development package. A scoped owned-source scan found no
 private keys, service secrets, tokens, or populated credential variables;
 dependency source containing generic PEM marker strings was not misreported as
 a credential.
+
+The normalized commands were:
+
+```sh
+pnpm fetch --frozen-lockfile --store-dir "$EMPTY_STORE"
+(cd "$EMPTY_STORE" && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "$STORE_MANIFEST"
+deploy/build-release.sh \
+  --output "$OUTPUT" \
+  --store "$EMPTY_STORE" \
+  --store-manifest "$STORE_MANIFEST" \
+  --oauth-tarball "$EXACT_OAUTH_TARBALL" \
+  --community-commit 89d04dafc8aaa55f0e327241fbb7b3521c0042f0 \
+  --community-root "$COMMUNITY_ROOT"
+python3 "$EXTRACTED/deploy/verify-release.py" \
+  --root "$EXTRACTED" \
+  --phlogiston-commit a8f17c7ac50994bc3e21606e6f03aed9ff7b6c0d \
+  --community-commit 89d04dafc8aaa55f0e327241fbb7b3521c0042f0
+```
+
+The variables were absolute paths to the fresh or retained qualification
+objects identified above; no already-installed `node_modules` tree was an
+input.
 
 ## Exact-artifact runtime result
 
