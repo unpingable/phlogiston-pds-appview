@@ -1,0 +1,21 @@
+[Unit]
+Description=Phlogiston read-only community projection API
+After=local-fs.target
+RequiresMountsFor=/var/lib/phlogiston-communitywatch
+
+[Service]
+Type=simple
+User=phlogiston-observer
+Group=phlogiston-observer
+WorkingDirectory=/opt/atproto-community/current
+ExecStart=/opt/atproto-community/current/venv/bin/communitywatch-web --config /etc/phlogiston/communitywatch.toml
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadOnlyPaths=/var/lib/phlogiston-communitywatch
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,25 @@
+[Unit]
+Description=Phlogiston OAuth and read-only membership surface
+After=network-online.target phlogiston-communitywatch.service
+Wants=network-online.target
+Requires=phlogiston-communitywatch.service
+
+[Service]
+Type=simple
+User=phlogiston
+Group=phlogiston
+WorkingDirectory=/opt/phlogiston/current/web
+EnvironmentFile=/etc/phlogiston/phlogiston-web.env
+ExecStart=/usr/bin/node dist/server.js
+Restart=on-failure
+RestartSec=5s
+StateDirectory=phlogiston
+StateDirectoryMode=0700
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/phlogiston
+
+[Install]
+WantedBy=multi-user.target

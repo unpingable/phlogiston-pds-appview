@@ -1,0 +1,7 @@
+phlogiston.app {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8092
+}
+
+# The phlogiston.social PDS route is deliberately absent. Add it only with
+# separately approved PDS identity, state, secrets, backup and activation.

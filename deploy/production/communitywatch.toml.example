@@ -1,0 +1,8 @@
+community_did = "SET_EXACT_COMMUNITY_DID_BEFORE_START"
+community_slug = "phlogiston"
+sqlite_path = "/var/lib/phlogiston-communitywatch/observer.sqlite3"
+bind = "127.0.0.1"
+port = 8093
+page_size = 50
+max_page_size = 100
+stale_threshold_seconds = 300
