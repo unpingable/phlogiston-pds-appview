@@ -1,0 +1,23 @@
+{
+  "admission": "at://did:plc:o4uk5tl5a6yzpmqf32jt5qso/zone.neutral.community.admission/admit-e144edc5a8541403bfb1adf30d1c4f04ba984bab1ce0c8e823ecc4a29f23ea7b",
+  "archiveBytes": 962560,
+  "archiveSha256": "102c47cd4fe34bcf781acadf1fb12750171b8ce6225262848fa9a02344a3addd",
+  "authorityRecordsExact": true,
+  "communityDid": "did:plc:o4uk5tl5a6yzpmqf32jt5qso",
+  "membershipInvented": false,
+  "onePdsUnavailable": {
+    "authorityWidened": false,
+    "projectionCompletionClaimed": false,
+    "result": "dependency_unavailable"
+  },
+  "participantDid": "did:plc:hsivrlxuvahiu462pubiznwh",
+  "pdsCount": 2,
+  "projectionAbsentBeforeRebuild": true,
+  "projectionRebuilt": true,
+  "removal": "at://did:plc:o4uk5tl5a6yzpmqf32jt5qso/zone.neutral.community.modAction/remove-90f49300ed31ba112da48e3db2d4a3ee304fabc403bfb734fb240229a8fcb2cf",
+  "removedContentVisible": false,
+  "replayIdempotent": true,
+  "result": "passed",
+  "schema": "phlogiston.community-recovery-qualification.v1",
+  "sourceLifecycleReceiptSha256": "f74d29c33cd2ff326769eb9fb67ba19e91ff0b50797528d9c6d2d728c514b151"
+}
