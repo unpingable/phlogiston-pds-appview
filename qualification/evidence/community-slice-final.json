@@ -1,22 +1,22 @@
 {
-  "admission": "at://did:plc:nv6qwq5a7i6epcin64lt34mp/zone.neutral.community.admission/admit-dd13a9ec9c05e71e1b6fd2f2d6bd9ee4b9c9c05b55cb0037f5ed8b804950714f",
+  "admission": "at://did:plc:h7rxwttyxl4a7fvqspxyrexp/zone.neutral.community.admission/admit-a94e93232b56867751f282cb27f51531e543a1c8f63192189f5aadfafaccdf15",
   "communityCommit": "fe98207c486ac32bec47636206f230d15e7e7b54",
-  "communityDid": "did:plc:nv6qwq5a7i6epcin64lt34mp",
+  "communityDid": "did:plc:h7rxwttyxl4a7fvqspxyrexp",
   "externalNetwork": false,
   "hiddenAfterRemoval": true,
   "membership": {
-    "communityDid": "did:plc:nv6qwq5a7i6epcin64lt34mp",
-    "generatedAt": "2026-09-22T18:05:41.015984Z",
+    "communityDid": "did:plc:h7rxwttyxl4a7fvqspxyrexp",
+    "generatedAt": "2026-09-22T18:11:07.990920Z",
     "members": [
       {
         "action": "add",
-        "actor": "did:plc:s7qafdgkhvym4reu532at3fq",
-        "createdAt": "2026-09-22T18:05:39.465669Z",
-        "did": "did:plc:lxnwslstvg3gno7g24pz2vme",
+        "actor": "did:plc:whfc2dvpnnx3zydjjb3xieai",
+        "createdAt": "2026-09-22T18:11:06.387552Z",
+        "did": "did:plc:3fnxgywu3f5p4mqwmnpvrc5b",
         "reason": "isolated qualification",
         "record": {
-          "cid": "bafyreiatwi7olht67ewr5dasfygx4y26bvofke7fdjaysyezvg6baoxvga",
-          "uri": "at://did:plc:nv6qwq5a7i6epcin64lt34mp/zone.neutral.community.memberAction/e30c07af4efdda647073297083e8b0be279e40f3a05c784fe9859eeb1e928ebb"
+          "cid": "bafyreiftf4k5g2jtyqjwnsmb7qsignjlurbokzegcuzht36i6lwescuayi",
+          "uri": "at://did:plc:h7rxwttyxl4a7fvqspxyrexp/zone.neutral.community.memberAction/fb6398f430ba2ac4a5fea87ff5dc42ffa64284562dbe8e55a927ecc8d09dc3fa"
         },
         "status": "active"
       }
@@ -30,10 +30,10 @@
   "multiPds": true,
   "observerHealth": {
     "activeGeneration": "g1",
-    "generatedAt": "2026-09-22T18:05:41.017654Z",
+    "generatedAt": "2026-09-22T18:11:07.992576Z",
     "highWaterMatches": true,
-    "lastIngestAt": "2026-09-22T18:05:40.970301Z",
-    "lastResolveAt": "2026-09-22T18:05:40.773617Z",
+    "lastIngestAt": "2026-09-22T18:11:07.943448Z",
+    "lastResolveAt": "2026-09-22T18:11:07.761269Z",
     "projectionStatus": "complete",
     "projectionVersion": "v0",
     "reasonCodes": [],
@@ -48,11 +48,11 @@
     ],
     "status": "ok"
   },
-  "participantDid": "did:plc:lxnwslstvg3gno7g24pz2vme",
+  "participantDid": "did:plc:3fnxgywu3f5p4mqwmnpvrc5b",
   "pdsCount": 2,
   "pdsImage": "ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a",
-  "phlogistonCommit": "f107207aa1fdc9797d46d461d0d2a3d81921bcf1",
-  "removal": "at://did:plc:nv6qwq5a7i6epcin64lt34mp/zone.neutral.community.modAction/remove-bf9052b6f51f18589394769638ef74db34426a5244da5e4cdbc957021dbd11f1",
+  "phlogistonCommit": "44afef7315f0d6fd34e0c0ca1fc36eb7c7b3afe2",
+  "removal": "at://did:plc:h7rxwttyxl4a7fvqspxyrexp/zone.neutral.community.modAction/remove-c840543f78202b35cecdd22937f8c298dec7e41cf552497bf8c379a2675c6f10",
   "renderedBeforeRemoval": true,
   "result": "passed",
   "schema": "phlogiston.community-slice.v1"

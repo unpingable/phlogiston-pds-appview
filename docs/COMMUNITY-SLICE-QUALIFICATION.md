@@ -4,7 +4,7 @@ Result: **passed in isolated synthetic infrastructure** on 2026-09-22.
 
 Exact inputs:
 
-- Phlogiston: `f107207aa1fdc9797d46d461d0d2a3d81921bcf1`
+- Phlogiston: `44afef7315f0d6fd34e0c0ca1fc36eb7c7b3afe2`
 - atproto-community: `fe98207c486ac32bec47636206f230d15e7e7b54`
 - stock PDS image:
   `ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a`
@@ -18,7 +18,10 @@ resolved the participant DID through an isolated DID directory, read the
 participant record from the correct PDS, wrote membership/admission/removal
 records only to the community repository, and returned exact record refs.
 
-`communitywatch` verified repository proofs, projected the admitted content,
+The enrolled synthetic operator requested membership, admission, and removal
+through the authenticated Phlogiston handler; membership and removal exercised
+its explicit intent-bound confirmation page. `communitywatch` verified
+repository proofs, projected the admitted content,
 and exposed a fresh committed projection. Phlogiston rendered the post before
 removal and did not render it after the real removal record was ingested. The
 receipt records matching observer high-water state and no degradation reasons.
