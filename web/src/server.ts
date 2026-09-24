@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { join } from "node:path";
 import { loadConfig, type AppConfig } from "./config.js";
 import { clientMetadata, createOAuthClient, OAUTH_SCOPE } from "./oauth.js";
-import { HttpMembershipProjection, type MembershipProjection, type MembershipView } from "./projection.js";
+import { HttpMembershipProjection, type DiscussionListing, type MembershipProjection, type MembershipView } from "./projection.js";
 import { WebSessionStore, type WebSession } from "./storage.js";
 
 const COOKIE = "phlogiston_session";
@@ -42,8 +42,7 @@ async function route(deps: Dependencies, request: IncomingMessage, response: Ser
   if (method === "GET" && url.pathname === "/oauth-client-metadata.json") return json(response, 200, clientMetadata(deps.config));
   if (method === "GET" && url.pathname === "/community/") {
     const listing = await deps.projection.discussions();
-    const items = listing.discussions.map((item) => `<li><article><h2>${escape(item.authorDid)}</h2><p>${escape(item.text)}</p><p>Community state: <strong>${escape(item.status)}</strong></p></article></li>`).join("");
-    return html(response, 200, page("Phlogiston community", `<p>Author-owned posts admitted into this community view.</p><ol>${items || "<li>No admitted discussions are currently projected.</li>"}</ol><p>Projection generation: <code>${escape(listing.generation)}</code></p>`));
+    return html(response, 200, communityPage(listing, deps.config.communityUrl));
   }
   if (method === "POST") requireSameOrigin(request, deps.config.publicUrl);
 
@@ -61,11 +60,11 @@ async function route(deps: Dependencies, request: IncomingMessage, response: Ser
 
   const token = cookieValue(request.headers.cookie, COOKIE);
   const session = await deps.sessions.resolve(token, deps.now());
-  if (method === "GET" && url.pathname === "/") return html(response, 200, home(session));
+  if (method === "GET" && url.pathname === "/") return html(response, 200, home(session, deps.config.communityUrl));
   if (method === "GET" && url.pathname === "/me") {
     const authenticated = await requireOAuth(deps, response, token, session);
     const membership = await deps.projection.membership(authenticated.did);
-    return html(response, 200, accountPage(authenticated, membership));
+    return html(response, 200, accountPage(authenticated, membership, deps.config.communityUrl));
   }
   if (method === "POST" && url.pathname === "/session/logout") {
     const authenticated = requireSession(session);
@@ -104,18 +103,40 @@ async function requireOAuth(deps: Dependencies, response: ServerResponse, token:
   }
 }
 
-function home(session: WebSession | null): string {
+function communityLink(communityUrl: string | null): string {
+  return communityUrl ? `<p><a href="${escape(communityUrl)}">Go to the community</a></p>` : "";
+}
+
+function home(session: WebSession | null, communityUrl: string | null): string {
+  const purpose = "<p>This is the Phlogiston service's account and status page. It is not the place to post or reply.</p>";
   const body = session
-    ? `<p>Signed in to Phlogiston as <code>${escape(session.did)}</code>.</p><p><a href="/me">View identity and community standing</a></p>`
-    : '<p>Sign in with your ATProto account. Authentication does not make you a community member.</p><form method="post" action="/oauth/login"><label>Handle <input name="handle" autocomplete="username" required></label><button>Continue with ATProto</button></form>';
+    ? `${purpose}<p>Signed in to Phlogiston as <code>${escape(session.did)}</code>.</p>${communityLink(communityUrl)}<p><a href="/me">View your account and session</a></p>`
+    : `${purpose}${communityLink(communityUrl)}<p>Sign in with your ATProto account. Signing in here only confirms your account; taking part happens at the community site.</p><form method="post" action="/oauth/login"><label>Handle <input name="handle" autocomplete="username" required></label><button>Continue with ATProto</button></form>`;
   return page("Phlogiston", body);
 }
 
-function accountPage(session: WebSession, membership: MembershipView): string {
-  const authority = membership.state === "active" || membership.state === "removed"
-    ? `Authority record: <code>${escape(membership.reference ?? "reference unavailable")}</code>`
-    : "No membership authority is asserted by this page.";
-  return page("Your Phlogiston session", `<dl><dt>PDS identity</dt><dd><code>${escape(session.did)}</code></dd><dt>Phlogiston session</dt><dd>authenticated until ${escape(session.expiresAt)}</dd><dt>Community membership</dt><dd>${escape(membership.state)}</dd><dt>Projection</dt><dd>${escape(membership.projection)} (${escape(membership.reason)})</dd></dl><p>${authority}</p><form method="post" action="/session/logout"><input type="hidden" name="csrf" value="${escape(session.csrf)}"><button>Sign out of Phlogiston</button></form><form method="post" action="/session/disconnect"><input type="hidden" name="csrf" value="${escape(session.csrf)}"><button>Disconnect ATProto access</button></form>`);
+function accountPage(session: WebSession, membership: MembershipView, communityUrl: string | null): string {
+  const standing = membership.state === "active"
+    ? "Added to the community"
+    : membership.state === "removed" ? "Removed from the community" : null;
+  const standingRow = standing ? `<dt>Community standing</dt><dd>${standing}</dd>` : "";
+  const reference = standing ? `<dt>Authority record</dt><dd><code>${escape(membership.reference ?? "reference unavailable")}</code></dd>` : "";
+  const technical = `<details><summary>Technical details</summary><dl>${reference}<dt>Community projection</dt><dd>${escape(membership.projection)} (${escape(membership.reason)})</dd></dl></details>`;
+  return page("Your Phlogiston session", `<dl><dt>PDS identity</dt><dd><code>${escape(session.did)}</code></dd><dt>Phlogiston session</dt><dd>authenticated until ${escape(session.expiresAt)}</dd>${standingRow}</dl>${technical}${communityLink(communityUrl)}<form method="post" action="/session/logout"><input type="hidden" name="csrf" value="${escape(session.csrf)}"><button>Sign out of Phlogiston</button></form><form method="post" action="/session/disconnect"><input type="hidden" name="csrf" value="${escape(session.csrf)}"><button>Disconnect ATProto access</button></form>`);
+}
+
+function communityState(status: string): string {
+  if (status === "visible") return "In the community";
+  if (status === "removed") return "Removed from the community";
+  return "Community state not available";
+}
+
+function communityPage(listing: DiscussionListing, communityUrl: string | null): string {
+  // The projected items carry no discussion key, so only the community home is linked.
+  const intro = `<p>This is a read-only mirror of posts admitted to the community. Posting and replying happen at the community site.</p>${communityLink(communityUrl)}`;
+  const items = listing.discussions.map((item) => `<li><article><p>${escape(item.text)}</p><p>Posted by <code>${escape(item.authorDid)}</code></p><p>${communityState(item.status)}</p></article></li>`).join("");
+  const technical = `<details><summary>Technical details</summary><p>Projection generation: <code>${escape(listing.generation)}</code></p></details>`;
+  return page("Phlogiston community", `${intro}<ol>${items || "<li>No admitted discussions are currently projected.</li>"}</ol>${technical}`);
 }
 
 async function readForm(request: IncomingMessage): Promise<URLSearchParams> {

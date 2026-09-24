@@ -12,6 +12,7 @@ import { createHandler, type OAuthFacade } from "./server.js";
 import { WebSessionStore } from "./storage.js";
 
 const DID = "did:plc:aaaaaaaaaaaaaaaaaaaaaaaa";
+const COMMUNITY_URL = "https://community.test";
 
 class OAuthFake implements OAuthFacade {
   public unavailable = false;
@@ -55,11 +56,11 @@ class ResponseFixture {
   public end(value?: string | Uint8Array): this { this.body = value === undefined ? "" : Buffer.from(value).toString(); return this; }
 }
 
-async function fixture(membership: MembershipView) {
+async function fixture(membership: MembershipView, communityUrl: string | null = null) {
   const root = await mkdtemp(join(tmpdir(), "phlogiston-web-test-"));
   const sessions = new WebSessionStore(join(root, "sessions"));
   const oauth = new OAuthFake();
-  const config: AppConfig = { publicUrl: "http://127.0.0.1:8092", runtimeDirectory: root, projectionOrigin: "http://127.0.0.1:9", communityDid: "did:plc:communitycommunitycomm", port: 8092 };
+  const config: AppConfig = { publicUrl: "http://127.0.0.1:8092", runtimeDirectory: root, projectionOrigin: "http://127.0.0.1:9", communityDid: "did:plc:communitycommunitycomm", communityUrl, port: 8092 };
   const handler = createHandler({ config, oauth, sessions, projection: {
     membership: async () => membership,
     discussions: async () => ({ generation: "g1", discussions: [{ authorDid: DID, text: "Synthetic discussion", status: "visible" }] }),
@@ -77,8 +78,58 @@ test("public community route renders the bounded read-only projection", async ()
   const app = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" });
   const result = await app.invoke("GET", "/community/");
   assert.equal(result.statusCode, 200);
-  assert.match(result.body, /Synthetic discussion/);
-  assert.match(result.body, /Projection generation: <code>g1<\/code>/);
+  assert.match(result.body, /<p>Synthetic discussion<\/p><p>Posted by <code>did:plc:a+<\/code><\/p><p>In the community<\/p>/);
+  assert.match(result.body, /read-only mirror/);
+  assert.doesNotMatch(result.body, /<h2>/);
+  assert.doesNotMatch(result.body, /visible/);
+  assert.match(result.body, /<details><summary>Technical details<\/summary><p>Projection generation: <code>g1<\/code>/);
+  assert.doesNotMatch(result.body, /Go to the community/);
+});
+
+test("community link appears only when the community URL is configured", async () => {
+  const absent = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" });
+  const present = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" }, COMMUNITY_URL);
+  for (const path of ["/", "/community/"]) {
+    assert.doesNotMatch((await absent.invoke("GET", path)).body, /Go to the community|community\.test/);
+    assert.match((await present.invoke("GET", path)).body, /<a href="https:\/\/community\.test">Go to the community<\/a>/);
+  }
+  const home = (await present.invoke("GET", "/")).body;
+  assert(home.indexOf("Go to the community") < home.indexOf("<form"), "community link precedes sign-in form");
+  assert.match(home, /not the place to post/);
+  assert.match(home, /Signing in here only confirms your account/);
+  assert.doesNotMatch(home, /member/i);
+  for (const app of [absent, present]) {
+    const issued = await app.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
+    const me = (await app.invoke("GET", "/me", {}, `phlogiston_session=${issued.token}`)).body;
+    assert.equal(/Go to the community/.test(me), app === present);
+  }
+});
+
+test("security headers are unchanged on every page", async () => {
+  const app = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" }, COMMUNITY_URL);
+  const issued = await app.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
+  for (const path of ["/", "/community/", "/me"]) {
+    const result = await app.invoke("GET", path, {}, `phlogiston_session=${issued.token}`);
+    assert.equal(result.statusCode, 200);
+    assert.equal(result.headers.get("content-security-policy"), "default-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
+    assert.equal(result.headers.get("referrer-policy"), "no-referrer");
+    assert.equal(result.headers.get("x-content-type-options"), "nosniff");
+    assert.equal(result.headers.get("cache-control"), "no-store");
+  }
+});
+
+test("no participation routes exist and POST routes are unchanged", async () => {
+  const app = await fixture({ state: "not-member", projection: "fresh", reason: "no_authority_record" }, COMMUNITY_URL);
+  const issued = await app.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
+  for (const path of ["/", "/community/", "/me"]) {
+    const body = (await app.invoke("GET", path, {}, `phlogiston_session=${issued.token}`)).body;
+    const actions = [...body.matchAll(/<form method="post" action="([^"]+)"/g)].map((match) => match[1]);
+    assert(actions.every((action) => ["/oauth/login", "/session/logout", "/session/disconnect"].includes(action!)), `${path}: ${actions.join(",")}`);
+  }
+  for (const path of ["/submit", "/reply", "/moderate", "/community/"]) {
+    const result = await app.invoke("POST", path, { csrf: issued.csrf }, `phlogiston_session=${issued.token}`);
+    assert.equal(result.statusCode, 404);
+  }
 });
 
 test("PDS unavailability during enrollment is classified without a local session", async () => {
@@ -98,8 +149,11 @@ test("OAuth callback creates a persistent Phlogiston session but not membership"
   const page = await app.invoke("GET", "/me", {}, cookie);
   assert.equal(page.statusCode, 200);
   assert.match(page.body, /PDS identity/);
-  assert.match(page.body, /Community membership<\/dt><dd>not-member/);
-  assert.match(page.body, /No membership authority is asserted/);
+  assert.doesNotMatch(page.body, /member/i);
+  assert.doesNotMatch(page.body, /Community standing/);
+  assert.match(page.body, /<details><summary>Technical details<\/summary><dl><dt>Community projection<\/dt><dd>fresh \(no_authority_record\)/);
+  assert.match(page.body, /action="\/session\/logout"/);
+  assert.match(page.body, /action="\/session\/disconnect"/);
 });
 
 test("revoked OAuth invalidates the otherwise active web session", async () => {
@@ -116,7 +170,22 @@ test("stale projection remains indeterminate despite valid authentication", asyn
   const app = await fixture({ state: "indeterminate", projection: "stale", reason: "projection_not_fresh" });
   const issued = await app.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
   const result = await app.invoke("GET", "/me", {}, `phlogiston_session=${issued.token}`);
-  assert.match(result.body, /Community membership<\/dt><dd>indeterminate/);
+  assert.doesNotMatch(result.body, /Community standing|member/i);
+  assert.match(result.body, /Community projection<\/dt><dd>stale \(projection_not_fresh\)/);
+});
+
+test("an authority record is shown as plain community standing with a technical reference", async () => {
+  const active = await fixture({ state: "active", projection: "fresh", reason: "authority_add_projected", reference: "at://did:plc:community/member/1" });
+  let issued = await active.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
+  let body = (await active.invoke("GET", "/me", {}, `phlogiston_session=${issued.token}`)).body;
+  assert.match(body, /<dt>Community standing<\/dt><dd>Added to the community<\/dd>/);
+  assert.match(body, /<details><summary>Technical details<\/summary><dl><dt>Authority record<\/dt><dd><code>at:\/\/did:plc:community\/member\/1<\/code>/);
+  assert.doesNotMatch(body.slice(0, body.indexOf("<details>")), /at:\/\//);
+
+  const removed = await fixture({ state: "removed", projection: "fresh", reason: "authority_remove_projected", reference: "at://did:plc:community/member/2" });
+  issued = await removed.sessions.issue(DID, new Date("2026-09-22T12:00:00Z"));
+  body = (await removed.invoke("GET", "/me", {}, `phlogiston_session=${issued.token}`)).body;
+  assert.match(body, /<dt>Community standing<\/dt><dd>Removed from the community<\/dd>/);
 });
 
 test("logout is local while disconnect revokes provider authorization", async () => {

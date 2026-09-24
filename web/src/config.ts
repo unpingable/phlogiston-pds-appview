@@ -6,6 +6,7 @@ export interface AppConfig {
   runtimeDirectory: string;
   projectionOrigin: string;
   communityDid: string | null;
+  communityUrl: string | null;
   port: number;
 }
 
@@ -15,6 +16,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     runtimeDirectory: resolve(required(env.PHLOGISTON_RUNTIME_DIR, "PHLOGISTON_RUNTIME_DIR")),
     projectionOrigin: exactOrigin(required(env.PHLOGISTON_PROJECTION_ORIGIN, "PHLOGISTON_PROJECTION_ORIGIN")),
     communityDid: optionalDid(env.PHLOGISTON_COMMUNITY_DID),
+    communityUrl: optionalHttpsUrl(env.PHLOGISTON_COMMUNITY_URL, "PHLOGISTON_COMMUNITY_URL"),
     port: boundedPort(env.PORT ?? "8092"),
   };
 }
@@ -41,6 +43,21 @@ function did(value: string): string {
 function optionalDid(value: string | undefined): string | null {
   const normalized = value?.trim();
   return normalized ? did(normalized) : null;
+}
+
+function optionalHttpsUrl(value: string | undefined, name: string): string | null {
+  const normalized = value?.trim();
+  if (!normalized) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(normalized);
+  } catch {
+    throw new Error(`${name} must be an absolute URL`);
+  }
+  if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
+    throw new Error(`${name} must be an https: URL without credentials, query, or fragment`);
+  }
+  return parsed.href.replace(/\/+$/, "");
 }
 
 function boundedPort(value: string): number {

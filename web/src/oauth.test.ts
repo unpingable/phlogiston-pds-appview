@@ -8,6 +8,7 @@ const config: AppConfig = {
   runtimeDirectory: "/tmp/phlogiston-runtime",
   projectionOrigin: "https://projection.invalid.test",
   communityDid: "did:plc:aaaaaaaaaaaaaaaaaaaaaaaa",
+  communityUrl: null,
   port: 8092,
 };
 
