@@ -36,6 +36,12 @@ authority and projection interfaces. See [the integration map](docs/COMMUNITY-IN
 and [integrated recovery contract](docs/INTEGRATED-RECOVERY.md). It is not
 activated or deployed.
 
+Product direction and sequencing live in
+[docs/PRODUCT-ARCHITECTURE.md](docs/PRODUCT-ARCHITECTURE.md); the first
+external trial is specified as a demand experiment in
+[docs/PHASE-2-TRIAL.md](docs/PHASE-2-TRIAL.md) with its unfilled
+[participant packet](docs/PHASE-2-PARTICIPANT-PACKET.md).
+
 ## Authority boundary
 
 `deploy/`, `backup/`, `restore/`, `rollback/`, and `uninstall/` are operator
