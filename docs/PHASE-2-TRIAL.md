@@ -23,17 +23,26 @@ evidence.
 
 | # | Precondition | Where | State |
 | --- | --- | --- | --- |
-| 1 | One public participation surface: `community-live` at the community site. phlogiston.app links to it and carries no participation features. | atproto-community `apps/community-live`; this repo `web/` | in this tranche |
-| 2 | Discussion permalink readable without login at a clean path (`/d/<rkey>`). Mutations keep their session requirement. | atproto-community PCV2-A | in this tranche |
-| 3 | Visible submission lifecycle: submitter sees "waiting for the moderator"; moderator sees the post text in the queue; the room is notified on pending and admitted through one outbound webhook (`community-notify`). | atproto-community PCV2-B | in this tranche |
-| 4 | Existing-post submission by URL alongside composition; composition states that it creates a public Bluesky post; copy on the path reframed to "a moderated community collection over author-custodied public posts". | atproto-community PCV2-C | in this tranche |
+| 1 | One public participation surface: `community-live` at the community site. phlogiston.app links to it and carries no participation features. | atproto-community `apps/community-live`; this repo `web/` | done: phlogiston `b4213b5`; community-live copy in PCV2 |
+| 2 | Discussion permalink readable without login at a clean path (`/d/<rkey>`). Mutations keep their session requirement. | atproto-community PCV2-A | done: `45dc205`, hardened `5b13b31` |
+| 3 | Visible submission lifecycle: submitter sees "waiting for the moderator"; moderator sees the post text in the queue; the room is notified on pending and admitted through one outbound webhook (`community-notify`). | atproto-community PCV2-B | done: `1e1f42d`, `4936d68`, `7edc744`, `cdfec53` |
+| 4 | Existing-post submission by URL alongside composition; composition states that it creates a public Bluesky post; copy on the path reframed to "a moderated community collection over author-custodied public posts". | atproto-community PCV2-C | done: `e9b145b`, `6947642` |
 | 5 | Named group, topic, moderator, second maintainer, activity, cohort, and room, recorded in the participant packet and accepted by the owner. | [PHASE-2-PARTICIPANT-PACKET.md](PHASE-2-PARTICIPANT-PACKET.md) | **blocked on owner** |
 | 6 | Success criterion replaced with the behavioral observations and interpretation rule below. | this document; PRODUCT-ARCHITECTURE.md | done |
 | 7 | PD-E / standalone-client disposition recorded. | PRODUCT-ARCHITECTURE.md "Client surface disposition" | done |
 | 8 | Phase 3 trimmed to the S2 community feed generator in the community lane. | PRODUCT-ARCHITECTURE.md | done |
 
 Deployment-side prerequisites that are *not* preconditions of the experiment
-design but gate its start: Q2 terminal receipt; Horizon 0 cross-version
+design but gate its start (found by the 2026-09-24 first-user review, plus the existing gates):
+the atproto-community runtime must be re-cut and re-qualified at the PCV2
+revision (`cdfec53`; the current qualified cut is `89d04da`);
+`PHLOGISTON_COMMUNITY_URL` set in the phlogiston web env (it is commented out
+in the example, so the pointer is off by default); the community-live env
+filled from the participant packet (name, purpose, moderator DID are
+placeholders); the PCV0 deployment validator currently requires the
+campaign's fault-injection flags that the README says to remove after the
+campaign, so one of the two must change before a trial deploy; the room
+webhook proven once against the real room; and Q2 terminal receipt; Horizon 0 cross-version
 restore; lexicon publication; PCV0 integration identities; the PCV0
 two-account supervised integration; the operator's technical verification.
 
