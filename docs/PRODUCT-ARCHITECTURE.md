@@ -52,32 +52,89 @@ integration roadmap.
 
 ## Sequencing
 
+Revised 2026-09-24 after the workspace user-path critique
+(`atproto-nutrition/USER-CRITIQUE-PHLOGISTON-PLAN-2026-09-24.md`) and the
+cohesion survey (`SURVEY-WORKSPACE-COHESION-2026-09-24.md`). Both stay in
+place as receipts of how this sequencing changed. The composition decision
+above is unchanged; what changed is what Phase 2 measures and what must be
+true before it starts.
+
 0. **Composition baseline (pre-Q2-close).** One canonical source line (this
    repository, `main`); this document; spike-branch dispositions
-   ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)).
+   ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)). Done.
 1. **Activate infrastructure (post-Q2).** Inert deployment, TLS, PDS live;
    Horizon 0 cross-version restore; lexicon namespace publication
-   (`zone.neutral.community.*`); PCV0 integration identities.
-2. **One legible public community.** The PCV0 social loop deployed for a
-   single, deliberately chosen community — not "a platform." Success is a
-   qualitatively new piece of evidence: *someone who isn't the operator
-   joins one.*
-   **Hard gate:** if external users can use it and demonstrably don't want
-   to, stop. Do not answer disinterest with more substrate.
-3. **Community feeds + integrated attention policy.** Per-community feed
-   generators (atproto-community slice S2, authorized via its BUILD.md
-   amendment process); reply-lineage acquisition (`reply.root`/`reply.parent`)
-   enabling deterministic quench; atproto-acl quench vocabulary with
-   `muteThread` adapter; per-reader `author_exposure_decay` as an opt-in feed
-   view policy; ACL preview/explanation embedded in the community surface.
-4. **Richer personal attention surface.** phlogiston.app becomes the native
-   client for participating while retaining attention control: native
-   ACL/quench editing, hide/demote/annotate/warn/refuse semantics, provenance
-   and status cards. Generic timeline rendering stays delegated.
+   (`zone.neutral.community.*`); PCV0 integration identities. Nothing here
+   is on a participant's path: participants bring their own ATProto
+   account. `phlogiston.social` is operator infrastructure (community actor,
+   lexicon authority, backups), not a place people register.
+2. **One legible public community: a demand experiment.** The PCV0 social
+   loop deployed for a single, deliberately chosen community, run as the
+   experiment specified in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md). Its
+   preconditions, all pre-Q2-safe and listed there, are: one participation
+   URL (`community-live`), an anonymous pasteable permalink, a visible
+   submission lifecycle with the room notified on admission, existing-post
+   submission with the public-post consequence stated, a named cohort and
+   activity, and the behavioral success criteria below.
+   `submit → admit → visible → audit entry` remains the technical
+   verification of the deployment. It is not the product gate.
+   **Hard gate:** the trial's interpretation rule decides whether Phase 3
+   opens, the trial extends once, or work stops to reassess. Disinterest is
+   never answered with more substrate.
+3. **Community feed generator (S2).** The one community-lane addition that
+   is legible at trial scale: an `app.bsky.feed.generator` over the
+   committed admission projection, reverse-chronological, every item linking
+   to the community permalink, subscribable from any ordinary Bluesky
+   client. Authorized through atproto-community's BUILD.md amendment
+   process; the generator record is emitted through `communityd`. This also
+   closes the discovery gap: the community appears where participants
+   already are. Quench and `author_exposure_decay` are **not** part of this
+   phase; see "Attention-policy lane" below.
+4. **Standalone surfaces that earn their existence.** phlogiston.app grows
+   only where standalone is the right shape: the operator surface, service
+   status and recovery standing, provenance and network-condition cards
+   (labelwatch, weatherwatch, driftwatch, Constellation read-only), and
+   personal attention-policy editing with preview and receipts (the
+   atproto-acl host bridge). It does not become a generic Bluesky client;
+   timelines, threads, profiles, notifications, and media stay with the
+   client the participant already uses. See "Client surface disposition".
 5. **Hardening and wider composition.** Observer-convergence measurement of
    phlogiston's own stack (lifecyclewatch's design applied inward); one
-   governed operation under an applicable Constellation profile; allowlisted
-   public evidence surface; recurring cross-version restore rehearsal.
+   governed operation under an applicable Constellation profile;
+   allowlisted public evidence surface; recurring cross-version restore
+   rehearsal.
+
+### Attention-policy lane (parallel, own evidence gate)
+
+Thread-origin quench and per-reader exposure decay answer firehose-scale
+attention problems. A human-curated community of a few dozen items has no
+such problem: everything visible was admitted by a person. Quench acts on
+the reader's own timeline via `app.bsky.graph.muteThread`, which works in
+every client and has nothing community-specific about it. Both therefore
+dogfood on instantinternet.news and real attention-pressure surfaces, under
+their own evidence gate, in atproto-acl and atproto-feeds. They compose into
+phlogiston later only if real use shows the need. Nothing in the community
+lane waits on them.
+
+### Client surface disposition (PD-E)
+
+atproto-community's `PRODUCT-DIRECTION.md` PD-E records that the preferred
+reader-facing vehicle is a plugin inside the Impro Bluesky client, and that
+its PD-E0 spike disproved the need for a standalone read-only frontend
+(steps 1–5 passed; the write-half bridge, step 6, was never attempted and
+remains gated on OQ-4). That result is not overridden here:
+
+- For Phase 2 the participation surface is `community-live`, because it is
+  the only surface with the authorized write half (OAuth-terminated,
+  socket-attested requests to `communityd`). The Impro plugin has no write
+  path and is not required for the trial.
+- phlogiston.app is constrained to what genuinely benefits from being
+  standalone (Phase 4 list). It must never be required for participation and
+  never duplicates community-live.
+- An Impro (or other host-client) plugin remains the preferred vehicle for a
+  richer *read* experience if trial evidence shows people will not visit a
+  standalone page. That decision is taken on evidence from Phase 2, not
+  before.
 
 ## Where integration changes land
 
@@ -87,11 +144,14 @@ integration roadmap.
   records, each authorized by BUILD.md amendment; admission projection is the
   feed membership source; reverse-chron canonical projection unchanged
   ("ranking is view policy").
-- **atproto-acl**: quench policy section, evaluator extension, `muteThread`
-  adapter, reply-lineage retention in feed-exposure acquisition,
-  exposure-decay vocabulary.
+- **atproto-community** (Phase 2 preconditions): PCV2 in its BUILD.md —
+  anonymous permalink, submission lifecycle visibility, the single room
+  webhook (`community-notify`), existing-post submission and honest copy.
+- **atproto-acl** (attention-policy lane): quench policy section, evaluator
+  extension, `muteThread` adapter, reply-lineage retention in feed-exposure
+  acquisition, exposure-decay vocabulary.
 - **atproto-feeds**: generalized multi-feed dispatch as the community feedgen
-  template; `root_uri` lineage exposure.
+  template; `root_uri` lineage exposure (attention-policy lane).
 - **Watch systems and Constellation**: no modification; read-only consumption
   under their published contracts.
 
@@ -111,9 +171,13 @@ integration roadmap.
   typecheck clean (verified 2026-09-24 on `main` at the
   community-integration merge).
 - Horizon 0 cross-version restore receipt before any public registration.
-- Phase-2 evidence: external-cohort submit → admit → visible, with audit
-  entry, in the single spearhead community.
-- Phase-3 evidence: one community feed generator serving `getFeedSkeleton`;
-  a quenched thread origin suppressed for that user across community views,
-  receipted and reversible; ACL preview behavior-hash parity between CLI and
-  web.
+- Phase-2 technical verification: external-cohort submit → admit → visible,
+  with audit entry, in the single spearhead community.
+- Phase-2 product evidence: the behavioral observations and interpretation
+  rule in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md).
+- Phase-3 evidence: one community feed generator serving `getFeedSkeleton`
+  with admitted-set parity against the projection, subscribed from an
+  ordinary client.
+- Attention-policy lane evidence (separate): a quenched thread origin
+  suppressed for that user, receipted and reversible; ACL preview
+  behavior-hash parity between CLI and web.
