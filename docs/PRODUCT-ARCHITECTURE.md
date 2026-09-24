@@ -52,7 +52,7 @@ integration roadmap.
 
 ## Sequencing
 
-0. **Consolidation (pre-Q2-close).** One canonical source line (this
+0. **Composition baseline (pre-Q2-close).** One canonical source line (this
    repository, `main`); this document; spike-branch dispositions
    ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)).
 1. **Activate infrastructure (post-Q2).** Inert deployment, TLS, PDS live;

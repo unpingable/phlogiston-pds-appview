@@ -1,9 +1,9 @@
 # Spike-branch dispositions
 
 Status: record of disposition decisions for unmerged research branches
-referenced by the phlogiston composition. Decided 2026-09-24 during product
-consolidation. This document records; it does not modify the owning
-repositories.
+referenced by the phlogiston composition. Decided 2026-09-24 while
+establishing the product composition baseline. This document records; it does
+not modify the owning repositories.
 
 ## `atproto-acl` @ `semantic-quench-spike` (`84f2d78`)
 
