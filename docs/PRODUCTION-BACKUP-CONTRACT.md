@@ -1,5 +1,14 @@
 # Production backup contract
 
+Note (2026-09-25): for Phase 2 the community services' state and credentials
+live under the atproto-community PCV0 kit's paths (`/var/lib/communityd`,
+`/var/lib/community-web`, `/var/lib/communitywatch`, `/etc/atproto-community`),
+not the `/var/lib/phlogiston-communityd` / `/var/lib/phlogiston-communitywatch`
+paths assumed below, and the community repository is on a Bluesky-hosted PDS,
+not `phlogiston.social`. Backups for those paths are planned in the PCV0 kit,
+not here; this contract continues to govern `/var/lib/phlogiston`. See
+[PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment topology".
+
 The production host has no `/tank/nfs` mount. Durable custody is owned by the
 existing off-host backup operator, which reaches the established NFS export
 through its reviewed Docker volume. The application must never fall back to a

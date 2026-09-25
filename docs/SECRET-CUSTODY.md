@@ -1,5 +1,14 @@
 # Production secret custody
 
+Note (2026-09-25): for Phase 2 the `communityd` PDS credential and the other
+community services' credentials are custodied under the atproto-community
+PCV0 kit's paths (`/etc/atproto-community`, with state under
+`/var/lib/communityd`, `/var/lib/community-web`, `/var/lib/communitywatch`),
+in that kit's credential form, and the community actor is a Bluesky-hosted
+account rather than a `phlogiston.social` one. The `communityd` row below is
+retained as the phlogiston-unit record; it is not the Phase 2 custody. See
+[PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment topology".
+
 This is a custody map, not secret material and not activation authority.
 
 | Material | Owner / consumer | Scope and generation | Storage and modes | Rotation / revocation | Backup |

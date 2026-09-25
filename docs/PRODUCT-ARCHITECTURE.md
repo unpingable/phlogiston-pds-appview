@@ -67,12 +67,17 @@ true before it starts.
 0. **Composition baseline (pre-Q2-close).** One canonical source line (this
    repository, `main`); this document; spike-branch dispositions
    ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)). Done.
-1. **Activate infrastructure (post-Q2).** Inert deployment, TLS, PDS live;
-   Horizon 0 cross-version restore; lexicon namespace publication
-   (`zone.neutral.community.*`); PCV0 integration identities. Nothing here
-   is on a participant's path: participants bring their own ATProto
-   account. `phlogiston.social` is operator infrastructure (community actor,
-   lexicon authority, backups), not a place people register.
+1. **Activate infrastructure (post-Q2).** Lexicon namespace publication
+   (`zone.neutral.community.*`); PCV0 integration identities; the PCV0 kit's
+   community services; the inert phlogiston-web deployment and its
+   `phlogiston.app` route. Nothing here is on a participant's path:
+   participants bring their own ATProto account. Corrected 2026-09-25: the
+   community actor is a Bluesky-hosted account
+   (`did:plc:b53udqv47g2dayvpstzdefpq`), not a `phlogiston.social` account.
+   The `phlogiston.social` PDS, its TLS and the Horizon 0 cross-version
+   restore are separately activated operator infrastructure, not required
+   for Phase 2 (see [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment
+   topology").
 2. **One legible public community: a demand experiment.** The PCV0 social
    loop deployed for a single, deliberately chosen community, run as the
    experiment specified in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md). Its

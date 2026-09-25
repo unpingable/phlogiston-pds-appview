@@ -1,5 +1,13 @@
 # Pre-Q2 activation readiness
 
+> **Superseded for Phase 2 (2026-09-25).** The topology below (an
+> activated `communitywatch` on `127.0.0.1:8093` and a phlogiston-owned
+> `communityd` unit) is kept as the record it was; for Phase 2 the
+> atproto-community PCV0 kit owns every community service, the observer is
+> its `communitywatch-web` on `127.0.0.1:8080`, the community actor is a
+> Bluesky-hosted account, and phlogiston deploys only phlogiston-web. See
+> [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment topology".
+
 Frozen 2026-09-22. **Prepared, not deployed and not activated.** The protected
 shared-host observation ends at `2026-09-27T16:54:28Z`; elapsed time alone is
 not acceptance. Deployment requires its accepted uncontaminated closeout

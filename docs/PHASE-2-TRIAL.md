@@ -32,21 +32,67 @@ evidence.
 | 7 | PD-E / standalone-client disposition recorded. | PRODUCT-ARCHITECTURE.md "Client surface disposition" | done |
 | 8 | Phase 3 trimmed to the S2 community feed generator in the community lane. | PRODUCT-ARCHITECTURE.md | done |
 
+## Deployment topology (decided 2026-09-25)
+
+For Phase 2 the atproto-community PCV0 kit
+(`deploy/public-community-pcv0/`) owns every community service: `communityd`,
+`communitywatch-index` and `communitywatch-web` (observer on
+`127.0.0.1:8080`), `community-policy`, `community-live` and
+`community-notify`, under that kit's users, paths
+(`/var/lib/communityd`, `/var/lib/community-web`, `/var/lib/communitywatch`,
+`/etc/atproto-community`) and credential. Its README is the single README for
+the community services. phlogiston deploys only phlogiston-web
+(`phlogiston.app`), which reads the PCV0 observer unchanged
+(`PHLOGISTON_PROJECTION_ORIGIN=http://127.0.0.1:8080`) and is an optional
+pointer, never on the participant path.
+
+The community actor is a Bluesky-hosted account
+(`did:plc:b53udqv47g2dayvpstzdefpq` on
+`phellinus.us-west.host.bsky.network`), not a `phlogiston.social` account.
+The phlogiston PDS (`phlogiston.social`, `127.0.0.1:3002`) is separately
+activated operator infrastructure and is not on the participant path.
+
+Invariant: exactly one communityd per community DID holds the actor
+credential; one journal, one socket, SO_PEERCRED-checked requesters. The
+phlogiston `phlogiston-communityd.service` / `phlogiston-communitywatch.service`
+units and their `.toml.example` files are withdrawn for Phase 2 (header-marked,
+kept for the record) and must never run beside the PCV0 `communityd.service`;
+`deploy/production/preflight.py` refuses if any other installed unit starts
+`communityd-serve` or if `phlogiston-communityd.service` is installed and not
+masked, and `deploy-inert.sh` extracts the community runtime only with
+`--with-community-runtime`, which Phase 2 does not use.
+
 Deployment-side prerequisites that are *not* preconditions of the experiment
-design but gate its start (found by the 2026-09-24 first-user review, plus the existing gates):
-the atproto-community runtime must be re-cut and re-qualified at the PCV2
-revision (`cdfec53`; the current qualified cut is `89d04da`);
-`PHLOGISTON_COMMUNITY_URL` set in the phlogiston web env (it is commented out
-in the example, so the pointer is off by default); the community-live env
-filled from the participant packet (name, purpose, moderator DID are
-placeholders); the PCV0 deployment validator currently requires the
-campaign's fault-injection flags that the README says to remove after the
-campaign, so one of the two must change before a trial deploy; the room
-webhook proven once against the real room; the `community.neutral.zone` A
-record repointed from GitHub Pages to the host (owner DNS change; see
-[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)); and Q2 terminal receipt; Horizon 0 cross-version
-restore; lexicon publication; PCV0 integration identities; the PCV0
-two-account supervised integration; the operator's technical verification.
+design but gate its start (found by the 2026-09-24 first-user review, the
+2026-09-25 topology decision, plus the existing gates):
+
+- the atproto-community runtime re-cut and re-qualified at the PCV2 revision
+  (`cdfec53`; the current qualified cut is `89d04da`);
+- owned by atproto-community, pre-deploy: the double-writer guard in the PCV0
+  kit (refuse to start `communityd` unless exactly one installed unit's
+  `ExecStart` runs `communityd-serve` and it is PCV0's `communityd.service`;
+  mask `phlogiston-communityd.service`), and the `community-live.service`
+  start path (`corepack pnpm start` needs a home cache that
+  `ProtectSystem=strict`/`ProtectHome=yes` deny; run
+  `node_modules/.bin/tsx src/server.ts` or provision `COREPACK_HOME`);
+- `PHLOGISTON_COMMUNITY_URL` set in the phlogiston web env (it is commented
+  out in the example, so the pointer is off by default);
+- the community-live env filled from the participant packet (name, purpose,
+  moderator DID are placeholders);
+- the PCV0 deployment validator currently requires the campaign's
+  fault-injection flags that the README says to remove after the campaign,
+  so one of the two must change before a trial deploy;
+- the room webhook proven once against the real room;
+- the `community.neutral.zone` A record repointed from GitHub Pages to the
+  host (owner DNS change; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md));
+- the Q2 terminal receipt; lexicon publication; PCV0 integration identities;
+  the PCV0 two-account supervised integration; the operator's technical
+  verification.
+
+`phlogiston.social` activation prerequisites, kept separately and not gates
+for Phase 2: the phlogiston PDS live on `127.0.0.1:3002`, its
+`phlogiston.social` TLS and Caddy route, and the Horizon 0 cross-version
+restore receipt (still required before any public registration there).
 
 ## The participant's path (what we are testing)
 

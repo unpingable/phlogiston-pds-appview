@@ -1,5 +1,14 @@
 # Integrated community recovery
 
+Note (2026-09-25): for Phase 2 the `communityd` journal and the community
+services' state and credentials live under the atproto-community PCV0 kit's
+paths (`/var/lib/communityd`, `/var/lib/community-web`,
+`/var/lib/communitywatch`, `/etc/atproto-community`), and the community
+repository is on a Bluesky-hosted PDS rather than a phlogiston-operated one.
+The state model and qualification below are unchanged as a record; recovery
+for the PCV0 paths is planned in that kit, not here. See
+[PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment topology".
+
 Status: qualified against two isolated stock PDS instances; not a production
 backup or cross-version migration claim.
 
