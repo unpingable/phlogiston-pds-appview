@@ -13,8 +13,8 @@ remote.
 | Remote | `origin` (`git remote get-url origin` from the worktree) |
 | Branch | `main` |
 | Expected old remote tip | `cbc6f88deb4a0d2610009f5a2bb29fe5ae0ad0f2` (`origin/main` as fetched 2026-09-25) |
-| New tip | `PLACEHOLDER_TIP` (the tip of `main` after the Phase 2 freeze lanes are merged; the orchestrator fills this from `git rev-parse main`) |
-| Commit count `origin/main..main` | 38 at the freeze base `6670e17`; 42 at this lane's tip `campaign/phase2-freeze` before its merge; final count filled with the tip: `PLACEHOLDER_COUNT` |
+| New tip | the tip of `main` at push time: the commit that carries this document and `PHASE-2-FREEZE.md` (its parent is `35e6545`); confirm with `git rev-parse main` and compare with the tranche closeout at the workspace root |
+| Commit count `origin/main..main` | 38 at the freeze base `6670e17`; 42 at this lane's tip `campaign/phase2-freeze` before its merge; 45 at the frozen tip |
 | Worktree holding `main` | `/data/git/atproto-nutrition/.worktrees/phlogiston-community-integration-20260922` |
 
 Preconditions, checked immediately before the push:
@@ -25,7 +25,7 @@ git status --porcelain            # empty (web/node_modules is ignored; a symlin
 git fetch origin
 git rev-parse origin/main          # must print cbc6f88deb4a0d2610009f5a2bb29fe5ae0ad0f2
 git merge-base --is-ancestor origin/main main && echo fast-forward
-git rev-parse main                 # must print PLACEHOLDER_TIP
+git rev-parse main                 # must equal the tip named in the tranche closeout
 PYTHONPATH=src python3 -m pytest -q
 ( cd web && ./node_modules/.bin/tsc --noEmit && node --import tsx --test src/*.test.ts )
 ```
@@ -40,7 +40,7 @@ Read-back, immediately after:
 
 ```sh
 git fetch origin
-git rev-parse origin/main          # must print PLACEHOLDER_TIP
+git rev-parse origin/main          # must equal the pushed tip
 git log --oneline origin/main -3
 git status -sb                     # "## main...origin/main" with no ahead/behind
 ```
