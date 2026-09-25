@@ -1,5 +1,10 @@
 # First human-use smoke test
 
+> Routing note (2026-09-25): this document describes phlogiston-web routed at
+> phlogiston.app. For Phase 2 that route is withdrawn; phlogiston.app serves
+> community-live from the PCV0 kit. See [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md).
+
+
 Status: prepared; every effect still requires the authority named in the
 synthetic activation packet.
 

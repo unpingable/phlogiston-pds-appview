@@ -68,8 +68,9 @@ authorization; none grants the next.
 
 Current behaviour of `community-live` as deployed for Phase 2, in plain
 words. Nothing here is a promise of future features. Every sentence describes
-what the software does today; the two marked placeholders are filled by the
-orchestrator from the UX-disposition lane before the packet is accepted.
+what the software does today; the UX limitations were settled on 2026-09-25 (rejected
+submissions are deferred as a post-trial state; retained replies under a
+removed root are accepted trial semantics).
 
 - **Opening the site.** `https://phlogiston.app` shows the community's name,
   one line of purpose, a "What is this?" note, and the posts currently in the
@@ -108,14 +109,18 @@ orchestrator from the UX-disposition lane before the packet is accepted.
   view ever changes.
 - **"My discussions" (`/mine`).** Shows the participant's submissions that are
   waiting for the moderator, the discussions they are in, and unfinished
-  operations they can resume. Limitations today: a submission the community's
-  automatic checks could not accept ____ [PLACEHOLDER: orchestrator fills from
-  the UX-disposition lane (E2), Question 1: whether `/mine` now shows a
-  "Couldn't be accepted" bucket, or whether such a submission disappears from
-  the list without a word and how the operator finds the reason]. Existing
-  replies under a removed discussion ____ [PLACEHOLDER: orchestrator fills
-  from the UX-disposition lane (E2), Question 2: whether retained replies stay
-  visible under a removed root and how that is explained].
+  operations they can resume. Limitations today: after you add a post, it appears under
+  "Waiting for the moderator" until the moderator admits it. If it disappears
+  from that list without appearing under "Discussions you are in", the
+  community's checks did not accept it, which is rare and almost always a
+  problem on our side; your Bluesky post is still public and unchanged, and
+  the record that asked for it to be added stays in your account. Tell the
+  operator in the room with the link to your post; you do not need to submit
+  it again. If the moderator removes a discussion, its opening post
+  disappears from the community and nobody can add new replies; replies that
+  were already added stay readable on that discussion's page, each with its
+  own "Why is this here?", because the moderator decides on each reply
+  separately.
 - **Notifications.** The room gets one short line when a submission is
   waiting for the moderator and one when a discussion is admitted, each with
   a link and never the post text. There is no email, no push notification,
@@ -127,9 +132,9 @@ orchestrator from the UX-disposition lane before the packet is accepted.
   changed by the community; they can be deleted by the author at any time
   with their usual client. Author display names and handles are fetched from
   the public Bluesky AppView for display only; avatars are not shown.
-- **Reporting a problem.** ____ [PLACEHOLDER: the room; how and to whom a
-  participant reports a problem is filled by the owner with the room in
-  section 3]. A problem that stops someone completing a step is a user-path
+- **Reporting a problem.** Say so in the room (section 3 names it and who
+  answers) and paste the link to your Bluesky post or the community page you
+  were on. ____ [owner: name the person who answers]. A problem that stops someone completing a step is a user-path
   blocker and is fixed in the owning repository; it does not count against
   the trial's demand evidence.
 

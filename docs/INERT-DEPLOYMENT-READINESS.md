@@ -1,5 +1,10 @@
 # Inert deployment readiness
 
+> Routing note (2026-09-25): this document describes phlogiston-web routed at
+> phlogiston.app. For Phase 2 that route is withdrawn; phlogiston.app serves
+> community-live from the PCV0 kit. See [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md).
+
+
 > **Superseded for Phase 2 (2026-09-25).** The topology below (an
 > activated `communitywatch` on `127.0.0.1:8093` and a phlogiston-owned
 > `communityd` unit) is kept as the record it was; for Phase 2 the
