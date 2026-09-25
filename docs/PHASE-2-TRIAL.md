@@ -66,22 +66,20 @@ Deployment-side prerequisites that are *not* preconditions of the experiment
 design but gate its start (found by the 2026-09-24 first-user review, the
 2026-09-25 topology decision, plus the existing gates):
 
-- the atproto-community runtime re-cut and re-qualified at the PCV2 revision
-  (`cdfec53`; the current qualified cut is `89d04da`);
-- owned by atproto-community, pre-deploy: the double-writer guard in the PCV0
-  kit (refuse to start `communityd` unless exactly one installed unit's
-  `ExecStart` runs `communityd-serve` and it is PCV0's `communityd.service`;
-  mask `phlogiston-communityd.service`), and the `community-live.service`
-  start path (`corepack pnpm start` needs a home cache that
-  `ProtectSystem=strict`/`ProtectHome=yes` deny; run
-  `node_modules/.bin/tsx src/server.ts` or provision `COREPACK_HOME`);
+- the trial runs `community-live`, `community-policy`, and
+  `community-notify` from an atproto-community source checkout at the exact
+  tip recorded in the tranche closeout (`PHASE-2-PREQUAL-TRANCHE-2026-09-25.md`
+  at the workspace root), installed with `pnpm install --frozen-lockfile`
+  from the committed lockfile (never `--prod`); the wheels-only runtime
+  archive is a re-attestation and does not carry those services;
+- done on 2026-09-25 and no longer open: the double-writer guard (PCV0
+  `host-preflight` and phlogiston `preflight.py`), the `community-live`
+  start path (`node_modules/.bin/tsx src/server.ts`), and the deployment
+  validator's campaign/normal fault-mode distinction;
 - `PHLOGISTON_COMMUNITY_URL` set in the phlogiston web env (it is commented
   out in the example, so the pointer is off by default);
 - the community-live env filled from the participant packet (name, purpose,
   moderator DID are placeholders);
-- the PCV0 deployment validator currently requires the campaign's
-  fault-injection flags that the README says to remove after the campaign,
-  so one of the two must change before a trial deploy;
 - the room webhook proven once against the real room;
 - the `community.neutral.zone` A record repointed from GitHub Pages to the
   host (owner DNS change; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md));
