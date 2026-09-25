@@ -209,6 +209,20 @@ def test_preflight_refuses_second_communityd_writer(tmp_path: Path) -> None:
         raise AssertionError("second communityd writer was accepted")
 
 
+def test_preflight_refuses_module_launched_communityd_writer(tmp_path: Path) -> None:
+    config, machine = preflight_fixture(tmp_path)
+    root = systemd_fixture(tmp_path)
+    (root / "lib/systemd/system/other-communityd.service").write_text(
+        "[Service]\nExecStart=/opt/other/venv/bin/python -m communityd.serve_cli --config /etc/other/communityd.toml\n"
+    )
+    try:
+        validate_at_gate(config, machine, root)
+    except PREFLIGHT.Refusal as error:
+        assert "other-communityd.service" in str(error)
+    else:
+        raise AssertionError("module-launched communityd writer was accepted")
+
+
 def test_preflight_refuses_unmasked_withdrawn_phlogiston_communityd(tmp_path: Path) -> None:
     config, machine = preflight_fixture(tmp_path)
     root = systemd_fixture(tmp_path)

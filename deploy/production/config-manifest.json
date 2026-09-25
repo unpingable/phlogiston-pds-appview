@@ -16,7 +16,7 @@
     "phlogiston-pds.service": "c78cbd97b4656ec74d52988a15f6b50a24c8aed5a0672884ea78e4f765a204f1",
     "phlogiston-web.env.example": "13d84e0f09cd2bf899e93b5a1789d2697f058c96027afb3acb387ac85332e8ab",
     "phlogiston-web.service": "bcecf7e3a279f6795947160c188c7f605ce7d1da04bf392f0c8482754f54be5b",
-    "preflight.py": "7267798f3b2862afa995007c026281021f79be8ba930e4ed61826bbada154149",
+    "preflight.py": "7f028449ac94997b9d3b2e5c4c03fe7fca0fab142fcb27e30ebc187683231015",
     "rollback-inert.sh": "65cf35e890904668c8d8ddda9debaf00c96c64bee7cfd04be3c013cf34420ab2",
     "verify-external.sh": "a7a2158ebe5ce8f4ac39e151249010b508bb9ff6d6c964f252fee148f5622409"
   }

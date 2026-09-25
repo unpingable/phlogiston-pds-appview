@@ -21,7 +21,7 @@ PLACEHOLDER = "SET_"
 # withdrawn phlogiston unit may be present only if it is masked.
 PCV0_COMMUNITYD_UNIT = "communityd.service"
 WITHDRAWN_COMMUNITYD_UNIT = "phlogiston-communityd.service"
-COMMUNITYD_WRITER_MARKER = "communityd-serve"
+COMMUNITYD_WRITER_MARKERS = ("communityd-serve", "communityd.serve_cli")
 # Earlier entries take precedence, matching systemd's unit search order.
 SYSTEMD_UNIT_DIRS = (
     "etc/systemd/system",
@@ -149,7 +149,7 @@ def check_single_community_writer(
     writers = sorted(
         name
         for name, unit in units.items()
-        if not unit["masked"] and any(COMMUNITYD_WRITER_MARKER in value for value in unit["exec_starts"])
+        if not unit["masked"] and any(marker in value for value in unit["exec_starts"] for marker in COMMUNITYD_WRITER_MARKERS)
     )
     foreign = [name for name in writers if name != PCV0_COMMUNITYD_UNIT]
     if foreign:
