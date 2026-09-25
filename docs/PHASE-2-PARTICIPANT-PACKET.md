@@ -19,7 +19,7 @@ reference.
 | Community display name (`COMMUNITY_NAME`) | ____ |
 | One-line purpose shown on the home page (`COMMUNITY_PURPOSE`) | ____ |
 | Topic / what belongs here (one or two sentences, plain words) | ____ |
-| Public site URL | `https://community.neutral.zone` (confirm or change) |
+| Public site URL | `https://community.neutral.zone` (decided 2026-09-25; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)) |
 
 ## 2. The people
 

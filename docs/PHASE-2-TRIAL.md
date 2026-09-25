@@ -42,7 +42,9 @@ filled from the participant packet (name, purpose, moderator DID are
 placeholders); the PCV0 deployment validator currently requires the
 campaign's fault-injection flags that the README says to remove after the
 campaign, so one of the two must change before a trial deploy; the room
-webhook proven once against the real room; and Q2 terminal receipt; Horizon 0 cross-version
+webhook proven once against the real room; the `community.neutral.zone` A
+record repointed from GitHub Pages to the host (owner DNS change; see
+[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)); and Q2 terminal receipt; Horizon 0 cross-version
 restore; lexicon publication; PCV0 integration identities; the PCV0
 two-account supervised integration; the operator's technical verification.
 

@@ -46,6 +46,11 @@ phlogiston pins the qualified revision.
 | labelwatch / weatherwatch / driftwatch | Provenance, network-conditions, and operational-standing read surfaces | Read-only consumption; testimony, not verdicts |
 | Constellation | Read-only governed-operations projection; later one-use operations under a released profile | No remote authority federation |
 
+Public hostnames and their roles are fixed in
+[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md): `community.neutral.zone` is the
+participant front door, `phlogiston.social` is protocol-only, `phlogiston.app`
+is the operator/status surface.
+
 Generic `app.bsky` read views are delegated to existing external AppViews. A
 network-scale relay-consuming AppView remains a deferred frontier per the
 integration roadmap.
