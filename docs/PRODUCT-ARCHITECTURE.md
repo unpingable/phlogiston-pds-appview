@@ -38,7 +38,7 @@ phlogiston pins the qualified revision.
 | Component | Role in product | Boundary |
 | --- | --- | --- |
 | PDS (`phlogiston.social`) | Account/repo/blob hosting; stock externally supplied PDS software | Unmodified upstream behavior; no fork |
-| phlogiston-web (`web/`) | Product surface: DID/OAuth login, community views, policy editor, provenance/status cards | Application-local state keyed by DID |
+| phlogiston-web (`web/`) | Operator/status/account surface: DID/OAuth login, read-only community mirror, later policy editor and provenance/status cards. Not publicly routed in Phase 2 | Application-local state keyed by DID |
 | `src/phlogiston_appview/` | Render, receipt, operator, community, recovery modules | Bounded application view; **not** a network-scale AppView |
 | atproto-community | Community semantics: `communityd` sole authority writer; `communitywatch` verified read-only projection; `community-live` OAuth app | Pinned revision; its AGENTS.md invariants are inherited here |
 | atproto-acl | Personal policy compiler/evaluator, preview, receipts; quench vocabulary when qualified | Policy effects are user-authored and receipted; observation never becomes authority |
@@ -47,9 +47,11 @@ phlogiston pins the qualified revision.
 | Constellation | Read-only governed-operations projection; later one-use operations under a released profile | No remote authority federation |
 
 Public hostnames and their roles are fixed in
-[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md): `community.neutral.zone` is the
-participant front door, `phlogiston.social` is protocol-only, `phlogiston.app`
-is the operator/status surface.
+[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md): `phlogiston.app` is the
+participant origin (served by `community-live` from the PCV0 kit),
+`phlogiston.social` is protocol-only, `community.neutral.zone` is retired as
+a site and kept only as the DNS lexicon authority. phlogiston-web is an
+operator tool that is not publicly routed in Phase 2.
 
 Generic `app.bsky` read views are delegated to existing external AppViews. A
 network-scale relay-consuming AppView remains a deferred frontier per the
@@ -69,9 +71,11 @@ true before it starts.
    ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)). Done.
 1. **Activate infrastructure (post-Q2).** Lexicon namespace publication
    (`zone.neutral.community.*`); PCV0 integration identities; the PCV0 kit's
-   community services; the inert phlogiston-web deployment and its
-   `phlogiston.app` route. Nothing here is on a participant's path:
-   participants bring their own ATProto account. Corrected 2026-09-25: the
+   community services, including the `phlogiston.app` Caddy site that routes
+   to `community-live`; the inert phlogiston-web release (installed, not
+   routed). Nothing here is on a participant's path beyond
+   `https://phlogiston.app` itself: participants bring their own ATProto
+   account. Corrected 2026-09-25: the
    community actor is a Bluesky-hosted account
    (`did:plc:b53udqv47g2dayvpstzdefpq`), not a `phlogiston.social` account.
    The `phlogiston.social` PDS, its TLS and the Horizon 0 cross-version
@@ -82,7 +86,8 @@ true before it starts.
    loop deployed for a single, deliberately chosen community, run as the
    experiment specified in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md). Its
    preconditions, all pre-Q2-safe and listed there, are: one participation
-   URL (`community-live`), an anonymous pasteable permalink, a visible
+   URL (`community-live` at `https://phlogiston.app`), an anonymous pasteable
+   permalink, a visible
    submission lifecycle with the room notified on admission, existing-post
    submission with the public-post consequence stated, a named cohort and
    activity, and the behavioral success criteria below.
@@ -100,8 +105,9 @@ true before it starts.
    closes the discovery gap: the community appears where participants
    already are. Quench and `author_exposure_decay` are **not** part of this
    phase; see "Attention-policy lane" below.
-4. **Standalone surfaces that earn their existence.** phlogiston.app grows
-   only where standalone is the right shape: the operator surface, service
+4. **Standalone surfaces that earn their existence.** phlogiston-web (at a
+   distinct hostname, never sharing the participant origin) grows only where
+   standalone is the right shape: the operator surface, service
    status and recovery standing, provenance and network-condition cards
    (labelwatch, weatherwatch, driftwatch, Constellation read-only), and
    personal attention-policy editing with preview and receipts (the
@@ -134,13 +140,17 @@ its PD-E0 spike disproved the need for a standalone read-only frontend
 (steps 1–5 passed; the write-half bridge, step 6, was never attempted and
 remains gated on OQ-4). That result is not overridden here:
 
-- For Phase 2 the participation surface is `community-live`, because it is
-  the only surface with the authorized write half (OAuth-terminated,
-  socket-attested requests to `communityd`). The Impro plugin has no write
-  path and is not required for the trial.
-- phlogiston.app is constrained to what genuinely benefits from being
-  standalone (Phase 4 list). It must never be required for participation and
-  never duplicates community-live.
+- For Phase 2 the participation surface is `community-live` at
+  `https://phlogiston.app`, because it is the only surface with the
+  authorized write half (OAuth-terminated, socket-attested requests to
+  `communityd`). The Impro plugin has no write path and is not required for
+  the trial.
+- phlogiston-web is an operator tool. It is not routed publicly in Phase 2
+  (it would collide with community-live on `/` and `/oauth/*` at the same
+  origin; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)). When it returns, at
+  a distinct hostname, it is constrained to what genuinely benefits from
+  being standalone (Phase 4 list), must never be required for participation
+  and never duplicates community-live.
 - An Impro (or other host-client) plugin remains the preferred vehicle for a
   richer *read* experience if trial evidence shows people will not visit a
   standalone page. That decision is taken on evidence from Phase 2, not

@@ -23,7 +23,7 @@ evidence.
 
 | # | Precondition | Where | State |
 | --- | --- | --- | --- |
-| 1 | One public participation surface: `community-live` at the community site. phlogiston.app links to it and carries no participation features. | atproto-community `apps/community-live`; this repo `web/` | done: phlogiston `b4213b5`; community-live copy in PCV2 |
+| 1 | One public participation surface: `community-live` at `https://phlogiston.app`. phlogiston-web carries no participation features and is not publicly routed. | atproto-community `apps/community-live`; this repo `deploy/production` | done: phlogiston `b4213b5`, withdrawal of web routing in this freeze; community-live copy in PCV2 |
 | 2 | Discussion permalink readable without login at a clean path (`/d/<rkey>`). Mutations keep their session requirement. | atproto-community PCV2-A | done: `45dc205`, hardened `5b13b31` |
 | 3 | Visible submission lifecycle: submitter sees "waiting for the moderator"; moderator sees the post text in the queue; the room is notified on pending and admitted through one outbound webhook (`community-notify`). | atproto-community PCV2-B | done: `1e1f42d`, `4936d68`, `7edc744`, `cdfec53` |
 | 4 | Existing-post submission by URL alongside composition; composition states that it creates a public Bluesky post; copy on the path reframed to "a moderated community collection over author-custodied public posts". | atproto-community PCV2-C | done: `e9b145b`, `6947642` |
@@ -41,10 +41,15 @@ For Phase 2 the atproto-community PCV0 kit
 `community-notify`, under that kit's users, paths
 (`/var/lib/communityd`, `/var/lib/community-web`, `/var/lib/communitywatch`,
 `/etc/atproto-community`) and credential. Its README is the single README for
-the community services. phlogiston deploys only phlogiston-web
-(`phlogiston.app`), which reads the PCV0 observer unchanged
-(`PHLOGISTON_PROJECTION_ORIGIN=http://127.0.0.1:8080`) and is an optional
-pointer, never on the participant path.
+the community services. The participant origin is `https://phlogiston.app`,
+served by `community-live` on `127.0.0.1:3210` behind a Caddy site block that
+the PCV0 kit owns (see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)). phlogiston
+installs only the phlogiston-web release, which reads the PCV0 observer
+unchanged (`PHLOGISTON_PROJECTION_ORIGIN=http://127.0.0.1:8080`) and is
+withdrawn from public routing for Phase 2: it would collide with
+community-live at the same origin, so its unit is not enabled and its Caddy
+fragment defines no site block. `community.neutral.zone` is retired as a
+site; `community.phlogiston.social` is dropped.
 
 The community actor is a Bluesky-hosted account
 (`did:plc:b53udqv47g2dayvpstzdefpq` on
@@ -76,16 +81,21 @@ design but gate its start (found by the 2026-09-24 first-user review, the
   `host-preflight` and phlogiston `preflight.py`), the `community-live`
   start path (`node_modules/.bin/tsx src/server.ts`), and the deployment
   validator's campaign/normal fault-mode distinction;
-- `PHLOGISTON_COMMUNITY_URL` set in the phlogiston web env (it is commented
-  out in the example, so the pointer is off by default);
 - the community-live env filled from the participant packet (name, purpose,
-  moderator DID are placeholders);
+  moderator DID are placeholders) with `COMMUNITY_PUBLIC_URL=https://phlogiston.app`;
+- the PCV0 kit's `phlogiston.app` Caddy site block installed and its
+  ordinary ACME certificate verified (no DNS repoint is needed for the front
+  door: `phlogiston.app` already resolves to the host; see
+  [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md));
+- retire the `community.neutral.zone` site role: nothing to do at DNS beyond
+  not creating an A record for it at the host (the `_lexicon` TXT is
+  published at lexicon publication as planned);
 - the room webhook proven once against the real room;
-- the `community.neutral.zone` A record repointed from GitHub Pages to the
-  host (owner DNS change; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md));
 - the Q2 terminal receipt; lexicon publication; PCV0 integration identities;
   the PCV0 two-account supervised integration; the operator's technical
-  verification.
+  verification ([PRODUCTION-VERIFICATION.md](PRODUCTION-VERIFICATION.md));
+  the external-cohort authorization; all in the order given by
+  [Q2-ACTIVATION-RUNBOOK.md](Q2-ACTIVATION-RUNBOOK.md).
 
 `phlogiston.social` activation prerequisites, kept separately and not gates
 for Phase 2: the phlogiston PDS live on `127.0.0.1:3002`, its
@@ -97,8 +107,9 @@ restore receipt (still required before any public registration there).
 A friend receives one link in a group chat and is told "put something in
 here."
 
-1. Opens the community home. Sees the name, one line of purpose, "What is
-   this?", and the current collection. No login needed to read.
+1. Opens the community home at `https://phlogiston.app`. Sees the name, one
+   line of purpose, "What is this?", and the current collection. No login
+   needed to read.
 2. Signs in with their own Bluesky account (OAuth on their PDS). No account
    is created anywhere.
 3. Either submits a post they already made (by URL), or writes a new one
