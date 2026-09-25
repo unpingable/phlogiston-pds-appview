@@ -1,0 +1,59 @@
+{
+  "admission": "at://did:plc:ajnmye6kqwu4f7rir54tg52c/zone.neutral.community.admission/admit-5cdda2f81b774abf8c43d1eff99033017bda744e46cdc1ddebcf2af7a61fac63",
+  "communityCommit": "cdfec53b38e2ba8f4c6258d431c6531460712d02",
+  "communityDid": "did:plc:ajnmye6kqwu4f7rir54tg52c",
+  "externalNetwork": false,
+  "hiddenAfterRemoval": true,
+  "membership": {
+    "communityDid": "did:plc:ajnmye6kqwu4f7rir54tg52c",
+    "generatedAt": "2026-09-25T14:48:31.742125Z",
+    "members": [
+      {
+        "action": "add",
+        "actor": "did:plc:oxp5aym4lixm76zkxfcil52z",
+        "createdAt": "2026-09-25T14:48:28.692953Z",
+        "did": "did:plc:hcjnr4ze63cqyqticdtcdwjo",
+        "reason": "isolated qualification",
+        "record": {
+          "cid": "bafyreidamhy327yf2yqfy4n5ksy77fdfrytltgha4coiwrxypruf5tm7ha",
+          "uri": "at://did:plc:ajnmye6kqwu4f7rir54tg52c/zone.neutral.community.memberAction/1f9a6a53b07627ccc6579882dc2b3c0878a5a926084c1afffd0358798c401fa2"
+        },
+        "status": "active"
+      }
+    ],
+    "projection": {
+      "fresh": true,
+      "generation": "g1",
+      "version": "v0"
+    }
+  },
+  "multiPds": true,
+  "observerHealth": {
+    "activeGeneration": "g1",
+    "generatedAt": "2026-09-25T14:48:31.749846Z",
+    "highWaterMatches": true,
+    "lastIngestAt": "2026-09-25T14:48:31.621735Z",
+    "lastResolveAt": "2026-09-25T14:48:31.109157Z",
+    "projectionStatus": "complete",
+    "projectionVersion": "v0",
+    "reasonCodes": [],
+    "schemaVersion": 3,
+    "sources": [
+      {
+        "committedCursor": "5",
+        "matches": true,
+        "name": "isolated-pds",
+        "projectedCursor": "5"
+      }
+    ],
+    "status": "ok"
+  },
+  "participantDid": "did:plc:hcjnr4ze63cqyqticdtcdwjo",
+  "pdsCount": 2,
+  "pdsImage": "ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a",
+  "phlogistonCommit": "f7be2996124c787c325742df6b23493d29fe6d6b",
+  "removal": "at://did:plc:ajnmye6kqwu4f7rir54tg52c/zone.neutral.community.modAction/remove-c05b1149f8ff2ad6d5c2b97c013b44e310cb3ed723894b8301fa72c8cf83d1f5",
+  "renderedBeforeRemoval": true,
+  "result": "passed",
+  "schema": "phlogiston.community-slice.v1"
+}
