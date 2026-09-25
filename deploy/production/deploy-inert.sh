@@ -1,16 +1,23 @@
 #!/bin/sh
 set -eu
 
-# Phase 2 deploys phlogiston-web only. The community runtime (communitywatch
-# observer, communityd) is owned by the atproto-community PCV0 kit and is
-# neither extracted nor installed unless --with-community-runtime is given.
+# Phase 2 installs the phlogiston-web release only. The community runtime
+# (communitywatch observer, communityd) is owned by the atproto-community PCV0
+# kit and is neither extracted nor installed unless --with-community-runtime is
+# given. phlogiston-web is withdrawn from public routing for Phase 2
+# (phlogiston.app is served by the PCV0 kit's community-live): the web unit is
+# enabled and the Caddy fragment installed only with --with-status-web.
 with_community_runtime=0
-if [ "$#" -ge 1 ] && [ "$1" = "--with-community-runtime" ]; then
-  with_community_runtime=1
-  shift
-fi
+with_status_web=0
+while [ "$#" -ge 1 ]; do
+  case "$1" in
+    --with-community-runtime) with_community_runtime=1; shift ;;
+    --with-status-web) with_status_web=1; shift ;;
+    *) break ;;
+  esac
+done
 if [ "$#" -ne 1 ]; then
-  echo "usage: deploy-inert.sh [--with-community-runtime] /etc/phlogiston/deployment.json" >&2
+  echo "usage: deploy-inert.sh [--with-community-runtime] [--with-status-web] /etc/phlogiston/deployment.json" >&2
   exit 64
 fi
 config=$1
@@ -75,34 +82,51 @@ if [ "$with_community_runtime" -eq 1 ]; then
   mv -T "$community_root/current.new" "$community_root/current"
 fi
 
-systemctl daemon-reload
-systemctl enable --now phlogiston-web.service
-curl --fail --silent --show-error http://127.0.0.1:8092/healthz
-curl --fail --silent --show-error http://127.0.0.1:8092/oauth-client-metadata.json >/dev/null
-status=$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8092/community/)
-[ "$status" = 503 ] || { echo "refused: inert community route returned $status" >&2; exit 1; }
-
-install -d -m 0700 "$caddy_backup_dir"
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
-caddy_backup="$caddy_backup_dir/Caddyfile.before-phlogiston.$stamp"
-cp --preserve=mode,timestamps "$caddyfile" "$caddy_backup"
-sha256sum "$caddy_backup" > "$caddy_backup.sha256"
-candidate=$(mktemp /tmp/phlogiston-Caddyfile.XXXXXX)
-trap 'rm -f "$candidate"' EXIT HUP INT TERM
-python3 "$script_dir/render-caddy.py" --current "$caddyfile" --fragment "$phlog_release/deploy/Caddyfile.fragment" --output "$candidate"
-docker cp "$candidate" "$caddy_container:/tmp/Caddyfile.phlogiston-candidate"
-docker exec "$caddy_container" caddy validate --config /tmp/Caddyfile.phlogiston-candidate
-cp "$candidate" "$caddyfile"
-if ! docker exec "$caddy_container" caddy validate --config /etc/caddy/Caddyfile; then
-  cp "$caddy_backup" "$caddyfile"
-  docker exec "$caddy_container" caddy validate --config /etc/caddy/Caddyfile
-  echo "refused: installed Caddyfile failed validation and was restored" >&2
-  exit 1
+systemctl daemon-reload
+caddy_backup=none
+if [ "$with_status_web" -eq 1 ]; then
+  # Not used for Phase 2: phlogiston-web is withdrawn from public routing.
+  systemctl enable --now phlogiston-web.service
+  curl --fail --silent --show-error http://127.0.0.1:8092/healthz
+  curl --fail --silent --show-error http://127.0.0.1:8092/oauth-client-metadata.json >/dev/null
+  status=$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8092/community/)
+  [ "$status" = 503 ] || { echo "refused: inert community route returned $status" >&2; exit 1; }
+
+  fragment="$phlog_release/deploy/Caddyfile.fragment"
+  status_host=$(grep -m1 -E '^[A-Za-z0-9.-]+ \{' "$fragment" | cut -d' ' -f1 || true)
+  if [ -z "$status_host" ]; then
+    echo "refused: Caddyfile.fragment is withdrawn for Phase 2 and defines no site block; define one for a distinct hostname before --with-status-web" >&2
+    exit 1
+  fi
+  case "$status_host" in
+    phlogiston.app|phlogiston.social|*.phlogiston.social)
+      echo "refused: $status_host is not available to phlogiston-web (PCV0 owns phlogiston.app; phlogiston.social is the PDS)" >&2
+      exit 1 ;;
+  esac
+  install -d -m 0700 "$caddy_backup_dir"
+  caddy_backup="$caddy_backup_dir/Caddyfile.before-phlogiston.$stamp"
+  cp --preserve=mode,timestamps "$caddyfile" "$caddy_backup"
+  sha256sum "$caddy_backup" > "$caddy_backup.sha256"
+  candidate=$(mktemp /tmp/phlogiston-Caddyfile.XXXXXX)
+  trap 'rm -f "$candidate"' EXIT HUP INT TERM
+  python3 "$script_dir/render-caddy.py" --current "$caddyfile" --fragment "$fragment" --output "$candidate"
+  docker cp "$candidate" "$caddy_container:/tmp/Caddyfile.phlogiston-candidate"
+  docker exec "$caddy_container" caddy validate --config /tmp/Caddyfile.phlogiston-candidate
+  cp "$candidate" "$caddyfile"
+  if ! docker exec "$caddy_container" caddy validate --config /etc/caddy/Caddyfile; then
+    cp "$caddy_backup" "$caddyfile"
+    docker exec "$caddy_container" caddy validate --config /etc/caddy/Caddyfile
+    echo "refused: installed Caddyfile failed validation and was restored" >&2
+    exit 1
+  fi
+  docker exec "$caddy_container" caddy reload --config /etc/caddy/Caddyfile
+  curl --fail --silent --show-error "https://$status_host/healthz"
+else
+  echo "phlogiston-web is withdrawn from public routing for Phase 2: unit installed but not enabled, Caddy untouched (use --with-status-web to override)"
 fi
-docker exec "$caddy_container" caddy reload --config /etc/caddy/Caddyfile
-curl --fail --silent --show-error https://phlogiston.app/healthz
 
 receipt="/var/lib/phlogiston/inert-deployment-$stamp.json"
-python3 -c 'import json,sys; json.dump({"schema":"phlogiston.inert-deployment-receipt.v1","artifact_sha256":sys.argv[1],"communitywatch_sha256":sys.argv[2],"community_runtime_installed":sys.argv[5]=="1","caddy_backup":sys.argv[3],"activated_accounts":0,"community_mutations":0},open(sys.argv[4],"x"),sort_keys=True)' "$phlog_sha" "$community_sha" "$caddy_backup" "$receipt" "$with_community_runtime"
+python3 -c 'import json,sys; json.dump({"schema":"phlogiston.inert-deployment-receipt.v1","artifact_sha256":sys.argv[1],"communitywatch_sha256":sys.argv[2],"community_runtime_installed":sys.argv[5]=="1","status_web_enabled":sys.argv[6]=="1","public_route_installed":sys.argv[3]!="none","caddy_backup":sys.argv[3],"activated_accounts":0,"community_mutations":0},open(sys.argv[4],"x"),sort_keys=True)' "$phlog_sha" "$community_sha" "$caddy_backup" "$receipt" "$with_community_runtime" "$with_status_web"
 chmod 0600 "$receipt"
-echo "inert application and public route accepted; no account or community activation occurred"
+echo "inert release accepted; no account or community activation occurred"

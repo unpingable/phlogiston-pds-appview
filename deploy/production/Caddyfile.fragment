@@ -1,7 +1,16 @@
-phlogiston.app {
-	encode zstd gzip
-	reverse_proxy 127.0.0.1:8092
-}
-
+# Withdrawn for Phase 2: this fragment defines no site block.
+#
+# https://phlogiston.app is the participant origin and is served by
+# community-live (127.0.0.1:3210). Its Caddy site block is owned by the
+# atproto-community PCV0 kit (deploy/public-community-pcv0/Caddyfile.fragment),
+# not by this packet. phlogiston-web (127.0.0.1:8092) is not publicly routed in
+# Phase 2 because it would collide with community-live on `/` and `/oauth/*`.
+#
+# To route phlogiston-web again, define a site block here for a distinct
+# hostname (never phlogiston.app, never phlogiston.social or
+# *.phlogiston.social) and deploy with `deploy-inert.sh --with-status-web`.
+# preflight.py refuses a phlogiston.app site block in this file.
+# See docs/PUBLIC-SURFACES.md.
+#
 # The phlogiston.social PDS route is deliberately absent. Add it only with
 # separately approved PDS identity, state, secrets, backup and activation.

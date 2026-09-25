@@ -31,6 +31,12 @@ SYSTEMD_UNIT_DIRS = (
 )
 SYSTEMD_MASKED_STATES = {"masked", "masked-runtime"}
 
+# Phase 2 public-routing guard. https://phlogiston.app is served by the PCV0
+# kit's community-live; the phlogiston kit's Caddy fragment is withdrawn and
+# must not define a phlogiston.app site block (docs/PUBLIC-SURFACES.md).
+PCV0_OWNED_HOST = "phlogiston.app"
+KIT_CADDY_FRAGMENT = Path(__file__).resolve().parent / "Caddyfile.fragment"
+
 Systemctl = Callable[[list[str]], str]
 
 
@@ -157,6 +163,26 @@ def check_single_community_writer(
     return {"community_writer_units": writers, "units_inspected": len(units)}
 
 
+def check_caddy_fragment_withdrawn(fragment_path: Path = KIT_CADDY_FRAGMENT) -> dict:
+    """Refuse if the phlogiston kit's Caddy fragment defines a phlogiston.app site.
+
+    A plain text check: any non-comment line naming the PCV0-owned host is a
+    site block (or a matcher for one) that would collide with community-live.
+    An unreadable fragment is a refusal, not a pass.
+    """
+    try:
+        lines = fragment_path.read_text().splitlines()
+    except OSError as error:
+        raise Refusal(f"Caddy fragment is not readable: {fragment_path}") from error
+    active = [line.strip() for line in lines if line.strip() and not line.strip().startswith("#")]
+    if any(PCV0_OWNED_HOST in line for line in active):
+        raise Refusal(
+            f"phlogiston kit Caddy fragment defines a {PCV0_OWNED_HOST} site; "
+            "the PCV0 kit owns that site for Phase 2 (community-live)"
+        )
+    return {"caddy_fragment_site_lines": len(active)}
+
+
 def validate(
     config_path: Path,
     *,
@@ -164,6 +190,7 @@ def validate(
     machine_id_path: Path = Path("/etc/machine-id"),
     systemd_root: Path = Path("/"),
     systemctl: Systemctl | None | Callable[[], Systemctl | None] = default_systemctl,
+    caddy_fragment: Path = KIT_CADDY_FRAGMENT,
 ) -> dict:
     config = load_json(config_path)
     if config.get("schema") != "phlogiston.inert-deployment.v1":
@@ -215,6 +242,7 @@ def validate(
 
     resolved_systemctl = systemctl() if systemctl is default_systemctl else systemctl
     writer_guard = check_single_community_writer(systemd_root, resolved_systemctl)
+    fragment_guard = check_caddy_fragment_withdrawn(caddy_fragment)
     return {
         "schema": config["schema"],
         "status": "accepted",
@@ -222,6 +250,7 @@ def validate(
         "backup_destination": config["expected_backup_destination"],
         "artifacts_verified": 2,
         "community_writer_units": writer_guard["community_writer_units"],
+        "caddy_fragment_site_lines": fragment_guard["caddy_fragment_site_lines"],
     }
 
 

@@ -1,3 +1,4 @@
+# Withdrawn from public routing for Phase 2: phlogiston.app is served by the PCV0 kit's community-live (see docs/PUBLIC-SURFACES.md). Loopback operator tool only; enabled only by deploy-inert.sh --with-status-web.
 [Unit]
 Description=Phlogiston OAuth and read-only membership surface
 After=network-online.target

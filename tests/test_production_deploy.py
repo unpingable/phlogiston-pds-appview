@@ -24,6 +24,7 @@ RENDER_SPEC.loader.exec_module(RENDER)
 def test_web_unit_is_loopback_only_and_preserves_state_boundary() -> None:
     unit = (ROOT / "deploy/production/phlogiston-web.service").read_text()
     environment = (ROOT / "deploy/production/phlogiston-web.env.example").read_text()
+    assert unit.splitlines()[0].startswith("# Withdrawn from public routing for Phase 2:")
     assert "ExecStart=/usr/bin/node dist/server.js" in unit
     assert "StateDirectory=phlogiston" in unit
     assert "ReadWritePaths=/var/lib/phlogiston" in unit
@@ -64,20 +65,56 @@ def test_community_runtime_templates_are_withdrawn_for_phase_2() -> None:
     assert "phlogiston-communityd.service" not in deploy
 
 
-def test_caddy_packet_exposes_only_the_app_surface() -> None:
+def test_caddy_fragment_is_withdrawn_for_phase_2() -> None:
     fragment = (ROOT / "deploy/production/Caddyfile.fragment").read_text()
-    assert "phlogiston.app" in fragment
-    assert "127.0.0.1:8092" in fragment
+    active = [line for line in fragment.splitlines() if line.strip() and not line.lstrip().startswith("#")]
+    assert active == [], active
+    assert "phlogiston.app" in fragment  # the comment explains who owns the site
     assert "phlogiston.social {" not in fragment
     assert "8093" not in fragment
+    assert PREFLIGHT.check_caddy_fragment_withdrawn(ROOT / "deploy/production/Caddyfile.fragment") == {"caddy_fragment_site_lines": 0}
+    pcv0_site = "phlogiston.app {\n\treverse_proxy 127.0.0.1:3210\n}\n"
+    try:
+        RENDER.render(pcv0_site, fragment)
+    except ValueError as error:
+        assert "existing" in str(error)
+    else:
+        raise AssertionError("rendered over the PCV0-owned phlogiston.app site")
     rendered = RENDER.render("example.net { respond ok }\n", fragment)
-    assert rendered.count("phlogiston.app") == 1
     try:
         RENDER.render(rendered, fragment)
     except ValueError as error:
         assert "existing" in str(error)
     else:
-        raise AssertionError("duplicate route was accepted")
+        raise AssertionError("duplicate marker was accepted")
+
+
+def test_preflight_refuses_phlogiston_app_site_in_kit_fragment(tmp_path: Path) -> None:
+    config, machine = preflight_fixture(tmp_path)
+    colliding = tmp_path / "Caddyfile.fragment"
+    colliding.write_text("# comment mentioning phlogiston.app is fine\nphlogiston.app {\n\treverse_proxy 127.0.0.1:8092\n}\n")
+    try:
+        PREFLIGHT.validate(
+            config,
+            now=datetime(2026, 9, 27, 16, 54, 29, tzinfo=timezone.utc),
+            machine_id_path=machine,
+            systemd_root=systemd_fixture(tmp_path),
+            systemctl=None,
+            caddy_fragment=colliding,
+        )
+    except PREFLIGHT.Refusal as error:
+        assert "phlogiston.app" in str(error) and "PCV0" in str(error)
+    else:
+        raise AssertionError("phlogiston.app site block in the kit fragment was accepted")
+    distinct = tmp_path / "distinct.fragment"
+    distinct.write_text("# phlogiston.app belongs to PCV0\nstatus.example.net {\n\treverse_proxy 127.0.0.1:8092\n}\n")
+    assert PREFLIGHT.check_caddy_fragment_withdrawn(distinct) == {"caddy_fragment_site_lines": 3}
+    try:
+        PREFLIGHT.check_caddy_fragment_withdrawn(tmp_path / "absent.fragment")
+    except PREFLIGHT.Refusal as error:
+        assert "not readable" in str(error)
+    else:
+        raise AssertionError("absent fragment was accepted")
 
 
 def test_on_demand_tls_dispatch_preserves_pds_ownership() -> None:
@@ -335,9 +372,20 @@ def test_deploy_and_rollback_scripts_are_guarded() -> None:
     rollback = (ROOT / "deploy/production/rollback-inert.sh").read_text()
     for required in ("preflight.py", "verify-release.py", "caddy validate", "/community/", "inert-deployment-receipt"):
         assert required in deploy
+    assert "--with-status-web" in deploy
+    assert "with_status_web=0" in deploy
+    head, _, gated = deploy.partition('if [ "$with_status_web" -eq 1 ]; then\n  # Not used for Phase 2')
+    assert gated, "status-web install is not gated"
+    for status_only in ("systemctl enable --now phlogiston-web.service", "render-caddy.py", "caddy reload", "Caddyfile.before-phlogiston"):
+        assert status_only not in head, status_only
+        assert status_only in gated, status_only
+    assert "https://phlogiston.app/healthz" not in deploy
+    for refused in ("phlogiston.app|phlogiston.social|*.phlogiston.social)", "defines no site block"):
+        assert refused in gated, refused
     preflight = (ROOT / "deploy/production/preflight.py").read_text()
     assert "backup_custody_receipt" in preflight
     assert "communityd-serve" in preflight
+    assert "check_caddy_fragment_withdrawn" in preflight
     assert "--confirm-inert-rollback" in rollback
     assert "caddy validate" in rollback
     assert "rm -rf /var/lib" not in rollback

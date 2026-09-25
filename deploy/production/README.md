@@ -9,11 +9,12 @@ The Phase 2 allocation on the shared host (decided 2026-09-25; see
 
 | Component | Owner | Boundary |
 |---|---|---|
-| Phlogiston web | this packet | systemd `phlogiston-web.service`, `127.0.0.1:8092`; the only unit this packet installs |
+| Phlogiston web | this packet | systemd `phlogiston-web.service`, `127.0.0.1:8092`; the only unit this packet installs; **withdrawn from public routing for Phase 2** (installed, not enabled, no Caddy route unless `--with-status-web`) |
 | communitywatch observer (index + web) | atproto-community PCV0 kit | `127.0.0.1:8080`; phlogiston-web reads it unchanged via `PHLOGISTON_PROJECTION_ORIGIN` |
 | communityd, community-policy, community-live, community-notify | atproto-community PCV0 kit | PCV0 units, users, paths and credential; not installed here |
 | Phlogiston PDS (`phlogiston.social`) | separate activation | `127.0.0.1:3002`; operator infrastructure, not on the participant path, not required for Phase 2 |
-| Caddy | existing shared container/config | route only `phlogiston.app` to 8092 |
+| community-live at `https://phlogiston.app` | atproto-community PCV0 kit | the participant origin; its Caddy site block (`phlogiston.app` → `127.0.0.1:3210`) is the PCV0 kit's fragment, not this packet's |
+| Caddy | existing shared container/config | this packet installs no site block in Phase 2; `Caddyfile.fragment` is withdrawn (comment only) |
 
 Two-kit rule: exactly one communityd per community DID holds the actor
 credential, and for Phase 2 that is the PCV0 kit's `communityd.service`, so
@@ -29,6 +30,25 @@ is the Bluesky-hosted `did:plc:b53udqv47g2dayvpstzdefpq`, not a
 `deploy-inert.sh` extracts the community runtime archive and installs the
 withdrawn communitywatch unit only with the explicit `--with-community-runtime`
 flag, which defaults off. Phase 2 does not use it.
+
+Public routing (decided 2026-09-25, superseding the earlier front-door memo;
+see `docs/PUBLIC-SURFACES.md`): `https://phlogiston.app` is the participant
+origin and is served by the PCV0 kit's `community-live` on `127.0.0.1:3210`.
+phlogiston-web collides with it on `/` and `/oauth/*`, so for Phase 2 it is
+withdrawn from public routing: `phlogiston-web.service` is header-marked,
+`Caddyfile.fragment` defines no site block, `deploy-inert.sh` installs the
+release and unit file but enables the unit and runs the Caddy transaction only
+with the explicit `--with-status-web` flag (default off), and `preflight.py`
+refuses if this packet's fragment defines a `phlogiston.app` site. With the
+flag, the fragment must define a site block for a distinct hostname; the
+script refuses `phlogiston.app`, `phlogiston.social` and `*.phlogiston.social`.
+`PHLOGISTON_COMMUNITY_URL` stays optional and is unused in Phase 2 because
+phlogiston.app itself is the community. A default (flagless) deployment writes
+`status_web_enabled: false` and `public_route_installed: false` into its
+receipt; rolling it back needs no Caddy step, only `systemctl disable --now
+phlogiston-web.service` (a no-op), removal of the unit file, and repointing
+`current`, because `rollback-inert.sh` expects a Caddy backup that a flagless
+deployment never creates.
 
 The existing `pds` container is Juche custody and is not reusable. The existing
 `atproto-community-demo` is retained evidence and is not the production
@@ -57,13 +77,13 @@ state path and contains server-side OAuth/DPoP and opaque web sessions.
 
 Immediately before deployment, the off-host backup operator must issue the
 fresh custody receipt described in `docs/PRODUCTION-BACKUP-CONTRACT.md`; the
-production host has no direct NFS mount. Start Phlogiston web, then validate local `/healthz`, client metadata, and the
-expected `/community/` refusal. The observer is the PCV0 kit's
+production host has no direct NFS mount. With `--with-status-web` only: start Phlogiston web, then validate local
+`/healthz`, client metadata, and the expected `/community/` refusal. The observer is the PCV0 kit's
 `communitywatch-web` on `127.0.0.1:8080`, started under that kit's own
 procedure; nothing in this packet starts it. Only afterward may a separately
-approved transaction add and reload the Caddy fragment. The fragment contains
-no `phlogiston.social` route because PDS installation/identity is a separate
-effect.
+approved transaction add and reload the Caddy fragment, and in Phase 2 there
+is none to add. The fragment contains no `phlogiston.social` route because
+PDS installation/identity is a separate effect.
 
 Rollback removes the Caddy fragment, reloads the previously captured complete
 Caddyfile, stops/disables the unit, and points `current` back to the retained
