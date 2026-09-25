@@ -1,3 +1,4 @@
+# Withdrawn for Phase 2: the PCV0 kit owns this service (see docs/PHASE-2-TRIAL.md). Never enable beside PCV0 communityd.service.
 [Unit]
 Description=Phlogiston community authority writer
 After=network-online.target phlogiston-pds.service

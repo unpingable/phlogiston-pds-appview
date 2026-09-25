@@ -1,3 +1,4 @@
+# Withdrawn for Phase 2: the PCV0 kit owns this service (see docs/PHASE-2-TRIAL.md). Never enable beside PCV0 communityd.service.
 [Unit]
 Description=Phlogiston read-only community projection API
 After=local-fs.target

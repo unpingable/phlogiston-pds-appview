@@ -1,3 +1,4 @@
+# Withdrawn for Phase 2: the PCV0 kit owns this service (see docs/PHASE-2-TRIAL.md). Never enable beside PCV0 communityd.service.
 community_did = "SET_EXACT_COMMUNITY_DID_BEFORE_START"
 community_slug = "phlogiston"
 sqlite_path = "/var/lib/phlogiston-communitywatch/observer.sqlite3"

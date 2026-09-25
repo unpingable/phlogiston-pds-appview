@@ -4,15 +4,31 @@ This packet installs no service by itself. It contains only the Phlogiston
 OAuth/read surface. It creates no PDS account, OAuth enrollment, membership,
 admission, moderation action, record, or Lexicon.
 
-The intended allocation on the shared host is:
+The Phase 2 allocation on the shared host (decided 2026-09-25; see
+`docs/PHASE-2-TRIAL.md` "Deployment topology") is:
 
-| Component | Boundary |
-|---|---|
-| Phlogiston web | systemd `phlogiston-web.service`, `127.0.0.1:8092` |
-| communitywatch web/API | separate read-only unit, proposed `127.0.0.1:8093` |
-| future Phlogiston PDS | separate container/unit and loopback port; deliberately unset |
-| communityd | separate authority-bearing unit over a peer-authenticated Unix socket |
-| Caddy | existing shared container/config, route only `phlogiston.app` to 8092 |
+| Component | Owner | Boundary |
+|---|---|---|
+| Phlogiston web | this packet | systemd `phlogiston-web.service`, `127.0.0.1:8092`; the only unit this packet installs |
+| communitywatch observer (index + web) | atproto-community PCV0 kit | `127.0.0.1:8080`; phlogiston-web reads it unchanged via `PHLOGISTON_PROJECTION_ORIGIN` |
+| communityd, community-policy, community-live, community-notify | atproto-community PCV0 kit | PCV0 units, users, paths and credential; not installed here |
+| Phlogiston PDS (`phlogiston.social`) | separate activation | `127.0.0.1:3002`; operator infrastructure, not on the participant path, not required for Phase 2 |
+| Caddy | existing shared container/config | route only `phlogiston.app` to 8092 |
+
+Two-kit rule: exactly one communityd per community DID holds the actor
+credential, and for Phase 2 that is the PCV0 kit's `communityd.service`, so
+this packet's `phlogiston-communityd.service`, `phlogiston-communitywatch.service`
+and their `.toml.example` files are withdrawn (kept for the record, header-marked,
+never to be enabled beside PCV0) and `preflight.py` refuses when any other
+installed unit starts `communityd-serve` or when `phlogiston-communityd.service`
+is installed and not masked. The single README for the community services is
+atproto-community `deploy/public-community-pcv0/README.md`; the community actor
+is the Bluesky-hosted `did:plc:b53udqv47g2dayvpstzdefpq`, not a
+`phlogiston.social` account.
+
+`deploy-inert.sh` extracts the community runtime archive and installs the
+withdrawn communitywatch unit only with the explicit `--with-community-runtime`
+flag, which defaults off. Phase 2 does not use it.
 
 The existing `pds` container is Juche custody and is not reusable. The existing
 `atproto-community-demo` is retained evidence and is not the production
@@ -23,9 +39,9 @@ been authorized or implemented. Do not expose it by manufacturing a session.
 The separately activated PDS template pins the qualified upstream image by
 digest, binds only `127.0.0.1:3002`, and stores its independent state under
 `/var/lib/phlogiston-pds`. The community runtime archive contains both the
-read-only projection packages and `communityd`; the latter remains a separate
-unit, Unix-socket authority boundary, credential and journal. Neither PDS nor
-communityd is installed or started by the inert deployment script.
+read-only projection packages and `communityd`; for Phase 2 it is pinned by
+the preflight but not extracted, because the PCV0 kit provides both. Neither
+PDS nor communityd is installed or started by the inert deployment script.
 
 Install an immutable release under `/opt/phlogiston/releases/<sha256>/`, verify
 the archive SHA-256 before extraction, then run `deploy/verify-release.py`
@@ -35,17 +51,16 @@ Create service user `phlogiston`; install the unit and an owner-only
 environment file at `/etc/phlogiston/phlogiston-web.env`. The inert generation
 must omit `PHLOGISTON_COMMUNITY_DID`; membership is then explicitly
 indeterminate and `/community/` refuses with 503 without contacting the
-observer. Add the exact DID and start communitywatch only through the later
-community-activation authority. `/var/lib/phlogiston` is the only writable web
+observer. Add the exact DID (the PCV0 community DID) only through the later
+community-activation authority; the observer it points at is PCV0's. `/var/lib/phlogiston` is the only writable web
 state path and contains server-side OAuth/DPoP and opaque web sessions.
 
 Immediately before deployment, the off-host backup operator must issue the
 fresh custody receipt described in `docs/PRODUCTION-BACKUP-CONTRACT.md`; the
-production host has no direct NFS mount. Start Phlogiston web without
-communitywatch, then validate local `/healthz`, client metadata, and the
-expected `/community/` refusal. Communitywatch is
-packaged and configured off-host but remains stopped until an exact community
-DID and observer database exist. Only afterward may a separately
+production host has no direct NFS mount. Start Phlogiston web, then validate local `/healthz`, client metadata, and the
+expected `/community/` refusal. The observer is the PCV0 kit's
+`communitywatch-web` on `127.0.0.1:8080`, started under that kit's own
+procedure; nothing in this packet starts it. Only afterward may a separately
 approved transaction add and reload the Caddy fragment. The fragment contains
 no `phlogiston.social` route because PDS installation/identity is a separate
 effect.
@@ -55,7 +70,7 @@ Caddyfile, stops/disables the unit, and points `current` back to the retained
 prior immutable release. Preserve `/var/lib/phlogiston`; rollback never treats
 session deletion as database recovery and never touches community/PDS records.
 
-The production-order packet is deliberately inert: observer, web, local health,
+The production-order packet is deliberately inert: web, local health,
 then an independently approved Caddy transaction. Account enrollment,
 membership, publication, and PDS activation are separate effects and remain
 disabled. If the Q2 observation window is active, do not install the release,

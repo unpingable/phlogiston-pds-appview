@@ -1,3 +1,4 @@
+# Withdrawn for Phase 2: the PCV0 kit owns this service (see docs/PHASE-2-TRIAL.md). Never enable beside PCV0 communityd.service.
 # Identity values are activation inputs. This file contains no secret.
 community_did = "SET_EXACT_COMMUNITY_DID_AT_ACTIVATION"
 administrator_did = "SET_EXACT_ADMINISTRATOR_DID_AT_ACTIVATION"
