@@ -6,11 +6,32 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import shutil
+import subprocess
+from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
 
 
 PLACEHOLDER = "SET_"
+
+# Phase 2 double-writer guard. Exactly one communityd may hold the community
+# actor credential: the atproto-community PCV0 kit's communityd.service. The
+# withdrawn phlogiston unit may be present only if it is masked.
+PCV0_COMMUNITYD_UNIT = "communityd.service"
+WITHDRAWN_COMMUNITYD_UNIT = "phlogiston-communityd.service"
+COMMUNITYD_WRITER_MARKER = "communityd-serve"
+# Earlier entries take precedence, matching systemd's unit search order.
+SYSTEMD_UNIT_DIRS = (
+    "etc/systemd/system",
+    "run/systemd/system",
+    "usr/lib/systemd/system",
+    "lib/systemd/system",
+)
+SYSTEMD_MASKED_STATES = {"masked", "masked-runtime"}
+
+Systemctl = Callable[[list[str]], str]
 
 
 class Refusal(RuntimeError):
@@ -35,11 +56,114 @@ def load_json(path: Path) -> dict:
     return value
 
 
+def run_systemctl(args: list[str]) -> str:
+    completed = subprocess.run(
+        ["systemctl", *args], capture_output=True, text=True, check=True, timeout=30
+    )
+    return completed.stdout
+
+
+def default_systemctl() -> Systemctl | None:
+    return run_systemctl if shutil.which("systemctl") else None
+
+
+def exec_starts(text: str) -> list[str]:
+    values = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("ExecStart") and "=" in stripped:
+            key, _, value = stripped.partition("=")
+            if key.strip() == "ExecStart":
+                values.append(value.strip())
+    return values
+
+
+def scan_unit_dirs(root: Path) -> tuple[dict[str, dict], bool]:
+    """Return {unit name: {masked, exec_starts, path}} and whether any dir existed."""
+    units: dict[str, dict] = {}
+    scanned = False
+    for relative in SYSTEMD_UNIT_DIRS:
+        directory = root / relative
+        if not directory.is_dir():
+            continue
+        scanned = True
+        for path in sorted(directory.iterdir()):
+            if path.suffix != ".service" or path.name in units:
+                continue
+            if path.is_symlink() and os.readlink(path) == "/dev/null":
+                units[path.name] = {"masked": True, "exec_starts": [], "path": str(path)}
+                continue
+            if not path.is_file():
+                continue
+            try:
+                text = path.read_text(errors="replace")
+            except OSError as error:
+                raise Refusal(f"systemd is not queryable: unreadable unit {path}") from error
+            units[path.name] = {"masked": False, "exec_starts": exec_starts(text), "path": str(path)}
+    return units, scanned
+
+
+def merge_systemctl_units(units: dict[str, dict], systemctl: Systemctl) -> None:
+    """Add units systemd knows about that the directory scan did not see."""
+    try:
+        listing = systemctl(["list-unit-files", "--type=service", "--no-legend", "--no-pager", "--plain"])
+    except (OSError, subprocess.SubprocessError, RuntimeError) as error:
+        raise Refusal(f"systemd is not queryable: {error}") from error
+    for line in listing.splitlines():
+        fields = line.split()
+        if not fields or not fields[0].endswith(".service"):
+            continue
+        name = fields[0]
+        state = fields[1] if len(fields) > 1 else ""
+        if state in SYSTEMD_MASKED_STATES:
+            units[name] = {"masked": True, "exec_starts": [], "path": None}
+            continue
+        if name in units:
+            continue
+        try:
+            text = systemctl(["cat", "--no-pager", name])
+        except (OSError, subprocess.SubprocessError, RuntimeError) as error:
+            raise Refusal(f"systemd is not queryable: {error}") from error
+        units[name] = {"masked": False, "exec_starts": exec_starts(text), "path": None}
+
+
+def check_single_community_writer(
+    root: Path = Path("/"),
+    systemctl: Systemctl | None = None,
+) -> dict:
+    """Refuse unless the PCV0 communityd.service is the only startable community writer.
+
+    Fails closed: if no systemd unit directory exists under ``root`` and
+    ``systemctl`` is unavailable or errors, the guard refuses.
+    """
+    units, scanned = scan_unit_dirs(root)
+    if systemctl is not None:
+        merge_systemctl_units(units, systemctl)
+    elif not scanned:
+        raise Refusal("systemd is not queryable: no unit directory under " + str(root) + " and no systemctl")
+
+    withdrawn = units.get(WITHDRAWN_COMMUNITYD_UNIT)
+    if withdrawn is not None and not withdrawn["masked"]:
+        raise Refusal(f"{WITHDRAWN_COMMUNITYD_UNIT} is installed and not masked; mask it (PCV0 communityd.service is the sole writer)")
+
+    writers = sorted(
+        name
+        for name, unit in units.items()
+        if not unit["masked"] and any(COMMUNITYD_WRITER_MARKER in value for value in unit["exec_starts"])
+    )
+    foreign = [name for name in writers if name != PCV0_COMMUNITYD_UNIT]
+    if foreign:
+        raise Refusal("second communityd writer installed beside PCV0 " + PCV0_COMMUNITYD_UNIT + ": " + ", ".join(foreign))
+    return {"community_writer_units": writers, "units_inspected": len(units)}
+
+
 def validate(
     config_path: Path,
     *,
     now: datetime | None = None,
     machine_id_path: Path = Path("/etc/machine-id"),
+    systemd_root: Path = Path("/"),
+    systemctl: Systemctl | None | Callable[[], Systemctl | None] = default_systemctl,
 ) -> dict:
     config = load_json(config_path)
     if config.get("schema") != "phlogiston.inert-deployment.v1":
@@ -88,12 +212,16 @@ def validate(
     unexpected = [Path(config[key]) for key in ("state_root", "observer_state_root") if Path(config[key]).exists()]
     if unexpected:
         raise Refusal("unexpected existing deployment state: " + ", ".join(map(str, unexpected)))
+
+    resolved_systemctl = systemctl() if systemctl is default_systemctl else systemctl
+    writer_guard = check_single_community_writer(systemd_root, resolved_systemctl)
     return {
         "schema": config["schema"],
         "status": "accepted",
         "not_before": config["not_before"],
         "backup_destination": config["expected_backup_destination"],
         "artifacts_verified": 2,
+        "community_writer_units": writer_guard["community_writer_units"],
     }
 
 
