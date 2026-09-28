@@ -9,7 +9,7 @@
     {"path": "verify-identity-resolution.sh", "sha256": "12d4c97cac1d2eef68e0a4670004c9c6aa1d9e7d0e714e7e862c9f92b8b97c61"},
     {"path": "verify-indexing-lag.sh", "sha256": "8976dcb8d9f8a8fbae26224c28daf993ccb729803d9bf3fd021b88e2dc0889be"},
     {"path": "verify-notification-idempotence.sh", "sha256": "368ed0b044bd9b2cebf8d0d09cfab33a83ab5ad1e41bcc5dd8ee9ceb842ef46c"},
-    {"path": "verify-oauth-continuity.sh", "sha256": "f66d513c9abc3aeb410fff5a4fc3a76a818382ac5dc052eae86bfa91a0b8e994"},
+    {"path": "verify-oauth-continuity.sh", "sha256": "e1229be3235b4bd6c62fe5148e715d29f0380c0311d573e487981fcd8c66cf92"},
     {"path": "verify_indexing_record.py", "sha256": "cba41071db366dfa722a6ba39d6394b2d52c8cb97a4a26c8eb612ecd604a92f5"}
   ]
 }

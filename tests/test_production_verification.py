@@ -98,6 +98,50 @@ def test_oauth_wrapper_binds_assigned_baseline_only_to_final_timer() -> None:
     assert wrapper.count("PHLOGISTON_VERIFY_BASELINE_SHA256") == 1
 
 
+def test_oauth_wrapper_executes_baseline_and_final_command_doubles(tmp_path: Path) -> None:
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    calls = tmp_path / "systemd-run.calls"
+    (fake_bin / "id").write_text("#!/bin/sh\nprintf '0\\n'\n")
+    (fake_bin / "install").write_text("#!/bin/sh\nfor value do target=$value; done\nmkdir -p \"$target\"\n")
+    (fake_bin / "systemd-run").write_text(
+        "#!/bin/sh\n"
+        "printf '%s\\n' \"$*\" >> \"$PHLOGISTON_COMMAND_DOUBLE_LOG\"\n"
+        "while [ \"$#\" -gt 0 ]; do\n"
+        "  if [ \"$1\" = baseline ]; then shift; shift; printf '{}\\n' > \"$1\"; fi\n"
+        "  shift\n"
+        "done\n"
+    )
+    for command in fake_bin.iterdir():
+        command.chmod(0o755)
+    live_root = tmp_path / "live"
+    (live_root / "node_modules/.bin").mkdir(parents=True)
+    tsx = live_root / "node_modules/.bin/tsx"
+    tsx.write_text("#!/bin/sh\nexit 99\n")
+    tsx.chmod(0o755)
+    env_file = tmp_path / "community-web.env"
+    env_file.write_text("# local command double\n")
+    session_dir = tmp_path / "session"
+    session_dir.mkdir()
+    receipt = tmp_path / "receipt.json"
+    environment = {
+        "PATH": f"{fake_bin}:{os.environ.get('PATH', '/usr/bin:/bin')}",
+        "PHLOGISTON_PRODUCTION_VERIFY": "1",
+        "PHLOGISTON_VERIFY_LOCAL_COMMAND_DOUBLE": "1",
+        "PHLOGISTON_COMMAND_DOUBLE_LOG": str(calls),
+    }
+    result = run( PRODUCTION / "verify-oauth-continuity.sh", "--receipt", str(receipt), "--did", "did:plc:fixture", "--hours", "12", "--live-root", str(live_root), "--env-file", str(env_file), "--local-command-double-session-dir", str(session_dir), env=environment)
+    assert result.returncode == 0, result.stderr
+    entries = calls.read_text().splitlines()
+    assert len(entries) == 2
+    assert "oauth-continuity.ts baseline did:plc:fixture" in entries[0]
+    assert "PHLOGISTON_VERIFY_BASELINE_SHA256=" not in entries[0]
+    baseline = receipt.with_suffix(receipt.suffix + ".baseline.json")
+    baseline_sha = __import__("hashlib").sha256(baseline.read_bytes()).hexdigest()
+    assert f"PHLOGISTON_VERIFY_BASELINE_SHA256={baseline_sha}" in entries[1]
+    assert "oauth-continuity.ts verify did:plc:fixture" in entries[1]
+
+
 def test_oauth_probe_uses_sdk_iso_expiry_and_post_read_currentness() -> None:
     probe = (PRODUCTION / "oauth-continuity.ts").read_text()
     assert 'typeof value !== "string"' in probe

@@ -4,12 +4,15 @@ set -eu
 . "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/lib.sh"
 verify_guard "$@"; shift 2
 did=; hours=; live_root=/opt/atproto-community/apps/community-live; env_file=/etc/atproto-community/community-web.env
+session_dir=/var/lib/community-web/oauth/session
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --did) did=$2; shift 2 ;;
     --hours) hours=$2; shift 2 ;;
     --live-root) live_root=$2; shift 2 ;;
+    --env-file) env_file=$2; shift 2 ;;
+    --local-command-double-session-dir) session_dir=$2; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 64 ;;
   esac
 done
@@ -19,10 +22,16 @@ case "$hours" in 0|[1-9][0-9]*) ;; *) echo "refused: --hours must be a canonical
 [ "$hours" -le 8760 ] || { echo "refused: --hours exceeds the bounded one-year scheduler limit" >&2; exit 64; }
 minimum_elapsed_seconds=$(( hours * 3600 ))
 [ "$(id -u)" -eq 0 ] || { echo "refused: root required (schedules transient units as community-web)" >&2; exit 64; }
+[ "${PHLOGISTON_VERIFY_LOCAL_COMMAND_DOUBLE:-}" != 1 ] || {
+  case "$session_dir" in /*) ;; *) echo "refused: local command-double session directory must be absolute" >&2; exit 64 ;; esac
+}
+[ "${PHLOGISTON_VERIFY_LOCAL_COMMAND_DOUBLE:-}" = 1 ] || [ "$session_dir" = /var/lib/community-web/oauth/session ] || {
+  echo "refused: alternate session directory is local command-double only" >&2; exit 64;
+}
 check=oauth-continuity
 test -x "$live_root/node_modules/.bin/tsx" || fail "$check" "$live_root/node_modules/.bin/tsx is absent"
 test -f "$env_file" || fail "$check" "$env_file is absent"
-test -d /var/lib/community-web/oauth/session || fail "$check" "no stored OAuth sessions under /var/lib/community-web/oauth/session"
+test -d "$session_dir" || fail "$check" "no stored OAuth sessions under $session_dir"
 
 result="$receipt.result.json"
 baseline="$receipt.baseline.json"
