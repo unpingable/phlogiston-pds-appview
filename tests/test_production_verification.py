@@ -116,3 +116,42 @@ def test_closed_production_verifier_manifest_refuses_tree_substitution(tmp_path:
     refused = subprocess.run(["python3", str(VALIDATOR), "--root", str(copied), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
     assert refused.returncode == 1
     assert "close" in refused.stderr
+
+
+def test_closed_manifest_refuses_links_missing_member_and_content_replacement(tmp_path: Path) -> None:
+    copied = tmp_path / "production"
+    shutil.copytree(PRODUCTION, copied)
+    missing = copied / "lib.sh"
+    missing.unlink()
+    refused_missing = subprocess.run(["python3", str(VALIDATOR), "--root", str(copied), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
+    assert refused_missing.returncode == 1
+    assert "close" in refused_missing.stderr
+
+    shutil.rmtree(copied)
+    shutil.copytree(PRODUCTION, copied)
+    replacement = copied / "lib.sh"
+    replacement.unlink()
+    replacement.write_text("#!/bin/sh\n# pathname replacement fixture\n")
+    refused_replacement = subprocess.run(["python3", str(VALIDATOR), "--root", str(copied), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
+    assert refused_replacement.returncode == 1
+    assert "digest mismatch" in refused_replacement.stderr
+
+    root_link = tmp_path / "production-link"
+    root_link.symlink_to(PRODUCTION, target_is_directory=True)
+    refused_root_link = subprocess.run(["python3", str(VALIDATOR), "--root", str(root_link), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
+    assert refused_root_link.returncode == 1
+    assert "root must be a real directory" in refused_root_link.stderr
+
+    manifest_link = tmp_path / "manifest-link.json"
+    manifest_link.symlink_to(MANIFEST)
+    refused_manifest_link = subprocess.run(["python3", str(VALIDATOR), "--root", str(PRODUCTION), "--manifest", str(manifest_link)], capture_output=True, text=True, check=False)
+    assert refused_manifest_link.returncode == 1
+    assert "manifest must be a real regular file" in refused_manifest_link.stderr
+
+
+def test_closed_manifest_refuses_duplicate_json_key(tmp_path: Path) -> None:
+    duplicate = tmp_path / "duplicate-manifest.json"
+    duplicate.write_text('{"schema":"phlogiston.production-verifier-closure.v1","schema":"x","files":[]}')
+    refused = subprocess.run(["python3", str(VALIDATOR), "--root", str(PRODUCTION), "--manifest", str(duplicate)], capture_output=True, text=True, check=False)
+    assert refused.returncode == 1
+    assert "duplicate JSON key" in refused.stderr
