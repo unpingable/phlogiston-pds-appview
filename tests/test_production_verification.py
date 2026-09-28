@@ -6,11 +6,15 @@ deployment (docs/PRODUCTION-VERIFICATION.md).
 """
 
 from pathlib import Path
+import shutil
 import os
 import subprocess
 
 ROOT = Path(__file__).parents[1]
 SCRIPTS = sorted((ROOT / "qualification/production").glob("verify-*.sh"))
+PRODUCTION = ROOT / "qualification/production"
+MANIFEST = ROOT / "qualification/production-verifier-manifest.json"
+VALIDATOR = PRODUCTION / "validate-production-verifier-closure.py"
 
 
 def run(script: Path, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
@@ -77,7 +81,38 @@ def test_receipt_writer_is_secret_free_by_construction() -> None:
     assert "phlogiston.production-verification.v1" in lib
     lag = (ROOT / "qualification/production/verify-indexing-lag.sh").read_text()
     assert "PHLOGISTON_VERIFY_APP_PASSWORD_FILE" in lag
-    assert "unset access" in lag
-    assert "write_receipt" in lag and '"$access"' not in lag.split("unset access")[1]
+    assert "verify_indexing_record.py" in lag
+    assert "--intent" in lag and "--rkey" in lag
+    assert "com.atproto.repo.createRecord" not in lag
     probe = (ROOT / "qualification/production/oauth-continuity.ts").read_text()
     assert "access_token" not in probe and "refresh_token" not in probe
+
+
+def test_oauth_wrapper_binds_assigned_baseline_only_to_final_timer() -> None:
+    wrapper = (PRODUCTION / "verify-oauth-continuity.sh").read_text()
+    baseline_call = wrapper.index('oauth-continuity.ts" baseline')
+    assignment = wrapper.index('baseline_sha=$(sha256sum "$baseline"')
+    final_timer = wrapper.index('systemd-run --unit="$unit" --on-active=')
+    digest_binding = wrapper.index('PHLOGISTON_VERIFY_BASELINE_SHA256="$baseline_sha"')
+    assert baseline_call < assignment < final_timer < digest_binding
+    assert wrapper.count("PHLOGISTON_VERIFY_BASELINE_SHA256") == 1
+
+
+def test_oauth_probe_uses_sdk_iso_expiry_and_post_read_currentness() -> None:
+    probe = (PRODUCTION / "oauth-continuity.ts").read_text()
+    assert 'typeof value !== "string"' in probe
+    assert "ISO expires_at string" in probe
+    assert probe.index("assessPrerequisites") < probe.index('client.restore(did, "auto")')
+    assert probe.index("readCompletedAt") > probe.index("await response.json()")
+    assert "ranAt: readCompletedAt" in probe
+
+
+def test_closed_production_verifier_manifest_refuses_tree_substitution(tmp_path: Path) -> None:
+    passed = subprocess.run(["python3", str(VALIDATOR), "--root", str(PRODUCTION), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
+    assert passed.returncode == 0, passed.stderr
+    copied = tmp_path / "production"
+    shutil.copytree(PRODUCTION, copied)
+    (copied / "unexpected.py").write_text("# substitution fixture\n")
+    refused = subprocess.run(["python3", str(VALIDATOR), "--root", str(copied), "--manifest", str(MANIFEST)], capture_output=True, text=True, check=False)
+    assert refused.returncode == 1
+    assert "close" in refused.stderr

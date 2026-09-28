@@ -1,0 +1,15 @@
+{
+  "schema": "phlogiston.production-verifier-closure.v1",
+  "files": [
+    {"path": "lib.sh", "sha256": "02007835bfa20316fee28d9747a529d18f29ce806695a7d3e35c68c889ca25a5"},
+    {"path": "oauth-continuity-policy.mjs", "sha256": "3ec5e94cccbc9ee1fe7644628fd76f968ef6f6772fa1b70dd2ea721409350e25"},
+    {"path": "oauth-continuity.ts", "sha256": "8de73f24ea6c2170f757037b87ce01c8d7305939bbee9d1f976e6d6464c7289d"},
+    {"path": "validate-production-verifier-closure.py", "sha256": "56592d9c0293fcf6d4ca2bf3c4a7cae80410d6e525be3bdc8891fe8e172fbcef"},
+    {"path": "verify-external-permalink.sh", "sha256": "8b5edb7825ad0863ebf6fe75fcf99ae24ba85ab36101ef66771ac79037237d56"},
+    {"path": "verify-identity-resolution.sh", "sha256": "12d4c97cac1d2eef68e0a4670004c9c6aa1d9e7d0e714e7e862c9f92b8b97c61"},
+    {"path": "verify-indexing-lag.sh", "sha256": "8976dcb8d9f8a8fbae26224c28daf993ccb729803d9bf3fd021b88e2dc0889be"},
+    {"path": "verify-notification-idempotence.sh", "sha256": "368ed0b044bd9b2cebf8d0d09cfab33a83ab5ad1e41bcc5dd8ee9ceb842ef46c"},
+    {"path": "verify-oauth-continuity.sh", "sha256": "f66d513c9abc3aeb410fff5a4fc3a76a818382ac5dc052eae86bfa91a0b8e994"},
+    {"path": "verify_indexing_record.py", "sha256": "cba41071db366dfa722a6ba39d6394b2d52c8cb97a4a26c8eb612ecd604a92f5"}
+  ]
+}

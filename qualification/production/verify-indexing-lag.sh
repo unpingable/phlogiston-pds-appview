@@ -1,74 +1,67 @@
 #!/bin/sh
-# Jetstream arrival and indexing lag for one controlled record. Writes exactly
-# one zone.neutral.community.submit record (a root submission of the
-# identity's own latest post) to the operator's integration identity's own
-# PDS, then measures when the observer first received it. Timestamps come
-# from the observer's audit event (first_received_at) and the local clock.
-#
-# Side effects: one submission record in the identity's repository (the
-# author can delete it with any client); one pending item in the moderation
-# queue, which the moderator leaves unadmitted or admits and removes; one
-# "pending" line in the room from community-notify. Run
-# verify-notification-idempotence.sh right after this check with the URI it
-# prints.
-#
-# The app password is read from the 0600 file named by
-# PHLOGISTON_VERIFY_APP_PASSWORD_FILE and is never printed or written.
-#
-# usage: PHLOGISTON_PRODUCTION_VERIFY=1 PHLOGISTON_VERIFY_APP_PASSWORD_FILE=/root/x verify-indexing-lag.sh --receipt /abs/r.json --did did:plc:... --community did:plc:b53udqv47g2dayvpstzdefpq [--observer http://127.0.0.1:8080] [--timeout 300]
+# Production V2. One exact caller-supplied rkey is durably reserved before
+# createRecord. Any uncertain response is reconciled by getRecord at that rkey;
+# an absent prior attempt is never redispatched.
 set -eu
 . "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/lib.sh"
 verify_guard "$@"; shift 2
-did=; community=did:plc:b53udqv47g2dayvpstzdefpq; observer=http://127.0.0.1:8080; timeout=300
+did=; community=did:plc:b53udqv47g2dayvpstzdefpq; observer=http://127.0.0.1:8080; timeout=300; intent=; rkey=
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --did) did=$2; shift 2 ;;
     --community) community=$2; shift 2 ;;
     --observer) observer=$2; shift 2 ;;
     --timeout) timeout=$2; shift 2 ;;
+    --intent) intent=$2; shift 2 ;;
+    --rkey) rkey=$2; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 64 ;;
   esac
 done
-[ -n "$did" ] || { echo "usage: --did <identity DID>" >&2; exit 64; }
+[ -n "$did" ] && [ -n "$intent" ] && [ -n "$rkey" ] || {
+  echo "usage: --did <identity DID> --intent /absolute/create-intent.json --rkey <preallocated record key>" >&2
+  exit 64
+}
+case "$intent" in /*) ;; *) echo "refused: --intent must be absolute" >&2; exit 64 ;; esac
+[ -d "$(dirname "$intent")" ] || { echo "refused: intent parent is absent" >&2; exit 64; }
 check=indexing-lag
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 password_file=${PHLOGISTON_VERIFY_APP_PASSWORD_FILE:-}
-[ -n "$password_file" ] && [ -f "$password_file" ] || { echo "refused: PHLOGISTON_VERIFY_APP_PASSWORD_FILE must name a readable file" >&2; exit 64; }
+[ -n "$password_file" ] && [ -f "$password_file" ] || {
+  echo "refused: PHLOGISTON_VERIFY_APP_PASSWORD_FILE must name a readable file" >&2; exit 64;
+}
 [ "$(stat -c %a "$password_file")" = 600 ] || { echo "refused: $password_file must be mode 0600" >&2; exit 64; }
 
 pds=$(curl --fail --silent --show-error --max-time 15 --proto '=https' "https://plc.directory/$did" |
   python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(s["serviceEndpoint"] for s in d.get("service",[]) if s.get("id")=="#atproto_pds"))')
-subject=$(curl --fail --silent --show-error --max-time 15 --proto '=https' \
-  "$pds/xrpc/com.atproto.repo.listRecords?repo=$did&collection=app.bsky.feed.post&limit=1" |
-  python3 -c 'import json,sys; r=json.load(sys.stdin)["records"][0]; print(r["uri"], r["cid"])')
-subject_uri=${subject% *}; subject_cid=${subject#* }
+created_at=; subject_uri=; subject_cid=
+if [ ! -e "$intent" ]; then
+  subject=$(curl --fail --silent --show-error --max-time 15 --proto '=https' \
+    "$pds/xrpc/com.atproto.repo.listRecords?repo=$did&collection=app.bsky.feed.post&limit=1" |
+    python3 -c 'import json,sys; r=json.load(sys.stdin)["records"][0]; print(r["uri"], r["cid"])')
+  subject_uri=${subject% *}; subject_cid=${subject#* }
+  created_at=$(utc_now)
+fi
 
-access=$(python3 - "$pds" "$did" "$password_file" <<'PY'
-import json, sys, urllib.request
-pds, did, path = sys.argv[1:]
-body = json.dumps({"identifier": did, "password": open(path).read().strip()}).encode()
-request = urllib.request.Request(f"{pds}/xrpc/com.atproto.server.createSession", data=body, headers={"content-type": "application/json"})
-with urllib.request.urlopen(request, timeout=20) as response:
-    print(json.load(response)["accessJwt"])
-PY
-)
-created_at=$(utc_now)
-t_create=$(date +%s.%N)
-# The access token crosses to the writer through the environment only (readable
-# by root via /proc; never an argument, never printed, never in the receipt).
-created=$(PHLOG_VERIFY_ACCESS="$access" python3 - "$pds" "$did" "$community" "$subject_uri" "$subject_cid" "$created_at" <<'PY'
-import json, os, sys, urllib.request
-pds, did, community, uri, cid, created_at = sys.argv[1:]
-record = {"$type": "zone.neutral.community.submit", "community": community, "subject": {"uri": uri, "cid": cid}, "createdAt": created_at}
-body = json.dumps({"repo": did, "collection": "zone.neutral.community.submit", "record": record}).encode()
-request = urllib.request.Request(f"{pds}/xrpc/com.atproto.repo.createRecord", data=body,
-    headers={"content-type": "application/json", "authorization": "Bearer " + os.environ["PHLOG_VERIFY_ACCESS"]})
-with urllib.request.urlopen(request, timeout=20) as response:
-    result = json.load(response)
-print(result["uri"], result["cid"])
-PY
-)
-unset access
-uri=${created% *}; cid=${created#* }
+if [ -e "$intent" ]; then
+  record_json=$(python3 -B "$here/verify_indexing_record.py" \
+    --intent "$intent" --pds "$pds" --did "$did" --community "$community" --rkey "$rkey" \
+    --password-file "$password_file") || record_status=$?
+else
+  record_json=$(python3 -B "$here/verify_indexing_record.py" \
+    --intent "$intent" --pds "$pds" --did "$did" --community "$community" --rkey "$rkey" \
+    --password-file "$password_file" --created-at "$created_at" \
+    --subject-uri "$subject_uri" --subject-cid "$subject_cid") || record_status=$?
+fi
+if [ "${record_status:-0}" -ne 0 ]; then
+  fail "$check" "exact record writer refused; inspect the retained intent and do not redispatch"
+fi
+json_field() {
+  printf '%s\n' "$record_json" | python3 -c 'import json,sys; print(json.load(sys.stdin)[sys.argv[1]])' "$1"
+}
+uri=$(json_field uri); cid=$(json_field cid); subject_uri=$(json_field subject_uri)
+created_at=$(json_field created_at); record_sha=$(json_field record_sha256)
+intent_sha=$(json_field intent_sha256); disposition=$(json_field disposition); attempts=$(json_field attempts)
+t_create=$(python3 -c 'import sys; from datetime import datetime; print(datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")).timestamp())' "$created_at")
 
 deadline=$(( $(date +%s) + timeout ))
 first_received=
@@ -82,15 +75,31 @@ print(next((e["first_received_at"] for e in events if e.get("record_uri")==uri),
   sleep 2
 done
 t_seen=$(date +%s.%N)
-[ -n "$first_received" ] || fail "$check" "observer did not receive $uri within ${timeout}s"
-lag=$(python3 -c 'import sys; from datetime import datetime, timezone
-first=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); t=float(sys.argv[2]); print(f"{first.timestamp()-t:.3f}")' "$first_received" "$t_create")
+if [ -z "$first_received" ]; then
+  write_receipt "$check" fail "reason=observer timeout after exact write" "at=$(utc_now)" \
+    "record_uri=$uri" "record_cid=$cid" "intent_path=$intent" "intent_sha256=$intent_sha"
+  exit 1
+fi
+lag=$(python3 -c 'import sys; from datetime import datetime
+first=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); print(f"{first.timestamp()-float(sys.argv[2]):.3f}")' "$first_received" "$t_create")
 seen_after=$(python3 -c 'import sys; print(f"{float(sys.argv[1])-float(sys.argv[2]):.3f}")' "$t_seen" "$t_create")
 health=$(curl --silent --max-time 10 "$observer/health" | python3 -c 'import json,sys; h=json.load(sys.stdin); print(h.get("status"), h.get("lastIngestAt"))' || echo "unavailable")
-queued=$(curl --silent --max-time 10 "$observer/api/v0/communities/$community/moderation-queue" | grep -c "$uri" || true)
+queued=$(curl --fail --silent --show-error --max-time 10 "$observer/api/v0/communities/$community/moderation-queue" |
+  python3 -c 'import json,sys; community,uri=sys.argv[1:]; d=json.load(sys.stdin)
+assert type(d) is dict and d.get("communityDid")==community and type(d.get("submissions")) is list
+print(sum(type(x) is dict and type(x.get("submission")) is dict and x["submission"].get("uri")==uri for x in d["submissions"]))' "$community" "$uri")
+if [ "$queued" -ne 1 ]; then
+  write_receipt "$check" fail "reason=exact record is not present exactly once in moderation queue" "at=$(utc_now)" \
+    "record_uri=$uri" "record_cid=$cid" "in_moderation_queue=$queued" \
+    "intent_path=$intent" "intent_sha256=$intent_sha"
+  exit 1
+fi
 
-write_receipt "$check" pass "at=$(utc_now)" "identity=$did" "pds=$pds" "community=$community" "record_uri=$uri" "record_cid=$cid" \
-  "subject_uri=$subject_uri" "created_at=$created_at" "observer_first_received_at=$first_received" \
-  "observer_lag_seconds=$lag" "poll_detected_after_seconds=$seen_after" "observer_health=$health" "in_moderation_queue=$queued"
-echo "indexing lag accepted: $uri received by the observer ${lag}s after creation; receipt $receipt"
+write_receipt "$check" pass "at=$(utc_now)" "identity=$did" "pds=$pds" "community=$community" \
+  "record_uri=$uri" "record_cid=$cid" "subject_uri=$subject_uri" "created_at=$created_at" \
+  "record_sha256=$record_sha" "intent_path=$intent" "intent_sha256=$intent_sha" \
+  "write_disposition=$disposition" "write_attempts=$attempts" \
+  "observer_first_received_at=$first_received" "observer_lag_seconds=$lag" \
+  "poll_detected_after_seconds=$seen_after" "observer_health=$health" "in_moderation_queue=$queued"
+echo "indexing lag accepted: $uri reconciled and present exactly once in moderation queue; receipt $receipt"
 echo "next: verify-notification-idempotence.sh --uri $uri --cid $cid"

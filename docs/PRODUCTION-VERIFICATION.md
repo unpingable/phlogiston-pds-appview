@@ -27,9 +27,9 @@ proves is sent once.
 | # | Check | Script | Where it runs | What it proves |
 | --- | --- | --- | --- | --- |
 | V1 | Real handle and PLC resolution through community-live's own path | `verify-identity-resolution.sh --handle <handle>` | any machine | `POST /oauth/login` resolves the named handle (DNS TXT or HTTPS well-known, cross-checked independently) to its DID, the DID's PDS via `plc.directory`, and redirects to that PDS's authorization server. The redirect is not followed; only its origin and the timing are recorded. Side effect: one short-lived PAR entry |
-| V2 | Jetstream arrival and indexing lag | `verify-indexing-lag.sh --did <integration DID>` with `PHLOGISTON_VERIFY_APP_PASSWORD_FILE` | the host (observer on loopback) | one controlled `zone.neutral.community.submit` record (root submission of the identity's own latest post) is written to the identity's PDS; the observer's audit event for that URI supplies `first_received_at`; the receipt records the lag against the local creation time, the poll detection time, `/health` `lastIngestAt`, and that the item is in the moderation queue |
+| V2 | Jetstream arrival and indexing lag | `verify-indexing-lag.sh --did <integration DID> --intent <new absolute occurrence intent> --rkey <preallocated key>` with `PHLOGISTON_VERIFY_APP_PASSWORD_FILE` | the host (observer on loopback) | one controlled `zone.neutral.community.submit` record (root submission of the identity's own latest post) is written at the preallocated key. The durable intent is fsynced before dispatch. A lost create response is reconciled only by exact `getRecord` readback at that key; an absent attempted record is indeterminate and is never redispatched. PASS requires the observer's `first_received_at` and exactly one moderation-queue entry for the same URI. |
 | V3 | One qualified notification with idempotence proof | `verify-notification-idempotence.sh --uri <from V2> --cid <from V2> [--room-observation "..."]` | the host, as root | waits for the notifier cursor to hold the `pending <uri> <cid>` key exactly once (the cursor is written only after the room accepted the message); stops the unit; polls once in the foreground as `community-notify` and requires `sent=0, baselined=0`; starts the unit; after two poll intervals requires the cursor bytes unchanged and no baseline/failure journal lines. The operator's statement of what the room showed is recorded verbatim |
-| V4 | OAuth long-duration continuity | `verify-oauth-continuity.sh --did <integration DID> --hours N` | the host, as root | schedules a systemd transient timer that, after N hours, runs `oauth-continuity.ts` as `community-web` with community-live's own env and client construction: `restore(did)` refreshes the stored session, one non-mutating `com.atproto.server.getSession` read must return 200 for that DID. The timer writes `<receipt>.result.json`; the scheduling receipt records the unit name. The identity must not be used on the site in the meantime |
+| V4 | OAuth long-duration continuity | `verify-oauth-continuity.sh --did <integration DID> --hours N` | the host, as root | first writes a same-service-identity, secret-free baseline containing the SDK's ISO `expires_at` string, then schedules a transient timer with that baseline's exact SHA-256. Before final session restoration, the timer refuses a short elapsed interval or a baseline that could still be valid at the boundary. It then requires a 200 `getSession` read for the DID, takes currentness at actual read completion, and accepts only an advanced final expiry current at that instant. |
 | V5 | Signed-out permalink from outside | `verify-external-permalink.sh --rkey <admitted rkey> --from "<network path>"` | a machine on another network path (refuses on the host or any machine holding the host's address) | `GET /d/<rkey>` with no cookies returns 200, no `Set-Cookie`, no sign-in wall, the community-view note present, TLS verified; the address resolved via 1.1.1.1 and the remote IP are recorded |
 
 ## Order and timing
@@ -55,6 +55,14 @@ and list their paths and `status` values in the campaign record. A `fail`
 receipt stops the runbook at action 6; fix in the owning repository, redeploy
 at a new pin, and rerun the failed check with a new receipt path. Never
 edit a receipt.
+
+Before V1--V5, the admitted occurrence validates the exact installed
+`qualification/production/` directory against the separately pinned
+`production-verifier-manifest.json` with
+`validate-production-verifier-closure.py`. The validator accepts only the
+manifested regular-file set and exact digests; extra paths, links, missing
+members, and substitutions refuse. This source tree and its manifest are not
+an authorization to install or run the checks.
 
 ## What these checks do not claim
 

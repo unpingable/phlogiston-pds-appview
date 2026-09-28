@@ -19,7 +19,7 @@ secret-free.
 | --- | --- | --- |
 | P1 | Q2 observation window closed with an uncontaminated closeout receipt (`atproto.q2-closeout.v1`, `uncontaminated: true`, `ended_at` = the configured `not_before`, which is `2026-09-27T16:54:28Z` in `deployment.json.example`) | `/etc/phlogiston/q2-closeout.json` |
 | P2 | Participant packet filled and accepted by the owner ([PHASE-2-PARTICIPANT-PACKET.md](PHASE-2-PARTICIPANT-PACKET.md), all sections, including the two UX placeholders) | packet, acceptance row |
-| P3 | Lexicon publication complete per the PCV0 README gate (seven documents, `_lexicon.community.neutral.zone` TXT resolving to the schema authority DID, publisher receipt) | publisher receipt |
+| P3 | Lexicon publication complete per the PCV0 README gate (all eight exact documents in the selected publisher manifest, `_lexicon.community.neutral.zone` TXT resolving to the schema authority DID, publisher receipt with URI/CID/readback for every document) | publisher receipt |
 | P4 | PCV0 integration identities recorded; the supervised two-account integration receipt validated `--complete` | `<campaign>/integration-receipt.json` |
 | P5 | Off-host backup custody receipt fresh (within one hour of the phlogiston preflight) and the secret custody receipt approved | `/etc/phlogiston/backup-custody.json`, `/etc/phlogiston/secret-custody.json` |
 | P6 | Both repositories at their freeze pins: atproto-community at the pinned commit; phlogiston `main` at the tip named in [PUSH-PREPARATION.md](PUSH-PREPARATION.md) | `git -C <community> rev-parse HEAD`; `git rev-parse HEAD` |

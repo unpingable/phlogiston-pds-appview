@@ -1,14 +1,5 @@
 #!/bin/sh
-# OAuth long-duration continuity: proves that a stored community-live OAuth
-# session still refreshes after N hours, driven by a systemd transient timer
-# rather than a person waiting. The operator signs the integration identity
-# in once in a browser, closes that browser, and does not use that identity
-# on the site until the result exists (refresh-token rotation means two
-# refreshers on one session would invalidate each other). This script writes
-# the scheduling receipt now; the timer writes <receipt>.result.json when it
-# fires, as the community-web user. Runs on the host as root.
-#
-# usage: PHLOGISTON_PRODUCTION_VERIFY=1 verify-oauth-continuity.sh --receipt /abs/r.json --did did:plc:... --hours 12
+# Take a secret-free expiry baseline, then schedule a final probe bound to it.
 set -eu
 . "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/lib.sh"
 verify_guard "$@"; shift 2
@@ -22,26 +13,49 @@ while [ "$#" -gt 0 ]; do
     *) echo "unknown argument: $1" >&2; exit 64 ;;
   esac
 done
-[ -n "$did" ] && [ -n "$hours" ] || { echo "usage: --did <identity DID> --hours <N>" >&2; exit 64; }
-[ "$(id -u)" -eq 0 ] || { echo "refused: root required (schedules a transient timer as community-web)" >&2; exit 64; }
+[ -n "$did" ] && [ -n "$hours" ] || { echo "usage: --did <identity DID> --hours <integer N>=12" >&2; exit 64; }
+case "$hours" in 0|[1-9][0-9]*) ;; *) echo "refused: --hours must be a canonical decimal integer >=12" >&2; exit 64 ;; esac
+[ "$hours" -ge 12 ] || { echo "refused: --hours must be >=12" >&2; exit 64; }
+[ "$hours" -le 8760 ] || { echo "refused: --hours exceeds the bounded one-year scheduler limit" >&2; exit 64; }
+minimum_elapsed_seconds=$(( hours * 3600 ))
+[ "$(id -u)" -eq 0 ] || { echo "refused: root required (schedules transient units as community-web)" >&2; exit 64; }
 check=oauth-continuity
-test -x "$live_root/node_modules/.bin/tsx" || fail "$check" "$live_root/node_modules/.bin/tsx is absent (install with pnpm install --frozen-lockfile)"
+test -x "$live_root/node_modules/.bin/tsx" || fail "$check" "$live_root/node_modules/.bin/tsx is absent"
 test -f "$env_file" || fail "$check" "$env_file is absent"
 test -d /var/lib/community-web/oauth/session || fail "$check" "no stored OAuth sessions under /var/lib/community-web/oauth/session"
 
 result="$receipt.result.json"
-[ ! -e "$result" ] || fail "$check" "result path exists: $result"
+baseline="$receipt.baseline.json"
+[ ! -e "$result" ] && [ ! -e "$baseline" ] || fail "$check" "result or baseline path exists"
 install -d -m 0750 -o community-web "$(dirname "$result")"
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 unit="phlogiston-oauth-continuity-$stamp"
+baseline_unit="$unit-baseline"
+scheduled_at=$(utc_now)
+
+systemd-run --unit="$baseline_unit" --wait --pipe \
+  --property=Type=oneshot --property=RemainAfterExit=yes \
+  --uid=community-web --gid=community-authority \
+  --property=EnvironmentFile="$env_file" --property=WorkingDirectory="$live_root" \
+  --setenv=COMMUNITY_LIVE_ROOT="$live_root" --setenv=PHLOGISTON_VERIFY_SCHEDULED_AT="$scheduled_at" \
+  --setenv=PHLOGISTON_VERIFY_MIN_ELAPSED_SECONDS="$minimum_elapsed_seconds" \
+  --property=ReadWritePaths=/var/lib/community-web --property=ReadWritePaths="$(dirname "$result")" \
+  "$live_root/node_modules/.bin/tsx" "$here/oauth-continuity.ts" baseline "$did" "$baseline"
+test -f "$baseline" || fail "$check" "baseline unit completed without the baseline receipt"
+baseline_sha=$(sha256sum "$baseline" | awk '{print $1}')
+
 systemd-run --unit="$unit" --on-active="${hours}h" --timer-property=AccuracySec=1min \
   --uid=community-web --gid=community-authority \
   --property=EnvironmentFile="$env_file" --property=WorkingDirectory="$live_root" \
-  --setenv=COMMUNITY_LIVE_ROOT="$live_root" --setenv=PHLOGISTON_VERIFY_SCHEDULED_AT="$(utc_now)" \
+  --setenv=COMMUNITY_LIVE_ROOT="$live_root" --setenv=PHLOGISTON_VERIFY_SCHEDULED_AT="$scheduled_at" \
+  --setenv=PHLOGISTON_VERIFY_MIN_ELAPSED_SECONDS="$minimum_elapsed_seconds" \
+  --setenv=PHLOGISTON_VERIFY_BASELINE_SHA256="$baseline_sha" \
   --property=ReadWritePaths=/var/lib/community-web --property=ReadWritePaths="$(dirname "$result")" \
-  "$live_root/node_modules/.bin/tsx" "$here/oauth-continuity.ts" "$did" "$result"
+  "$live_root/node_modules/.bin/tsx" "$here/oauth-continuity.ts" verify "$did" "$result" "$baseline"
 
-write_receipt "$check" scheduled "at=$(utc_now)" "did=$did" "hours=$hours" "timer_unit=$unit.timer" "result_path=$result" \
-  "note=pass/fail is in the result file written by the timer; do not use this identity on the site until then"
-echo "oauth continuity scheduled: $unit fires in ${hours}h and writes $result; receipt $receipt"
-echo "check later with: systemctl list-timers $unit.timer; cat $result"
+write_receipt "$check" scheduled "at=$scheduled_at" "did=$did" "hours=$hours" \
+  "minimum_elapsed_seconds=$minimum_elapsed_seconds" "baseline_unit=$baseline_unit.service" \
+  "baseline_path=$baseline" "baseline_sha256=$baseline_sha" \
+  "timer_unit=$unit.timer" "result_path=$result" \
+  "note=pass requires actual elapsed time, matching DID read and advanced token-expiry provenance; do not use this identity until result"
+echo "oauth continuity scheduled: $unit after at least ${hours}h; baseline $baseline; result $result; receipt $receipt"
