@@ -33,6 +33,15 @@ remains an independent instrument with its own repository, qualification, and
 release surface. Integration changes are made inside the owning component;
 phlogiston pins the qualified revision.
 
+## Exploratory contextual-overlay lane (not currently scheduled)
+
+[Typed contextual overlays](TYPED-CONTEXTUAL-OVERLAYS-RESEARCH.md) records a
+separate exploratory direction: provenance-bearing contextual assertions about
+an ATProto object, beginning with coarse voluntary place context as a worked
+example. It is not a schema, service, feed-ranking proposal, or Phase 2/3
+commitment. The document first tests whether existing ATProto records, labels,
+and community conventions already provide sufficient substrate.
+
 ## Component roles
 
 | Component | Role in product | Boundary |
