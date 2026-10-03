@@ -1,0 +1,18 @@
+# BEGIN PHLOGISTON PRELAUNCH EXPLAINER
+# Static explanation only; no community/OAuth/PDS application activation.
+# Replace this entire block with the PCV0 app site during admitted integration.
+phlogiston.app {
+    root * /srv/www/phlogiston-prelaunch
+    header {
+        Cache-Control "no-cache"
+        Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+        Referrer-Policy "no-referrer"
+        X-Content-Type-Options "nosniff"
+    }
+    @explainer path / /index.html
+    handle @explainer {
+        file_server
+    }
+    respond 404
+}
+# END PHLOGISTON PRELAUNCH EXPLAINER

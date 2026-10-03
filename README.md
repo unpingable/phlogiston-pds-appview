@@ -1,5 +1,13 @@
 # Phlogiston PDS/AppView — bounded synthetic qualification
 
+[Public project explainer](https://phlogiston.app/): communities first on ATProto,
+preparing for invite-only early access. Invitations are issued directly by the
+project owner; no public signup is offered. The static explainer does not
+activate the community application.
+
+[Private invite enrollment](docs/EARLY-ACCESS-INVITES.md) is a bounded future
+design, after initial integration, with identity and consent checked separately.
+
 This is **not** a network AppView, PDS, firehose consumer, identity service, or
 deployment of `phlogiston.app` or `phlogiston.social`.
 

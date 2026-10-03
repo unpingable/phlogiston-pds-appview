@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phlogiston — Communities first, on ATProto</title>
+<meta name="description" content="A communities-first composition layer for ATProto. Preparing for invite-only early access, with invitations issued directly by the project owner.">
+<link rel="canonical" href="https://phlogiston.app/">
+<style>
+:root { color-scheme: light dark; --bg:#fafaf8; --fg:#232522; --muted:#596455; --link:#315e42; --border:#dce0d7; }
+@media(prefers-color-scheme:dark) { :root { --bg:#121712; --fg:#e3e8de; --muted:#a4b69d; --link:#b1d89b; --border:#34432f; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:1.05rem/1.7 system-ui,sans-serif; }
+main { max-width:43rem; margin:auto; padding:4rem 1.5rem; }
+.eyebrow { color:var(--muted); font-size:.85rem; letter-spacing:.1em; text-transform:uppercase; }
+h1 { font-size:clamp(2.5rem,8vw,4rem); line-height:1.1; margin:.7rem 0 1.5rem; }
+h2 { font-size:1.35rem; margin:2.5rem 0 .8rem; }
+p { margin:0 0 1.2rem; }
+a { color:var(--link); text-underline-offset:.2em; }
+a:focus-visible { outline:2px solid currentColor; outline-offset:4px; }
+footer { border-top:1px solid var(--border); padding-top:1.5rem; margin-top:3rem; color:var(--muted); font-size:.9rem; }
+</style>
+</head>
+<body><main>
+<header><p class="eyebrow">Communities first · Built on ATProto</p><h1>Phlogiston</h1></header>
+<p>Phlogiston is a communities-first composition layer for ATProto: a way to bring posts into a shared community context without taking ownership of the author&#x27;s posts or requiring a new social account.</p>
+<p>It is for people who want a small, deliberate place to share and discuss things together, and for maintainers and moderators willing to help run that place. Participants bring their own ATProto identity. Posts remain in their authors&#x27; repositories; a community controls what appears in its own view.</p>
+<h2>What we&#x27;re building first</h2>
+<p>The first integration is deliberately small: a participant submits a post, a consenting moderator admits it, and readers can see it in the community view. The aim is to make that path understandable, including what is pending, what was admitted, and what was removed from the community view.</p>
+<p>Removing something from a community view does not delete the author&#x27;s post. Joining a community does not automatically make someone a moderator.</p>
+<h2>Where it stands</h2>
+<p>Phlogiston is being built and tested before its first participant deployment. There are currently <strong>zero real users</strong>. The first integration is still pending; this page describes the project, not an available community service.</p>
+<p>Early work needs a small group of consenting participants, a second maintainer, and moderators who explicitly agree to that responsibility. Consent to notifications or participation in a shared room is a separate choice. Anyone invited can decline.</p>
+<h2>Getting involved</h2>
+<p><strong>Phlogiston is not open signup. Early access is invite-only and invitations are issued directly by the project owner.</strong> There is no public signup, waitlist, or invite-request form. Initial invitations will be handed directly to people the owner has selected.</p>
+<p>An invitation starts an enrollment conversation. It does not establish identity, consent, moderator standing, or permission to involve a notification room. Those checks and choices happen separately.</p>
+<p>The <a href="https://github.com/unpingable/phlogiston-pds-appview">source repository</a> is public for people who want to follow the work.</p>
+<h2>What it doesn&#x27;t offer yet</h2>
+<p>Phlogiston is not generally available. It does not currently offer PDS hosting or account registration, a durability or availability commitment, or a guarantee of moderation outcomes. It is not a replacement for the ATProto client you already use.</p>
+<p>The immediate goal is one useful, understandable community integration. Wider access and additional features will depend on what that first experience teaches us.</p>
+<footer>Early development · Invite-only · No public signup</footer>
+</main></body></html>
