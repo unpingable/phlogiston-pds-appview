@@ -1,4 +1,20 @@
-# Production backup contract
+# Retained backup hardening contract
+
+Current scope (2026-10-03): Phlogiston has zero users, no irreplaceable user
+repository state and no current PDS continuity promise. The inert launch
+requirement is reconstruction after host loss from retained exact source,
+configuration, approved credential custody or reenrollment records, and small
+operational state. Total-site-loss recovery is outside this qualified envelope.
+Off-host backup custody, fresh backup probes and restore rehearsals are useful
+hardening, not current launch prerequisites. Revisit user-data/PDS DR when
+actually hosting user state or promising durability. Juche's technical patterns
+do not import its operational posture, user commitments or policy.
+
+The earlier procedure below is retained as historical hardening/rehearsal
+material. Its former pre-deployment backup gate is superseded; current
+`deploy/production/preflight.py` does not consume an off-host custody receipt.
+No new backup platform, geographic custody step or DR claim is introduced.
+
 
 Note (2026-09-25): for Phase 2 the community services' state and credentials
 live under the atproto-community PCV0 kit's paths (`/var/lib/communityd`,
@@ -14,14 +30,15 @@ existing off-host backup operator, which reaches the established NFS export
 through its reviewed Docker volume. The application must never fall back to a
 same-named local directory.
 
-## Pre-deployment custody gate
+## Historical pre-deployment custody gate (superseded)
 
 Immediately before deployment, the off-host operator verifies the exact Docker
 volume type/device/options and runs `deploy/production/backup-probe.sh` inside
 that mounted namespace against the dedicated `phlogiston-production`
 directory. The create, fsync, rename, reread/checksum and removal probe emits a
-`phlogiston.backup-custody.v1` receipt. The deployment preflight accepts only a
-matching receipt no more than one hour old. Mount identity remains in the
+`phlogiston.backup-custody.v1` receipt. The former deployment preflight accepted only a
+matching receipt no more than one hour old; this requirement no longer applies
+to the current zero-user inert deployment. Mount identity remains in the
 private operator configuration rather than this public repository.
 
 No automatic expiration is configured. Backup generations remain retained
