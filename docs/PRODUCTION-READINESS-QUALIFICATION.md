@@ -1,5 +1,9 @@
 # Community production-readiness qualification
 
+> Historical qualification/freeze snapshot. Superseded current pins, packaging,
+> and launch gates: [current integration standing](CURRENT-INTEGRATION-STANDING.md).
+> Preserve the dated results below as historical evidence.
+
 Date: 2026-09-22. Result: **qualified in isolation; activation not authorized**.
 
 ## Bound sources

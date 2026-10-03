@@ -71,12 +71,11 @@ Deployment-side prerequisites that are *not* preconditions of the experiment
 design but gate its start (found by the 2026-09-24 first-user review, the
 2026-09-25 topology decision, plus the existing gates):
 
-- the trial runs `community-live`, `community-policy`, and
-  `community-notify` from an atproto-community source checkout at the exact
-  tip recorded in the tranche closeout (`PHASE-2-PREQUAL-TRANCHE-2026-09-25.md`
-  at the workspace root), installed with `pnpm install --frozen-lockfile`
-  from the committed lockfile (never `--prod`); the wheels-only runtime
-  archive is a re-attestation and does not carry those services;
+- the current forward artifact includes `community-live`, `community-policy`
+  and `community-notify`, eight installable wheels and the closed offline
+  frontend dependency store. Use the verified artifact install path in
+  [Q2-ACTIVATION-RUNBOOK.md](Q2-ACTIVATION-RUNBOOK.md), not editable source
+  installs. The dated source-checkout freeze is historical evidence;
 - done on 2026-09-25 and no longer open: the double-writer guard (PCV0
   `host-preflight` and phlogiston `preflight.py`), the `community-live`
   start path (`node_modules/.bin/tsx src/server.ts`), and the deployment

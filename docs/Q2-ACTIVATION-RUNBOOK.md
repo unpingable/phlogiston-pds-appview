@@ -1,28 +1,40 @@
 # Q2 activation runbook — Phase 2 external trial
 
+Current initial integration uses the accepted artifact and gates in
+[CURRENT-INTEGRATION-STANDING.md](CURRENT-INTEGRATION-STANDING.md).
+The external cohort actions below remain prepared for a separate authorized
+trial; they are not additional initial-integration owner inputs.
+
 Status: **prepared, not executed.** Nothing here is authorized by this
 document. Each action below names the authority it waits for. The order is
 the real dependency order; do not reorder to save time. Every action lists
 its rollback command, the state it preserves, and the state that would need
 reconciliation after a rollback.
 
-Conventions: `<community>` is `/opt/atproto-community` (the atproto-community
-checkout at the exact freeze pin recorded in the tranche closeout,
-`PHASE-2-PREQUAL-TRANCHE-2026-09-25.md` at the workspace root); `<venv>` is
-`<community>/.venv`; `<campaign>` is `/var/lib/pcv0-campaign`. Commands run
-on the host as root unless stated. Receipts go under `<campaign>` and are
-secret-free.
+Conventions: `<community>` is the verified installed PCV0 source/kit path at
+`/opt/atproto-community`; `<release>` is the immutable retained artifact;
+`<stage>` is a separate writable installation copy, including its app and pnpm
+store; `<venv>` is the approved Python 3.12 environment; `<campaign>` is
+`/var/lib/pcv0-campaign`. Bind community source, builder source and archive hash
+from the accepted manifest in [current standing](CURRENT-INTEGRATION-STANDING.md).
+Commands run as root unless stated. Receipts are secret-free.
+
+For the current initial integration, bind the prepared authority and consenting
+participant/room records directly. External-cohort authorization in action 1
+and invitations in action 7 apply only to a separately authorized broader trial;
+they add no owner input to the initial integration. Actions 2–6 retain the
+existing mechanical deployment, rollback and verification order.
 
 ## Preconditions (all must hold before action 1)
 
 | # | Precondition | Evidence |
 | --- | --- | --- |
 | P1 | Q2 observation window closed with an uncontaminated closeout receipt (`atproto.q2-closeout.v1`, `uncontaminated: true`, `ended_at` = the configured `not_before`, which is `2026-09-27T16:54:28Z` in `deployment.json.example`) | `/etc/phlogiston/q2-closeout.json` |
-| P2 | Participant packet filled and accepted by the owner ([PHASE-2-PARTICIPANT-PACKET.md](PHASE-2-PARTICIPANT-PACKET.md), all sections, including the two UX placeholders) | packet, acceptance row |
+| P2 | Prepared integration identities and second-person/moderator role consent plus notification-room consent accepted. Recover existing facts mechanically; the full external-trial packet is required only for that separately authorized trial. | exact participant/consent records, acceptance row |
 | P3 | Lexicon publication complete per the PCV0 README gate (all eight exact documents in the selected publisher manifest, `_lexicon.community.neutral.zone` TXT resolving to the schema authority DID, publisher receipt with URI/CID/readback for every document) | publisher receipt |
 | P4 | PCV0 integration identities recorded; the supervised two-account integration receipt validated `--complete` | `<campaign>/integration-receipt.json` |
-| P5 | Off-host backup custody receipt fresh (within one hour of the phlogiston preflight) and the secret custody receipt approved | `/etc/phlogiston/backup-custody.json`, `/etc/phlogiston/secret-custody.json` |
-| P6 | Both repositories at their freeze pins: atproto-community at the pinned commit; phlogiston `main` at the tip named in [PUSH-PREPARATION.md](PUSH-PREPARATION.md) | `git -C <community> rev-parse HEAD`; `git rev-parse HEAD` |
+| P5 | Host-loss reconstruction inputs retained, small current operational state recorded, and secret custody receipt approved. Existing backup/restore evidence is useful hardening; no off-site key or total-site-loss gate. | retained release/configuration/state and `/etc/phlogiston/secret-custody.json` |
+| P6 | Verified artifact manifest binds community runtime source `6436e6a30a8db6b65160c4d290c8764c4216651d`, builder `f8bbf3319f65a7f7774490539274d965b1c7c50e` and the accepted archive hash; later documentation tips are not replacement runtime pins. | archive hash and verifier readback |
 | P7 | The room's incoming webhook URL is in the operator's custody and nowhere in any repository | operator statement |
 | P8 | DNS as recorded in [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md): `phlogiston.app` → host; no A record for `community.neutral.zone` at the host | `dig` |
 
@@ -48,15 +60,18 @@ only for the cohort the amendment names.
 
 Prerequisite: action 1. From the PCV0 README "Host preflight and startup".
 
-```sh
-git -C <community> fetch --all && git -C <community> checkout <pinned commit>
-git -C <community> status --porcelain          # must be empty
-<venv>/bin/pip install -e <community>/packages/communitywatch \
-  -e <community>/packages/communitywatch-web -e <community>/packages/community-policy \
-  -e <community>/packages/communityd -e <community>/packages/community-notify
-( cd <community>/apps/community-live && pnpm install --frozen-lockfile )
-test -x <community>/apps/community-live/node_modules/.bin/tsx
-```
+Use the accepted closed artifact, not editable source installs. Verify its
+archive hash and run `verify-communitywatch-release.py` against the exact
+community and builder pins before installing. Retain the current generation,
+configuration identities and rollback path. Install the eight wheels into the
+approved Python 3.12 virtual environment using `pip install --no-index --no-deps`
+and require `pip check`; reconstruct community-live from its packaged source and
+store in a separate writable `<stage>` copy with `pnpm install --offline --frozen-lockfile --trust-lockfile
+--ignore-scripts --store-dir <stage>/pnpm-store`. Place that tree at the
+existing PCV0 unit path and require `node_modules/.bin/tsx` executable.
+The retained installed-artifact smoke procedure supplies exact target-runtime
+and verifier bindings. It already passed; host activation still requires this
+runbook's genuine authority/identity gates. Do not rebuild merely to wait.
 
 Install the units and configuration from the kit examples, substituting the
 accepted moderator DID, UIDs, `COMMUNITY_NAME`, `COMMUNITY_PURPOSE`,

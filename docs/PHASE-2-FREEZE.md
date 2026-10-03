@@ -1,5 +1,9 @@
 # Phase 2 — pre-activation freeze (2026-09-25)
 
+> Historical qualification/freeze snapshot. Superseded current pins, packaging,
+> and launch gates: [current integration standing](CURRENT-INTEGRATION-STANDING.md).
+> Preserve the dated results below as historical evidence.
+
 Status: **PRE-ACTIVATION FROZEN.** No feature, refactor, dependency, UI, or
 semantic change is admitted before trial activation unless justified by a
 qualification failure, a security defect, a deployment blocker, or an
