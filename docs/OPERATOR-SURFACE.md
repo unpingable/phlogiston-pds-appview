@@ -39,7 +39,7 @@ PDS origins except explicit loopback used by isolated qualification.
 
 ## Current membership semantics
 
-`zone.neutral.community.memberAction` is an append-only community authority
+`app.phlogiston.community.memberAction` is an append-only community authority
 record. The initial vocabulary permits one `add` followed by one terminal
 `remove`; re-enrollment is deliberately refused until an explicit action-chain
 contract exists. PDS account existence and participation never imply

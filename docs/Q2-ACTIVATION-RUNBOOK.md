@@ -31,12 +31,12 @@ existing mechanical deployment, rollback and verification order.
 | --- | --- | --- |
 | P1 | Q2 observation window closed with an uncontaminated closeout receipt (`atproto.q2-closeout.v1`, `uncontaminated: true`, `ended_at` = the configured `not_before`, which is `2026-09-27T16:54:28Z` in `deployment.json.example`) | `/etc/phlogiston/q2-closeout.json` |
 | P2 | Prepared integration identities and second-person/moderator role consent plus notification-room consent accepted. Recover existing facts mechanically; the full external-trial packet is required only for that separately authorized trial. | exact participant/consent records, acceptance row |
-| P3 | Lexicon publication complete per the PCV0 README gate (all eight exact documents in the selected publisher manifest, `_lexicon.community.neutral.zone` TXT resolving to the schema authority DID, publisher receipt with URI/CID/readback for every document) | publisher receipt |
+| P3 | Lexicon publication complete per the PCV0 README gate (all eight exact documents in the selected publisher manifest, `_lexicon.community.phlogiston.app` TXT resolving to the schema authority DID, publisher receipt with URI/CID/readback for every document) | publisher receipt |
 | P4 | PCV0 integration identities recorded; the supervised two-account integration receipt validated `--complete` | `<campaign>/integration-receipt.json` |
 | P5 | Host-loss reconstruction inputs retained, small current operational state recorded, and secret custody receipt approved. Existing backup/restore evidence is useful hardening; no off-site key or total-site-loss gate. | retained release/configuration/state and `/etc/phlogiston/secret-custody.json` |
 | P6 | Verified artifact manifest binds community runtime source `6436e6a30a8db6b65160c4d290c8764c4216651d`, builder `f8bbf3319f65a7f7774490539274d965b1c7c50e` and the accepted archive hash; later documentation tips are not replacement runtime pins. | archive hash and verifier readback |
 | P7 | The room's incoming webhook URL is in the operator's custody and nowhere in any repository | operator statement |
-| P8 | DNS as recorded in [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md): `phlogiston.app` → host; no A record for `community.neutral.zone` at the host | `dig` |
+| P8 | DNS as recorded in [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md): `phlogiston.app` → host; product-owned Lexicon TXT/handle bindings; static explainer block replaced only during admitted integration | `dig` |
 
 ## Actions in dependency order
 

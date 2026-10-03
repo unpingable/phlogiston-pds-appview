@@ -202,8 +202,8 @@ def main():
         "text": "A real isolated Phlogiston community post.",
         "createdAt": "2026-09-22T12:00:00Z",
     })
-    submission = create_record(args.participant_pds_origin, participant_session, "zone.neutral.community.submit", {
-        "$type": "zone.neutral.community.submit",
+    submission = create_record(args.participant_pds_origin, participant_session, "app.phlogiston.community.submit", {
+        "$type": "app.phlogiston.community.submit",
         "community": community["did"],
         "subject": {"uri": post_ref["uri"], "cid": post_ref["cid"]},
         "createdAt": "2026-09-22T12:00:01Z",
@@ -334,13 +334,13 @@ def main():
         participant_claims, cursor = claims(
             args.participant_pds_origin,
             participant.reference,
-            ("zone.neutral.community.submit",),
+            ("app.phlogiston.community.submit",),
             0,
         )
         community_claims, cursor = claims(args.pds_origin, community["did"], (
-            "zone.neutral.community.memberAction",
-            "zone.neutral.community.admission",
-            "zone.neutral.community.replyPolicy",
+            "app.phlogiston.community.memberAction",
+            "app.phlogiston.community.admission",
+            "app.phlogiston.community.replyPolicy",
         ), cursor)
         admission_event_key = None
         admission_reference = None
@@ -357,10 +357,10 @@ def main():
                     "method": verified.verification_method,
                     "hasEvidence": verified.evidence_hash is not None,
                 })
-                if isinstance(envelope, Mapping) and envelope.get("collection") == "zone.neutral.community.admission" and verified.verification_outcome == "verified":
+                if isinstance(envelope, Mapping) and envelope.get("collection") == "app.phlogiston.community.admission" and verified.verification_outcome == "verified":
                     admission_event_key = ingested.key
                     admission_reference = (
-                        f"at://{community['did']}/zone.neutral.community.admission/"
+                        f"at://{community['did']}/app.phlogiston.community.admission/"
                         f"{envelope['rkey']}"
                     )
                     admission_cid = envelope.get("cid")
@@ -406,7 +406,7 @@ def main():
                 {key: value for key, value in removal_fields.items() if key != "path"},
             )
             confirm_effect(app, cookie, "smoke-csrf", review, removal_fields)
-            removal_claims, cursor = claims(args.pds_origin, community["did"], ("zone.neutral.community.modAction",), cursor)
+            removal_claims, cursor = claims(args.pds_origin, community["did"], ("app.phlogiston.community.modAction",), cursor)
             removal_reference = None
             for claim in removal_claims:
                 for verified in VerifyingEventSource(One(claim), **verifier_args).verify_delivery(claim):
@@ -414,7 +414,7 @@ def main():
                     envelope = verified.raw_envelope
                     if isinstance(envelope, Mapping):
                         removal_reference = (
-                            f"at://{community['did']}/zone.neutral.community.modAction/"
+                            f"at://{community['did']}/app.phlogiston.community.modAction/"
                             f"{envelope['rkey']}"
                         )
             after = app.handle("GET", "/community/").body.decode()

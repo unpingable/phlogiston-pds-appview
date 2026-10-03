@@ -79,7 +79,7 @@ removed root are accepted trial semantics).
   their own PDS). No account is created anywhere, and no password is entered
   on the community site. The consent page on their PDS shows the permission
   as "Repository · Publish changes"; the community collection
-  (`zone.neutral.community`) is listed only behind a details control there.
+  (`app.phlogiston.community`) is listed only behind a details control there.
   The site can create posts on their account and can record a submission
   record in their repository; it cannot read private data, follow, like or
   delete anything.

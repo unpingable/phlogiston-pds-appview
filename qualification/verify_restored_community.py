@@ -69,21 +69,21 @@ def verify(args: argparse.Namespace) -> None:
     expected_refs = {expected["admission"], expected["removal"]}
     found_refs = {
         item["uri"]
-        for collection in ("zone.neutral.community.admission", "zone.neutral.community.modAction")
+        for collection in ("app.phlogiston.community.admission", "app.phlogiston.community.modAction")
         for item in records(args.community_pds_origin, community_did, collection)
     }
-    member_records = records(args.community_pds_origin, community_did, "zone.neutral.community.memberAction")
+    member_records = records(args.community_pds_origin, community_did, "app.phlogiston.community.memberAction")
     if expected_refs != found_refs or len(member_records) != 1:
         raise RuntimeError("restored authority records do not match the source occurrence")
 
     resolver = Resolver(documents, origins)
     verifier_args = {"did_resolver": resolver, "pds_client": PdsClient(UrllibHttpGetter(timeout_seconds=10))}
     store = ObserverStore(args.root / "rebuilt-observer.sqlite3", community_did=community_did, administrator_did=member_records[0]["value"]["actor"])
-    participant_claims, cursor = claims(args.participant_pds_origin, participant_did, ("zone.neutral.community.submit",), 0)
+    participant_claims, cursor = claims(args.participant_pds_origin, participant_did, ("app.phlogiston.community.submit",), 0)
     community_claims, _ = claims(args.community_pds_origin, community_did, (
-        "zone.neutral.community.memberAction",
-        "zone.neutral.community.admission",
-        "zone.neutral.community.modAction",
+        "app.phlogiston.community.memberAction",
+        "app.phlogiston.community.admission",
+        "app.phlogiston.community.modAction",
     ), cursor)
     admission_event = None
     deliveries = participant_claims + community_claims
@@ -100,12 +100,12 @@ def verify(args: argparse.Namespace) -> None:
                         "method": verified.verification_method,
                         "evidence": verified.evidence_hash is not None,
                     })
-                if replay == 0 and isinstance(envelope, Mapping) and envelope.get("collection") == "zone.neutral.community.admission":
+                if replay == 0 and isinstance(envelope, Mapping) and envelope.get("collection") == "app.phlogiston.community.admission":
                     admission_event = ingested.key
     if admission_event is None:
         raise RuntimeError("restored admission did not produce verified evidence: " + json.dumps(verdicts, sort_keys=True))
 
-    submission = records(args.participant_pds_origin, participant_did, "zone.neutral.community.submit")
+    submission = records(args.participant_pds_origin, participant_did, "app.phlogiston.community.submit")
     if len(submission) != 1:
         raise RuntimeError("restored participant submission is not exact")
     subject_value = submission[0]["value"]["subject"]

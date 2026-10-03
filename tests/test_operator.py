@@ -109,16 +109,16 @@ def test_account_search_is_read_only_and_allowlists_rendered_fields(app):
 
 def test_admission_is_direct_but_removal_requires_bound_confirmation(app):
     surface, codec, _, community = app
-    admitted = request(surface, codec, "POST", "/admin/community/admit", {"csrf": "csrf-test", "uri": "at://did:example:alice/zone.neutral.community.submit/1", "cid": "bafy-test"})
+    admitted = request(surface, codec, "POST", "/admin/community/admit", {"csrf": "csrf-test", "uri": "at://did:example:alice/app.phlogiston.community.submit/1", "cid": "bafy-test"})
     assert admitted.status == 200 and community.calls[-1][0] == "admit"
 
-    review = request(surface, codec, "POST", "/admin/community/remove", {"csrf": "csrf-test", "uri": "at://did:example:community/zone.neutral.community.admission/1", "cid": "bafy-admit", "reason": "out of scope"})
+    review = request(surface, codec, "POST", "/admin/community/remove", {"csrf": "csrf-test", "uri": "at://did:example:community/app.phlogiston.community.admission/1", "cid": "bafy-admit", "reason": "out of scope"})
     assert review.status == 200
     assert community.calls[-1][0] == "admit"
     text = review.body.decode()
     marker = 'name="confirmation" value="'
     token = text.split(marker, 1)[1].split('"', 1)[0]
-    confirmed = request(surface, codec, "POST", "/admin/confirm", {"csrf": "csrf-test", "confirmation": token, "confirm": "yes", "path": "/admin/community/remove", "uri": "at://did:example:community/zone.neutral.community.admission/1", "cid": "bafy-admit", "reason": "out of scope"})
+    confirmed = request(surface, codec, "POST", "/admin/confirm", {"csrf": "csrf-test", "confirmation": token, "confirm": "yes", "path": "/admin/community/remove", "uri": "at://did:example:community/app.phlogiston.community.admission/1", "cid": "bafy-admit", "reason": "out of scope"})
     assert confirmed.status == 200
     assert community.calls[-1][0] == "remove"
     assert "Authoritative disposition" in confirmed.body.decode()
@@ -126,7 +126,7 @@ def test_admission_is_direct_but_removal_requires_bound_confirmation(app):
 
 def test_duplicate_operator_intent_has_stable_operation_identity(app):
     surface, codec, _, community = app
-    fields = {"csrf": "csrf-test", "uri": "at://did:example:alice/zone.neutral.community.submit/1", "cid": "bafy-test"}
+    fields = {"csrf": "csrf-test", "uri": "at://did:example:alice/app.phlogiston.community.submit/1", "cid": "bafy-test"}
     assert request(surface, codec, "POST", "/admin/community/admit", fields).status == 200
     assert request(surface, codec, "POST", "/admin/community/admit", fields).status == 200
     assert community.calls[0][1]["operation_id"] == community.calls[1][1]["operation_id"]
@@ -146,7 +146,7 @@ def test_communityd_unavailable_after_authentication_is_dependency_failure(app):
         codec,
         "POST",
         "/admin/community/admit",
-        {"csrf": "csrf-test", "uri": "at://did:example:alice/zone.neutral.community.submit/1", "cid": "bafy-test"},
+        {"csrf": "csrf-test", "uri": "at://did:example:alice/app.phlogiston.community.submit/1", "cid": "bafy-test"},
     )
     assert response.status == 503
     assert b"Dependency unavailable" in response.body

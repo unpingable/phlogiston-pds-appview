@@ -19,7 +19,7 @@ activation or real-account authority.
 The intended integrated lifecycle is:
 
 1. an authenticated participant creates an ordinary `app.bsky.feed.post` and
-   `zone.neutral.community.submit` in their own PDS repository;
+   `app.phlogiston.community.submit` in their own PDS repository;
 2. Phlogiston reads the pending submission from the community projection;
 3. an enrolled operator requests `root_admit` through the local communityd
    boundary;
@@ -32,7 +32,7 @@ The intended integrated lifecycle is:
 7. reconciliation updates the projected state to removed.
 
 Membership follows the same authority seam using
-`zone.neutral.community.memberAction`. It is not inferred from PDS account
+`app.phlogiston.community.memberAction`. It is not inferred from PDS account
 existence, OAuth login, posting, labels, or projection activity.
 
 ## Canonical Lexicon authority

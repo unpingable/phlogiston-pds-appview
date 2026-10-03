@@ -10,11 +10,22 @@ owning components' own campaign procedures.
 ## Product thesis
 
 Phlogiston is a **community-centered ATProto product**: bounded, inspectable
-communities over author-custodied posts, served from an operator-owned PDS
-(`phlogiston.social`) and product surface (`phlogiston.app`), with a personal
+communities over author-custodied posts, composed at the product surface
+(`phlogiston.app`), with a personal
 attention-policy engine (atproto-acl / quench) and observatory-grade
 provenance (labelwatch / weatherwatch / driftwatch) as first-class product
 surfaces.
+
+Current initial integration uses participants' existing ATProto accounts;
+Phlogiston is not currently a PDS, has zero real users and makes no PDS
+continuity promise. The operator PDS below is deferred infrastructure, not a
+participant prerequisite. Host-loss reconstruction is the current operational
+requirement; total-site-loss recovery is outside this envelope. Juche supplies
+implementation mechanics only, never product or durability requirements.
+
+The [public explainer](https://phlogiston.app/) describes invite-only
+early access. [Private invitations](EARLY-ACCESS-INVITES.md) are a bounded future
+enrollment mechanism, not public signup or a first-integration dependency.
 
 The composition order the architecture serves:
 
@@ -46,7 +57,7 @@ and community conventions already provide sufficient substrate.
 
 | Component | Role in product | Boundary |
 | --- | --- | --- |
-| PDS (`phlogiston.social`) | Account/repo/blob hosting; stock externally supplied PDS software | Unmodified upstream behavior; no fork |
+| Deferred operator PDS (`phlogiston.social`) | Possible later account/repo/blob hosting; stock externally supplied PDS software | Not currently hosting Phlogiston users or required for initial integration; no continuity promise |
 | phlogiston-web (`web/`) | Operator/status/account surface: DID/OAuth login, read-only community mirror, later policy editor and provenance/status cards. Not publicly routed in Phase 2 | Application-local state keyed by DID |
 | `src/phlogiston_appview/` | Render, receipt, operator, community, recovery modules | Bounded application view; **not** a network-scale AppView |
 | atproto-community | Community semantics: `communityd` sole authority writer; `communitywatch` verified read-only projection; `community-live` OAuth app | Pinned revision; its AGENTS.md invariants are inherited here |
@@ -58,8 +69,9 @@ and community conventions already provide sufficient substrate.
 Public hostnames and their roles are fixed in
 [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md): `phlogiston.app` is the
 participant origin (served by `community-live` from the PCV0 kit),
-`phlogiston.social` is protocol-only, `community.neutral.zone` is retired as
-a site and kept only as the DNS lexicon authority. phlogiston-web is an
+`phlogiston.social` is protocol-only, `community.phlogiston.app` is the DNS-only authority for the product-owned
+`app.phlogiston.community.*` Lexicons. neutral.zone is no longer canonical
+Phlogiston authority. phlogiston-web is an
 operator tool that is not publicly routed in Phase 2.
 
 Generic `app.bsky` read views are delegated to existing external AppViews. A
@@ -79,7 +91,7 @@ true before it starts.
    repository, `main`); this document; spike-branch dispositions
    ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)). Done.
 1. **Activate infrastructure (post-Q2).** Lexicon namespace publication
-   (`zone.neutral.community.*`); PCV0 integration identities; the PCV0 kit's
+   (`app.phlogiston.community.*`); PCV0 integration identities; the PCV0 kit's
    community services, including the `phlogiston.app` Caddy site that routes
    to `community-live`; the inert phlogiston-web release (installed, not
    routed). Nothing here is on a participant's path beyond
@@ -189,7 +201,7 @@ remains gated on OQ-4). That result is not overridden here:
 - Observation ≠ judgment ≠ distribution policy; labels are testimony.
 - `communitywatch` holds no credentials; `communityd` is the sole community
   authority writer.
-- No public registration before backup/restore and migration are qualified.
+- Early access is invite-only and owner-issued; public registration is not offered.
 - Missing acquisition means unknown/refuse, not allow.
 - Semantic discourse inference is not part of any enforcement path.
 - Removal from a community never deletes or mutates the author's record.
@@ -199,7 +211,9 @@ remains gated on OQ-4). That result is not overridden here:
 - Canonical line builds clean; 42 Python tests and 17 web tests pass;
   typecheck clean (verified 2026-09-24 on `main` at the
   community-integration merge).
-- Horizon 0 cross-version restore receipt before any public registration.
+- If hosting user state or promising durability is proposed later, qualify the
+  corresponding PDS/user-data recovery objective then. Existing restore evidence
+  is useful hardening, not an initial-integration gate.
 - Phase-2 technical verification: external-cohort submit → admit → visible,
   with audit entry, in the single spearhead community.
 - Phase-2 product evidence: the behavioral observations and interpretation

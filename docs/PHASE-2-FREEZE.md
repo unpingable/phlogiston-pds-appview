@@ -34,7 +34,7 @@ issue #2).
 `community-live` from the PCV0 kit (Caddy site in that kit, loopback :3210).
 `phlogiston.social` is the PDS/protocol origin; `*.phlogiston.social` is the
 hosted-handle namespace; neither is touched. `community.neutral.zone` is
-retired as an application surface; `zone.neutral.community.*` NSIDs are
+retired as an application surface; `app.phlogiston.community.*` NSIDs are
 unchanged and the DNS-only `_lexicon.community.neutral.zone` TXT authority
 is retained for lexicon publication only. `community.phlogiston.social` is
 not used. `phlogiston-web` is withdrawn from public routing for Phase 2.

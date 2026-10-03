@@ -23,7 +23,7 @@ import urllib.parse
 import urllib.request
 
 
-COLLECTION = "zone.neutral.community.submit"
+COLLECTION = "app.phlogiston.community.submit"
 CONTRACT = "phlogiston.v2-submit-intent.v1"
 PHASES = {"prepared", "attempting", "attempted_unknown", "settled"}
 RKEY = re.compile(r"^[A-Za-z0-9._~:-]{1,512}$")

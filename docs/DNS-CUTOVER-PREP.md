@@ -27,21 +27,27 @@ No AAAA records were observed for the three names (the external checks in
 | `phlogiston.app` | A | `192.46.223.21` | **none** (already the host) |
 | `phlogiston.social` | A | `192.46.223.21` | none; PDS activation is separate |
 | `*.phlogiston.social` | CNAME | unchanged | none; PDS activation is separate |
-| `community.neutral.zone` | A | not needed for Phase 2 | none required. Leave the Pages record or remove it at the owner's discretion; do **not** create an A record to the host (the site role is retired) |
-| `_lexicon.community.neutral.zone` | TXT | `did=<schema authority DID>` | at lexicon publication only, by the owner, per the PCV0 README's publication gate. The value is the dedicated schema-authority DID, never the community actor |
+| `community.phlogiston.app` | A | not needed for Phase 2 | none required. DNS-only namespace authority; no HTTP site/A record is required |
+| `_lexicon.community.phlogiston.app` | TXT | `did=<schema authority DID>` | after approved dedicated authority enrollment and exact-manifest acceptance, executed mechanically, per the PCV0 README's publication gate. The value is the dedicated schema-authority DID, never the community actor |
 
 ## TTL notes
 
 - Nothing in the front-door path changes, so TTLs do not matter for
   cutover. Keep the existing `phlogiston.app` TTL.
-- If the owner later removes the `community.neutral.zone` Pages record, no
-  service depends on it; the TTL only decides how long stale caches keep
-  returning the Pages address, which is harmless.
+- `community.phlogiston.app` is a DNS-only namespace authority. No Pages
+  record was recovered for this new name, and no HTTP/A record is required.
 - For the `_lexicon` TXT, use the registrar default; the lexicon publisher
   reads it once at publication and re-reads it on verification. Wait one
   TTL after creating it before running the publisher's DNS check.
 
-## Service target
+## Service target after admitted integration
+
+Before integration, only the static explainer is served. Replace its complete
+BEGIN/END PHLOGISTON PRELAUNCH EXPLAINER block with the existing PCV0 app block;
+never append a second site at the same origin. OAuth metadata remains404 until
+that separately admitted application activation.
+
+## Application service target
 
 - Caddy (existing shared container) → `127.0.0.1:3210` (`community-live`),
   from the atproto-community PCV0 kit's `Caddyfile.fragment` site block for
@@ -65,10 +71,9 @@ No AAAA records were observed for the three names (the external checks in
 
 ## Rollback
 
-- Front door: restore the previous complete Caddyfile from the byte-for-byte
-  backup taken before the PCV0 site block was added, validate, reload. That
-  removes the `phlogiston.app` site; the name then resolves to the host and
-  Caddy answers with its default (no site) behaviour.
+- Front door: restore only the exact replaced Phlogiston site block from the retained
+  pre-launch fragment after comparing current configuration, validate and
+  reload. Preserve concurrent unrelated shared-host routing changes.
 - No DNS change to roll back for the front door.
 - If the `_lexicon` TXT was created and publication was aborted, leave the
   TXT in place (it is inert without published records) or remove it; the
@@ -79,13 +84,13 @@ No AAAA records were observed for the three names (the external checks in
 ```sh
 dig +short A phlogiston.app                      # expect 192.46.223.21
 dig +short AAAA phlogiston.app                   # expect empty
-dig +short A community.neutral.zone              # expect Pages or empty; never the host
-dig +short TXT _lexicon.community.neutral.zone   # empty until publication
+dig +short A community.phlogiston.app             # no HTTP/A record required
+dig +short TXT _lexicon.community.phlogiston.app   # empty until publication
 curl -sI https://phlogiston.app/                 # HTTP/2 200, HSTS header, no cookie
 curl -s https://phlogiston.app/oauth-client-metadata.json
 #   expect client_id https://phlogiston.app/oauth-client-metadata.json,
 #   redirect_uris ["https://phlogiston.app/oauth/callback"],
-#   scope "atproto repo:app.bsky.feed.post?action=create repo:zone.neutral.community.submit?action=create"
+#   scope "atproto repo:app.bsky.feed.post?action=create repo:app.phlogiston.community.submit?action=create"
 openssl s_client -connect phlogiston.app:443 -servername phlogiston.app </dev/null 2>/dev/null |
   openssl x509 -noout -subject -issuer -dates -ext subjectAltName
 ```

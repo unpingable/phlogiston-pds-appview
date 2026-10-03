@@ -1,20 +1,29 @@
-# Public surfaces — what the names mean
+# Public surfaces — current Phlogiston identity
 
-Decided 2026-09-25 (owner topology decision, final). It supersedes the
-earlier front-door memo of the same day that recommended
-`community.neutral.zone`; the route-ownership facts from that inspection
-(the pinned PDS image `@atproto/pds` 0.5.34, inspected offline, and read-only
-DNS lookups) are retained below. No DNS, TLS, or host state was changed by
-this decision. Principle: one participant-facing origin, one protocol origin,
-nothing else public.
+Updated 2026-10-03 by owner instruction. Phlogiston owns its vocabulary:
+`app.phlogiston.community.*`, not Juche or neutral.zone. The eight schema
+structures remain unchanged; document IDs, digests, collection paths and OAuth
+scopes move together before canonical publication. Old prototype records and
+frozen evidence remain untouched, with no new compatibility promise.
 
-| Hostname | Role | Protocol constraints | Participant-facing? | Decision |
-| --- | --- | --- | --- | --- |
-| `phlogiston.app` | **The canonical participant-facing/application origin.** Serves `community-live`: participation, the OAuth client (`client_id` `https://phlogiston.app/oauth-client-metadata.json`, redirect `/oauth/callback`), community views, `/d/<rkey>` permalinks, notifier permalinks | Own origin, no protocol role. Caddy site block owned by the atproto-community PCV0 kit → `127.0.0.1:3210`. Ordinary ACME certificate | Yes | **The one front door for Phase 2** |
-| `phlogiston.social` (root) | PDS service hostname; operator infrastructure (invite-only accounts, backups). The Phase 2 community actor is a Bluesky-hosted account, not a phlogiston.social one | PDS owns `/`, `/xrpc/*`, `/.well-known/{atproto-did,oauth-authorization-server,oauth-protected-resource}`, `/oauth/*`, `/account*`, `/tls-check`; appears in hosted accounts' DID documents; OAuth authorization server | No | Protocol-only. Untouched. Never a front door; path routing is not safe |
-| `*.phlogiston.social` | Hosted handles | Wildcard route with on-demand TLS gated by the PDS `/tls-check` | Only for accounts hosted there (not Phase 2) | Protocol-only. Untouched |
-| `community.neutral.zone` | Retired as an application surface. Was the smoke-test/dev origin | `_lexicon.community.neutral.zone` TXT remains the permanent NSID authority for `zone.neutral.community.*` (DNS-only, sibling label). The NSIDs are unchanged | No | Retired as a site; DNS-only lexicon authority retained for future publication. No A record needed |
-| `community.phlogiston.social` | Dropped entirely | `community` is in the PDS reserved-handle list, but an operator admin handle update could still claim it, so it must also be reserved operationally | No | Dropped |
+| Hostname | Current role | Boundary |
+| --- | --- | --- |
+| `phlogiston.app` | Static pre-launch explainer; intended future `community-live` participant origin | No signup, OAuth endpoint, community service or PDS activated by the explainer. At admitted integration, replace the complete static Caddy block with the PCV0 app block at the same origin |
+| `community.phlogiston.app` | DNS-only authority for `app.phlogiston.community.*` | `_lexicon.community.phlogiston.app TXT did=<dedicated authority DID>`; no HTTP service or account inferred |
+| `lexicon.phlogiston.app` | Proposed dedicated schema publisher handle | `_atproto.lexicon.phlogiston.app` custom-handle binding after approved enrollment on existing Bluesky hosting; actual assigned DID/PDS recorded mechanically |
+| `phlogiston.social` | Deferred operator PDS infrastructure | Not currently a Phlogiston PDS/user-hosting commitment or initial integration prerequisite |
+| `community.neutral.zone` | Superseded prototype namespace/site | No canonical Phlogiston publication or new runtime compatibility obligation |
+
+The pre-launch static site is source-controlled in `public/prelaunch/index.html`;
+`deploy/prelaunch/Caddyfile.fragment` selects only `/` and `/index.html`.
+Application, OAuth and protocol routes refuse. The page makes no user,
+registration, PDS hosting, availability or durability promise.
+
+## Retained topology mechanics
+
+The earlier September topology inspection below supplies implementation
+mechanics only. Its old neutral namespace and planned PDS continuity wording
+are superseded by this current identity and zero-user product scope.
 
 ## Why phlogiston.app
 
@@ -27,12 +36,11 @@ fragile path allow-listing that breaks on any PDS upgrade.
 
 Between the remaining candidates the owner chose the application's own
 brand. `phlogiston.app` already resolves to the host, has no protocol role,
-and needs no DNS change. `community.neutral.zone` carried only the lexicon
-authority role, and that role is DNS-only: the `_lexicon` TXT is a sibling
-label and does not need an HTTP site behind it. The earlier noun-count
+and needs no front-door DNS change. Lexicon authority is DNS-only and does not
+need an HTTP site at `community.phlogiston.app`. The earlier noun-count
 argument for `neutral` was already weakened by the consent-page inspection:
 the participant's own PDS (oauth-provider-ui 0.10.3) shows the permission as
-"Repository · Publish changes" and names the `zone.neutral.community`
+"Repository · Publish changes" and names the `app.phlogiston.community`
 collection only in a details dialog. What a participant now meets: one site
 name (`phlogiston.app`), one client name (the community's own, per
 `COMMUNITY_NAME`), and Bluesky.
@@ -79,10 +87,10 @@ authentication bridge is authorized.
   has no other use; at a `phlogiston.social` name it would have bound every
   hosted handle.
 - The community DID (`did:plc:b53udqv47g2dayvpstzdefpq`) is independent of
-  any hostname. The scope `repo:zone.neutral.community.submit` is unchanged.
+  any hostname. The current scope is `repo:app.phlogiston.community.submit`; old grants cannot
+  authorize this renamed collection.
 - `community.neutral.zone` currently has an A record to GitHub Pages
-  (185.199.109.153) and no `_lexicon` TXT. Neither needs to change for Phase
-  2; see [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md).
+  (185.199.109.153) and no `_lexicon` TXT. This old namespace will not receive canonical Phlogiston publication; see [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md).
 
 ## Consequences
 
@@ -91,7 +99,7 @@ authentication bridge is authorized.
   `campaign.example.json` `publicOrigin`, the deployment validator's
   `PUBLIC_ORIGIN` and the test fixtures move to `https://phlogiston.app`
   (done in that repository's Phase 2 freeze lane). `LEXICON_DNS_NAME` and
-  the publisher contract keep `community.neutral.zone`.
+  the publisher contract move to `community.phlogiston.app`.
 - No DNS change for the front door. The `_lexicon` TXT is published at
   lexicon publication, as already planned.
 - `community-live`'s OAuth `client_name` follows `COMMUNITY_NAME`, so the

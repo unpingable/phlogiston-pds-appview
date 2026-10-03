@@ -9,7 +9,7 @@ No step in this document is authorization to activate production.
 
 ## Required identities and publication
 
-- Publish the canonical `zone.neutral.community.*` Lexicons from the
+- Publish the canonical `app.phlogiston.community.*` Lexicons from the
   atproto-community authority source, then verify generated consumers with the
   existing drift check. Do not publish a Phlogiston-maintained copy.
 - Select exact production PDS image, Phlogiston commit, community commit, and
