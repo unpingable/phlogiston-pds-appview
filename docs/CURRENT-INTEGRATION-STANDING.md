@@ -2,16 +2,22 @@
 
 ## Current initial-integration standing (2026-10-03)
 
-The earlier neutral-namespace artifact is retained historical evidence. The accepted predecessor
-build now contains all eight community wheels and the community-live source,
-static assets, frozen lockfile and closed offline dependency store: 7,010
-manifest entries, artifact SHA-256
-`1e040e276d9fa62ec64c68bf862ddfd94fb0c914c8889d3e6876bbe13a11f208`.
-Runtime source is community `6436e6a30a8db6b65160c4d290c8764c4216651d`,
-builder `f8bbf3319f65a7f7774490539274d965b1c7c50e`; the new namespace correction changes runtime collection identities and therefore
-requires a fresh source/artifact binding before activation. Predecessor packaging
-and installed-artifact qualification remain evidence, not acceptance of renamed
-record bytes. Host activation remains held.
+The product-owned namespace is `app.phlogiston.community.*`. All eight schemas
+preserve their structure/semantics; current collections, scopes, publisher guards
+and verifiers are qualified together. The new community artifact has eight wheels,
+community-live/static/lock and closed offline store: 7,010 manifest entries,
+SHA-256 `b7c95d396df935896bfb8054b58cf10253857b8073f1992129775c31a55ce7f1`.
+Community source: `ed107ed7ed5025ba62c75afa970525eed3bf1707`.
+Builder/Phlogiston source: `80a868973903d7e5ec478b6e112dbb6147a04923`.
+The new inert Phlogiston artifact is SHA-256
+`ad35f7ebb6fbcd0ab3ef76a8129b3527237595a60d84ad58c5004b3744009dee`.
+
+Checks: 1,385 Community Python, 134 application, nine browser, 14 publisher and
+73 Phlogiston tests; fresh installed-artifact reconstruction and isolated
+three-PDS synthetic path (27 positive/27 refusal cases) passed. The prior
+neutral-namespace artifact and frozen prototype records remain historical
+evidence; their acceptance was not reused for new record bytes.
+Application activation remains held.
 
 Q2 was approved as prepared on 2026-10-03, including the fixed September 20–27
 window, disclosed failed-observation limitation and distinct closeout authority.
