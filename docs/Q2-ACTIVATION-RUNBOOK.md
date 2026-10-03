@@ -1,5 +1,9 @@
 # Q2 activation runbook — Phase 2 external trial
 
+> [Frozen deployment handoff](FROZEN-DEPLOYMENT-HANDOFF.md) supplies the exact
+> qualified archive identities and current hard gates. **DO NOT DEPLOY or enroll
+> credentials before all three gates are satisfied.** Q2 is approved.
+
 Current initial integration uses the accepted artifact and gates in
 [CURRENT-INTEGRATION-STANDING.md](CURRENT-INTEGRATION-STANDING.md).
 The external cohort actions below remain prepared for a separate authorized
@@ -34,7 +38,7 @@ existing mechanical deployment, rollback and verification order.
 | P3 | Lexicon publication complete per the PCV0 README gate (all eight exact documents in the selected publisher manifest, `_lexicon.community.phlogiston.app` TXT resolving to the schema authority DID, publisher receipt with URI/CID/readback for every document) | publisher receipt |
 | P4 | PCV0 integration identities recorded; the supervised two-account integration receipt validated `--complete` | `<campaign>/integration-receipt.json` |
 | P5 | Host-loss reconstruction inputs retained, small current operational state recorded, and secret custody receipt approved. Existing backup/restore evidence is useful hardening; no off-site key or total-site-loss gate. | retained release/configuration/state and `/etc/phlogiston/secret-custody.json` |
-| P6 | Verified artifact manifest binds community runtime source `6436e6a30a8db6b65160c4d290c8764c4216651d`, builder `f8bbf3319f65a7f7774490539274d965b1c7c50e` and the accepted archive hash; later documentation tips are not replacement runtime pins. | archive hash and verifier readback |
+| P6 | Verified artifact manifest binds community runtime source `ed107ed7ed5025ba62c75afa970525eed3bf1707`, builder `80a868973903d7e5ec478b6e112dbb6147a04923` and the accepted archive hash; later documentation tips are not replacement runtime pins. | archive hash and verifier readback |
 | P7 | The room's incoming webhook URL is in the operator's custody and nowhere in any repository | operator statement |
 | P8 | DNS as recorded in [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md): `phlogiston.app` → host; product-owned Lexicon TXT/handle bindings; static explainer block replaced only during admitted integration | `dig` |
 

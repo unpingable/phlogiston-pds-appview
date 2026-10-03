@@ -1,5 +1,9 @@
 # Inert deployment packet
 
+> Current milestone is parked. [Frozen handoff](../../docs/FROZEN-DEPLOYMENT-HANDOFF.md)
+> names the exact qualified archives; reuse them without rebuilding.
+> **DO NOT DEPLOY or enroll credentials until all three recorded owner/participant/room gates are satisfied.**
+
 This packet installs no service by itself. It contains only the Phlogiston
 OAuth/read surface. It creates no PDS account, OAuth enrollment, membership,
 admission, moderation action, record, or Lexicon.
@@ -105,7 +109,7 @@ membership, publication, and PDS activation are separate effects and remain
 disabled. If the Q2 observation window is active, do not install the release,
 units, configuration, or route because those changes alter the observed host.
 
-## Build and install the current community artifact
+## Install retained current artifacts; build mechanism for future releases
 
 The ordinary `deploy/build-communitywatch-release.sh` now packages the eight
 PCV0 hot wheels, immutable `apps/community-live` source/static/package/lockfile,

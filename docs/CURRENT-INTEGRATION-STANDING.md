@@ -1,5 +1,11 @@
 # Phlogiston current integration standing
 
+> Terminal handoff: [exact frozen releases and hard gates](FROZEN-DEPLOYMENT-HANDOFF.md).
+> **DO NOT DEPLOY. Credential enrollment and deployment MUST NOT occur before
+> owner approval of the exact Lexicon publication account/location, a consenting
+> second participant/moderator, and notification-room consent all exist.**
+> Q2 is approved; the retained qualified artifacts require no rebuild.
+
 ## Current initial-integration standing (2026-10-03)
 
 The product-owned namespace is `app.phlogiston.community.*`. All eight schemas

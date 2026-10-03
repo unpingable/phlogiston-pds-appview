@@ -87,8 +87,8 @@ design but gate its start (found by the 2026-09-24 first-user review, the
   door: `phlogiston.app` already resolves to the host; see
   [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md));
 - retire the `community.neutral.zone` site role: nothing to do at DNS beyond
-  not creating an A record for it at the host (the `_lexicon` TXT is
-  published at lexicon publication as planned);
+  not creating an A record for it at the host. Canonical publication uses only
+  `_lexicon.community.phlogiston.app`; no superseded authority TXT is created;
 - the room webhook proven once against the real room;
 - the Q2 terminal receipt; lexicon publication; PCV0 integration identities;
   the PCV0 two-account supervised integration; the operator's technical
