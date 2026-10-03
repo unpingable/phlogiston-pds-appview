@@ -104,3 +104,63 @@ then an independently approved Caddy transaction. Account enrollment,
 membership, publication, and PDS activation are separate effects and remain
 disabled. If the Q2 observation window is active, do not install the release,
 units, configuration, or route because those changes alter the observed host.
+
+## Build and install the current community artifact
+
+The ordinary `deploy/build-communitywatch-release.sh` now packages the eight
+PCV0 hot wheels, immutable `apps/community-live` source/static/package/lockfile,
+and exact closed offline pnpm store under the existing `communitywatch/`
+archive root. It requires Python3.12, Node24+ and pnpm11.11.0; pass the retained
+build-tools wheels and verified `atproto.offline-tree.v1` store input:
+
+```sh
+deploy/build-communitywatch-release.sh --output /absolute/community-release.tar.gz \
+  --community-root /absolute/atproto-community --community-commit <exact-commit> \
+  --build-tools /absolute/build-tools --js-store /absolute/closed-pnpm-store \
+  --js-store-manifest /absolute/pnpm-store-manifest.json \
+  --js-store-manifest-sha256 <exact-manifest-sha256>
+```
+
+The builder refuses a dirty builder worktree, verifies the two pinned Python
+build-tool wheels and complete store inventory, builds all eight wheels from
+the supplied Git commit without network/build isolation, and records both the
+community and Phlogiston builder revisions. It includes its standalone verifier.
+The v2 inventory is the current artifact; retained six-wheel v1 archives remain
+historical evidence and do not satisfy current PCV0 release completeness.
+
+Verify the externally retained archive SHA256 before extracting into a new
+immutable generation, then invoke its bundled verifier with both exact sources:
+
+```sh
+python3 /absolute/generation/verify-communitywatch-release.py \
+  --root /absolute/generation --community-commit <exact-community-commit> \
+  --builder-commit <exact-phlogiston-builder-commit>
+cp -a /absolute/generation /absolute/staging-generation
+python3.12 -m venv /absolute/runtime-venv
+/absolute/runtime-venv/bin/python -m pip install --no-index --no-deps \
+  /absolute/staging-generation/wheels/*.whl
+/absolute/runtime-venv/bin/python -m pip check
+cd /absolute/staging-generation/community-live
+pnpm install --offline --frozen-lockfile --trust-lockfile --ignore-scripts \
+  --store-dir /absolute/staging-generation/pnpm-store
+pnpm typecheck
+```
+
+Perform installation in a disposable staging copy after verifying the immutable
+generation: pnpm creates local dependency links and project tracking metadata.
+Do not rerun release verification against that mutated runtime tree and claim
+it remains the sealed inventory. Keep the verified generation retained, and
+have the existing PCV0 action bind its staged runtime/executables and configuration
+before activation. `--trust-lockfile` applies only to the already reviewed,
+digest-bound canonical lockfile: pnpm11 otherwise rechecks registry policy even
+with `--offline` on a fresh cache. The locked package bytes remain fully verified;
+there is no dependency resolution change or global setting modification.
+
+Use the PCV0 units/users/state/credential scopes and normal-mode configuration
+from atproto-community `deploy/public-community-pcv0/README.md`. Fill and validate
+the actual approved authority/participant/publication records and run
+`validate_deployment.py validate-campaign --ready` before real activation.
+Packaging and a local synthetic smoke do not supply that authority or consent.
+The inert deployment still installs no community writer or public route by
+default; PCV0 owns the sole communityd and participant origin. Current recovery
+remains zero-user host-loss reconstruction, with no new backup/offsite gate.
