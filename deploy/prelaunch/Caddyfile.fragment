@@ -16,3 +16,22 @@ phlogiston.app {
     respond 404
 }
 # END PHLOGISTON PRELAUNCH EXPLAINER
+
+# BEGIN PHLOGISTON SOCIAL PRELAUNCH EXPLAINER
+# Static explanation only; no community/OAuth/PDS application activation.
+# Retain this explainer during .app integration; replace only at separately authorized PDS activation.
+phlogiston.social {
+    root * /srv/www/phlogiston-prelaunch
+    header {
+        Cache-Control "no-cache"
+        Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+        Referrer-Policy "no-referrer"
+        X-Content-Type-Options "nosniff"
+    }
+    @explainer path / /index.html
+    handle @explainer {
+        file_server
+    }
+    respond 404
+}
+# END PHLOGISTON SOCIAL PRELAUNCH EXPLAINER

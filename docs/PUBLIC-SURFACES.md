@@ -11,11 +11,13 @@ frozen evidence remain untouched, with no new compatibility promise.
 | `phlogiston.app` | Static pre-launch explainer; intended future `community-live` participant origin | No signup, OAuth endpoint, community service or PDS activated by the explainer. At admitted integration, replace the complete static Caddy block with the PCV0 app block at the same origin |
 | `community.phlogiston.app` | DNS-only authority for `app.phlogiston.community.*` | `_lexicon.community.phlogiston.app TXT did=<dedicated authority DID>`; no HTTP service or account inferred |
 | `lexicon.phlogiston.app` | Proposed dedicated schema publisher handle | `_atproto.lexicon.phlogiston.app` custom-handle binding after approved enrollment on existing Bluesky hosting; actual assigned DID/PDS recorded mechanically |
-| `phlogiston.social` | Deferred operator PDS infrastructure | Not currently a Phlogiston PDS/user-hosting commitment or initial integration prerequisite |
+| `phlogiston.social` | Same static pre-launch explainer; deferred operator PDS infrastructure | No PDS, account or enrollment activated. Keep this separate static block during .app integration; change it only at separately authorized PDS activation |
 | `community.neutral.zone` | Superseded prototype namespace/site | No canonical Phlogiston publication or new runtime compatibility obligation |
 
 The pre-launch static site is source-controlled in `public/prelaunch/index.html`;
-`deploy/prelaunch/Caddyfile.fragment` selects only `/` and `/index.html`.
+`deploy/prelaunch/Caddyfile.fragment` selects only `/` and `/index.html` on both
+`phlogiston.app` and `phlogiston.social`, using separate marked site blocks.
+The `.social` explainer remains when the `.app` block is replaced at admitted integration.
 Application, OAuth and protocol routes refuse. The page makes no user,
 registration, PDS hosting, availability or durability promise.
 
