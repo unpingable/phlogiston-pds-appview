@@ -162,8 +162,6 @@ def preflight_fixture(tmp_path: Path) -> tuple[Path, Path]:
     q2.write_text(json.dumps({"schema": "atproto.q2-closeout.v1", "uncontaminated": True, "ended_at": "2026-09-27T16:54:28Z"}))
     custody = tmp_path / "custody.json"
     custody.write_text(json.dumps({"schema": "phlogiston.secret-custody.v1", "approved": True}))
-    backup = tmp_path / "backup-custody.json"
-    backup.write_text(json.dumps({"schema": "phlogiston.backup-custody.v1", "status": "accepted", "destination": "phlogiston-production", "probed_at": "2026-09-27T16:54:28Z"}))
     one = tmp_path / "phlog.tar.gz"
     two = tmp_path / "observer.tar.gz"
     one.write_bytes(b"phlog")
@@ -179,8 +177,6 @@ def preflight_fixture(tmp_path: Path) -> tuple[Path, Path]:
         "communitywatch_artifact": str(two),
         "communitywatch_artifact_sha256": hashlib.sha256(two.read_bytes()).hexdigest(),
         "secret_custody_receipt": str(custody),
-        "backup_custody_receipt": str(backup),
-        "expected_backup_destination": "phlogiston-production",
         "state_root": str(tmp_path / "state"),
         "observer_state_root": str(tmp_path / "observer-state"),
     }
@@ -220,6 +216,10 @@ def test_preflight_accepts_only_complete_post_gate_inputs(tmp_path: Path) -> Non
     assert result["status"] == "accepted"
     assert result["artifacts_verified"] == 2
     assert result["community_writer_units"] == ["communityd.service"]
+    assert result["recovery_scope"] == "zero-user-host-loss-reconstruction"
+    assert result["total_site_loss_recovery_claimed"] is False
+    assert not (tmp_path / "backup-custody.json").exists()
+    assert "backup_custody_receipt" not in json.loads(config.read_text())
 
 
 def test_preflight_accepts_without_pcv0_writer_and_with_masked_withdrawn_unit(tmp_path: Path) -> None:
@@ -335,7 +335,6 @@ def test_preflight_refuses_each_dangerous_boundary(tmp_path: Path) -> None:
         "artifact": {"phlogiston_artifact_sha256": "0" * 64},
         "secret": {"secret_custody_receipt": str(tmp_path / "missing.json")},
         "host": {"expected_machine_id_sha256": "f" * 64},
-        "backup": {"expected_backup_destination": "wrong-destination"},
         "existing": {"state_root": str(tmp_path)},
     }
     for name, change in cases.items():
@@ -383,7 +382,8 @@ def test_deploy_and_rollback_scripts_are_guarded() -> None:
     for refused in ("phlogiston.app|phlogiston.social|*.phlogiston.social)", "defines no site block"):
         assert refused in gated, refused
     preflight = (ROOT / "deploy/production/preflight.py").read_text()
-    assert "backup_custody_receipt" in preflight
+    assert "backup_custody_receipt" not in preflight
+    assert "zero-user-host-loss-reconstruction" in preflight
     assert "communityd-serve" in preflight
     assert "check_caddy_fragment_withdrawn" in preflight
     assert "--confirm-inert-rollback" in rollback

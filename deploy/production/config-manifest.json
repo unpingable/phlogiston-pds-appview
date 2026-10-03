@@ -8,7 +8,7 @@
     "communityd.toml.example": "eda2c29e950d75362bd3627dd36587b5245b1efbf5f5f594d071b617cd9af8a8",
     "communitywatch.toml.example": "452beb6bba60e171a3ea695bab88bd34a650a55aa5d86df7fdb99054913ea9a2",
     "deploy-inert.sh": "5261c9ab6020d32b7f1bd66c0707830a45130f8d76747e492f133ada5ab868e0",
-    "deployment.json.example": "5dfd29cbe712a970629fc474a65b64c233369fe5a2697963a2b1deb74aadc050",
+    "deployment.json.example": "5084c36e61753fe124d23ac21281eb55ea0df7ed37a1a6816f1251ef5ba21b7e",
     "phlogiston-communityd.service": "462dd3aa41e3eeabf768f41b0abc7582c43450e8a2c19b4725d745f25f358f24",
     "phlogiston-communitywatch.service": "bbd61fb0385ce4e6e209731d40139e84832fee9ba158b3aac11fb4ec7bb4beb5",
     "phlogiston-pds.compose.yaml": "778a9ef5482aed88383ce3f6da672a65114ff01f535625df4525430838258aa9",
@@ -16,7 +16,7 @@
     "phlogiston-pds.service": "c78cbd97b4656ec74d52988a15f6b50a24c8aed5a0672884ea78e4f765a204f1",
     "phlogiston-web.env.example": "d95011d9d5120656a78c72dfc2a56645f8c44f577882995cc22ab604ca51a17d",
     "phlogiston-web.service": "bdf176f7f1c19296bb0d83f4e3a4181271914002001c7633d2696f47fcb84485",
-    "preflight.py": "4e4b4fdfd06e9d4caf5bfe1954fd47e5a14f453395047be02663853f01476f26",
+    "preflight.py": "828d3819f48e13bec0a5376e31847ff7a19353de895c568791487a34b177e7c7",
     "rollback-inert.sh": "65cf35e890904668c8d8ddda9debaf00c96c64bee7cfd04be3c013cf34420ab2",
     "verify-external.sh": "a7a2158ebe5ce8f4ac39e151249010b508bb9ff6d6c964f252fee148f5622409"
   }

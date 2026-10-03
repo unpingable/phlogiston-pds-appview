@@ -11,8 +11,6 @@
   "communitywatch_artifact": "/var/tmp/communitywatch-89d04da.tar.gz",
   "communitywatch_artifact_sha256": "ad954a8b607db9b98714e01471cb1f1e00da1847a6ed513430e0d25f6abcbccf",
   "secret_custody_receipt": "/etc/phlogiston/secret-custody.json",
-  "backup_custody_receipt": "/etc/phlogiston/backup-custody.json",
-  "expected_backup_destination": "phlogiston-production",
   "install_root": "/opt/phlogiston",
   "community_install_root": "/opt/atproto-community",
   "state_root": "/var/lib/phlogiston",

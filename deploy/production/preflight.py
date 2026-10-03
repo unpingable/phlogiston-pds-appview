@@ -224,17 +224,10 @@ def validate(
     if custody.get("schema") != "phlogiston.secret-custody.v1" or custody.get("approved") is not True:
         raise Refusal("secret custody is not approved")
 
-    backup = load_json(Path(config["backup_custody_receipt"]))
-    if backup.get("schema") != "phlogiston.backup-custody.v1" or backup.get("status") != "accepted":
-        raise Refusal("off-host backup custody is not accepted")
-    if backup.get("destination") != config["expected_backup_destination"]:
-        raise Refusal("backup destination mismatch")
-    try:
-        probed_at = datetime.fromisoformat(str(backup["probed_at"]).replace("Z", "+00:00"))
-    except (KeyError, ValueError) as error:
-        raise Refusal("backup custody receipt time is invalid") from error
-    if not (0 <= (instant - probed_at).total_seconds() <= 3600):
-        raise Refusal("backup custody receipt is stale or future-dated")
+    # Current inert deployment has no users or irreplaceable user repository
+    # state. Exact source/artifacts, retained configuration, approved credential
+    # custody or reenrollment, and the small application state cover host-loss
+    # reconstruction. Off-host/PDS backup hardening is not this launch gate.
 
     unexpected = [Path(config[key]) for key in ("state_root", "observer_state_root") if Path(config[key]).exists()]
     if unexpected:
@@ -247,7 +240,8 @@ def validate(
         "schema": config["schema"],
         "status": "accepted",
         "not_before": config["not_before"],
-        "backup_destination": config["expected_backup_destination"],
+        "recovery_scope": "zero-user-host-loss-reconstruction",
+        "total_site_loss_recovery_claimed": False,
         "artifacts_verified": 2,
         "community_writer_units": writer_guard["community_writer_units"],
         "caddy_fragment_site_lines": fragment_guard["caddy_fragment_site_lines"],

@@ -1,4 +1,4 @@
-# Inert production deployment packet
+# Inert deployment packet
 
 This packet installs no service by itself. It contains only the Phlogiston
 OAuth/read surface. It creates no PDS account, OAuth enrollment, membership,
@@ -75,9 +75,18 @@ observer. Add the exact DID (the PCV0 community DID) only through the later
 community-activation authority; the observer it points at is PCV0's. `/var/lib/phlogiston` is the only writable web
 state path and contains server-side OAuth/DPoP and opaque web sessions.
 
-Immediately before deployment, the off-host backup operator must issue the
-fresh custody receipt described in `docs/PRODUCTION-BACKUP-CONTRACT.md`; the
-production host has no direct NFS mount. With `--with-status-web` only: start Phlogiston web, then validate local
+Current recovery scope is host-loss reconstruction of a zero-user deployment:
+retain the exact source/releases and configuration, approved credential custody
+or reenrollment records, and small operational state. There is no current
+irreplaceable user repository state or PDS continuity promise. Off-host backup,
+geographic key custody and a fresh backup/restore rehearsal are optional
+hardening, not inert-launch prerequisites. Total-site-loss recovery is outside
+this qualified envelope. Revisit user-data/PDS DR when actually hosting user
+state or promising durability. Existing historical backup/rehearsal receipts
+remain useful evidence and are not altered. Juche offers technical examples
+only; its operational posture and user commitments are not Phlogiston policy.
+
+With `--with-status-web` only: start Phlogiston web, then validate local
 `/healthz`, client metadata, and the expected `/community/` refusal. The observer is the PCV0 kit's
 `communitywatch-web` on `127.0.0.1:8080`, started under that kit's own
 procedure; nothing in this packet starts it. Only afterward may a separately
