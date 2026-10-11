@@ -396,7 +396,7 @@ def test_activation_templates_keep_pds_and_authority_separate() -> None:
     pds_env = (ROOT / "deploy/production/phlogiston-pds.env.example").read_text()
     authority = (ROOT / "deploy/production/phlogiston-communityd.service").read_text()
     authority_config = (ROOT / "deploy/production/communityd.toml.example").read_text()
-    assert "ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a" in compose
+    assert "ghcr.io/bluesky-social/pds@sha256:74c650cd620eee2e6e0272b4cb76036a0271523b1742f61f813b79dc5a8b5273" in compose
     assert '"127.0.0.1:3002:3000"' in compose
     assert "PDS_HOSTNAME=phlogiston.social" in pds_env
     assert "SET_OWNER_ONLY_AT_ACTIVATION" in pds_env
