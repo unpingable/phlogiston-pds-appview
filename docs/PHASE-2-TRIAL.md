@@ -1,5 +1,8 @@
 # Phase 2 — the first external trial as a demand experiment
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 Status: **experiment design, pre-deployment.** Nothing here authorizes
 deployment, activation, DNS/TLS/Caddy changes, or a public trial. Those stay
 behind the Q2 observation window's terminal receipt, atproto-community's

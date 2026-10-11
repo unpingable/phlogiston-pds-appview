@@ -1,5 +1,8 @@
 # Q2 activation runbook — Phase 2 external trial
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 > [Frozen deployment handoff](FROZEN-DEPLOYMENT-HANDOFF.md) supplies the exact
 > qualified archive identities and current hard gates. **DO NOT DEPLOY or enroll
 > credentials before all three gates are satisfied.** Q2 is approved.

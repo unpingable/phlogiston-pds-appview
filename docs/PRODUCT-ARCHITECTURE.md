@@ -1,5 +1,8 @@
 # Phlogiston product architecture
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 Status: **product-direction record**. This document consolidates an approved
 composition decision and sequencing. It does not by itself authorize
 deployment, activation, DNS changes, account enrollment, or relay ingestion;

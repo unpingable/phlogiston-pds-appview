@@ -1,5 +1,8 @@
 # Phlogiston current integration standing
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 > Terminal handoff: [exact frozen releases and hard gates](FROZEN-DEPLOYMENT-HANDOFF.md).
 > **DO NOT DEPLOY. Credential enrollment and deployment MUST NOT occur before
 > owner approval of the exact Lexicon publication account/location, a consenting

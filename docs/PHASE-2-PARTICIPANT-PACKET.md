@@ -1,5 +1,8 @@
 # Phase 2 participant and activity packet — TEMPLATE
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 Status: **unfilled.** Every blank below is a decision only the owner can
 make. Nothing in this file may be invented by an agent. Until it is filled
 and accepted, atproto-community's PCV0 human-dogfood gate stays
