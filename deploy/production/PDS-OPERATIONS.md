@@ -2,7 +2,7 @@
 
 This kit operates the stock Bluesky PDS at `https://phlogiston.social`. Public registration stays closed. It does not modify Juche, migrate real users, or change other host services. Root's campaign checkpoint records exact host, source revision, digest, credential custody, retained artifacts and currently active producers. Read and reconcile it before operations; do not duplicate a producer after losing supervision.
 
-The current reviewed remote kit is staged under `/opt/phlogiston-pds/20261011-bootstrap`; verify each executor hash against its lane/source receipt before use. Preserve an exact source receipt when staging a later version. Runtime paths are `/etc/phlogiston/pds.env`, `/etc/phlogiston/phlogiston-pds.compose.yaml`, `/var/lib/phlogiston-pds`, unit `phlogiston-pds.service`, container `phlogiston-pds`, private listener `127.0.0.1:3002`. Verify actual host/machine identity and capacity against root's checkpoint. Admit allocation before image pulls or recovery copies: both the shared host and this runtime host have a 60 GiB unallocated reserve; root owns aggregate accounting. Do not apply another host's capacity sample here.
+The current reviewed remote kit is selected by a root-owned symlink to an exact source-revision directory under `/opt/phlogiston-pds/current`; verify each executor hash against its lane/source receipt before use. Preserve an exact source receipt when staging a later version. Runtime paths are `/etc/phlogiston/pds.env`, `/etc/phlogiston/phlogiston-pds.compose.yaml`, `/var/lib/phlogiston-pds`, unit `phlogiston-pds.service`, container `phlogiston-pds`, private listener `127.0.0.1:3002`. Verify actual host/machine identity and capacity against root's checkpoint. Admit allocation before image pulls or recovery copies: both the shared host and this runtime host have a 60 GiB unallocated reserve; root owns aggregate accounting. Do not apply another host's capacity sample here.
 
 ## Recorded live state and custody
 
@@ -29,15 +29,15 @@ The installed Constellation capability under current qualification is BARv1 **St
 Create root-only custody directories first. The CLI requires new paths and never prints secret values:
 
 ```sh
-/opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-ops.sh configure \
+/opt/phlogiston-pds/current/deploy/production/pds-ops.sh configure \
   --output /etc/phlogiston/pds.env \
-  --template /opt/phlogiston-pds/20261011-bootstrap/deploy/production/phlogiston-pds.env.example
+  --template /opt/phlogiston-pds/current/deploy/production/phlogiston-pds.env.example
 ```
 
 Never regenerate or overwrite this environment after accounts exist. Preserve the PLC rotation key, JWT/DPOP values and admin password with the whole PDS state. The template requires invites; no invite code is published. Admin provisioning uses a private one-use invite followed by stock `createAccount`:
 
 ```sh
-/opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-ops.sh provision \
+/opt/phlogiston-pds/current/deploy/production/pds-ops.sh provision \
   --env /etc/phlogiston/pds.env \
   --custody /var/lib/phlogiston-campaign/20261011/author-a-account.json \
   --handle author-a-20261011.phlogiston.social \
@@ -72,7 +72,7 @@ Provisioning recovery is deliberately conservative. If a protected checkpoint is
 The reusable executor avoids ad hoc scripts and admin record injection:
 
 ```sh
-python3 /opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-fixture-post.py \
+python3 /opt/phlogiston-pds/current/deploy/production/pds-fixture-post.py \
   --account /etc/phlogiston/test-accounts/author-a-20261011.json \
   --case p0-new-case-author-a-20261012 \
   --checkpoint /var/lib/phlogiston-campaign/20261011/p0-new-case-author-a-20261012.json
@@ -85,7 +85,7 @@ Use the actual custody filename from its provisioning receipt; the example is no
 Ensure no browser/lifecycle producer is still writing, pause new community writes/admissions using their existing controls, and record a durable root execution checkpoint with the exact source/image, host, run identity, logs, artifacts, custody and recovery action. A prolonged capture must run under the approved durable execution mechanism. Private age identity custody is separately protected; the public recipient can be recorded in normal receipts.
 
 ```sh
-/opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-ops.sh backup \
+/opt/phlogiston-pds/current/deploy/production/pds-ops.sh backup \
   --data /var/lib/phlogiston-pds --env /etc/phlogiston/pds.env \
   --compose /etc/phlogiston/phlogiston-pds.compose.yaml \
   --archive /var/lib/phlogiston-campaign/20261011/pds-backup.age \
@@ -99,7 +99,7 @@ All output paths must be new and outside the data directory. Capture stops the n
 Transfer ciphertext and its SHA256 receipt to independent custody, retaining the private age identity separately. On a disposable recovery filesystem, create a new empty 0700 target; decrypt only there:
 
 ```sh
-/opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-ops.sh restore \
+/opt/phlogiston-pds/current/deploy/production/pds-ops.sh restore \
   --archive /protected/pds-backup.age --identity /protected/backup.agekey \
   --target /protected/restore-20261011 --expected CIPHERTEXT_SHA256 \
   --receipt /protected/restore-20261011-receipt.json
@@ -119,7 +119,7 @@ docker run --detach --name phlogiston-pds-restore-20261011 \
 There is no privilege/host PID/host cgroup namespace or cgroup hierarchy mount. Root owns allocation/start/stop. Keep the original and restored writable state separate; this network-none clone cannot publish PLC or relay effects. Qualify account passwords and expected exact records through the clone's own loopback API:
 
 ```sh
-/opt/phlogiston-pds/20261011-bootstrap/deploy/production/pds-ops.sh qualify-restore \
+/opt/phlogiston-pds/current/deploy/production/pds-ops.sh qualify-restore \
   --container phlogiston-pds-restore-20261011 \
   --target /protected/restore-20261011 \
   --restore-receipt /protected/restore-20261011-receipt.json \
