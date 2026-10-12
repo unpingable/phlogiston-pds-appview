@@ -20,6 +20,25 @@ Personal-feed **authoring** is core product work distinct from reading a saved c
 
 An optional future [Observe mode](https://github.com/unpingable/atproto-community/issues/24) would use a separate effective read-only OAuth grant. It may allow app-local private curation and local quiet, but must refuse provider writes, including community submissions and notification mute. Changing a display choice cannot revoke an existing broader grant; a real transition must replace, revoke or isolate that grant and qualify the resulting permission boundary. Observe mode is not part of PF1.
 
+## Product learning after PF1
+
+The organizing principle is **a social client where people can deliberately construct and control their information environment**. This refines the Bluesky-client-with-composable-views direction; it does not replace ordinary client usability with a new architecture campaign. Let people borrow an account's perspective without becoming that account.
+
+Responsibilities remain distinct: feeds select incoming material; qualified ACL/Quench policies shape exposure and attention; Labelwatch supplies independent observations; Community supplies governed spaces and collections; composition arranges those surfaces; a future Observe mode constrains participation through effective permissions. These are product roles, not claims that every integration is released or that one component inherits another's authority.
+
+PF1 is subtractive: it can exclude items from the consumer's existing Following timeline, but cannot introduce posts absent from that source. Multiple sources, public follows-graph aggregation, independently scoped policies and publication remain future capabilities. Public direct blocks are only one part of an account's perspective, not a transferable copy of all its moderation preferences.
+
+On 2026-10-12 the owner reported sharing the live application with people to try. This is informal use in progress, not a completed usability study or evidence that PF1 has satisfied Alex's request. Before expanding this feed-authoring lane, learn from that use. It is not a recruited-tester prerequisite for unrelated work or routine fixes.
+
+Two questions should guide the next feedback:
+
+- Does the saved feed give the participant the experience they wanted, or does material remain that they expected the curator to exclude? Distinguish direct blocks, list subscriptions, private mutes, repost/quote behavior, freshness and source expectations before prescribing a solution.
+- What specifically did Alex find useful in the "latent info"? The valuable surface is still unknown; do not assume that phrase means Labelwatch or any particular inspector.
+
+Keep reports separate from reproduced behavior and proposed changes. Do not collect or publish a main/alt association merely to discuss feedback. Record concrete follow-up work in the existing GitHub project when evidence warrants it; PF1's completed implementation remains closed.
+
+Formalization consideration (owner: root, 2026-10-12): this is a product-direction and learning note against deployed web `9d974f517c3bc465cea7642b5d6ade7fd24e3111`, not a new runtime or authority claim. Existing PF1 source/runtime acceptance bounds the subtractive behavior. Prose is sufficient here; effectiveness for independent participants and the meaning of "latent info" remain unverified.
+
 ## Unified authenticated shell
 
 The current participant server is the qualified `community-live` application. The deployed successor adds the Phlogiston shell and the bounded Labelwatch consumer there; it does not route the retained legacy `web/` operator application over the same OAuth endpoints.
