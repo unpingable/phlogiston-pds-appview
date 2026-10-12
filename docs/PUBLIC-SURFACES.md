@@ -1,12 +1,12 @@
 # Public surfaces — Phlogiston participant application
 
-Updated 2026-10-12. The owner has explicitly authorized implementation and deployment of one authenticated Phlogiston shell, with My Labels first and the Cabinet retained as an exhibition. The earlier static-prelaunch, operator-only and PD-E/plugin-first sequencing descriptions are superseded as current product direction. Historical source and receipts remain evidence of their original scope.
+Updated 2026-10-12. Phlogiston is one ATProto social client for ordinary participation, composable feeds, intelligible attention/context and governed communities. The Cabinet remains its public exhibition; My Labels is one bounded contextual surface. The live participant implementation is atproto-community `apps/community-live`; this product repository owns deployment composition and documentation. The [product architecture](PRODUCT-ARCHITECTURE.md) states current direction and the [operational handoff](P0-IMPLEMENTATION-HANDOFF.md) identifies exact deployed source, runtime and rollback. Earlier static-prelaunch, operator-only and PD-E/plugin-first sequencing is historical, not a current gate.
 
 ## Host and route ownership
 
 | Hostname | Current role | Boundary |
 | --- | --- | --- |
-| `phlogiston.app` | Active unified participant application: Cabinet public exhibition and authenticated Home/My Labels/Settings | One application owns public navigation, OAuth client endpoints and participant sessions; anonymous Cabinet browse remains available |
+| `phlogiston.app` | Active participant client: public Cabinet and signed-in reader, feeds, conversation, account context and personal tools | One application owns public navigation, OAuth client endpoints and participant sessions; anonymous Cabinet browse remains available |
 | `community.phlogiston.app` | DNS-only authority for `app.phlogiston.community.*` | `_lexicon.community.phlogiston.app` TXT identifies the dedicated publisher; it is not a separate HTTP application or account provider |
 | `lexicon.phlogiston.app` | Published schema authority's custom handle | Dedicated publisher `did:plc:a3fsoszyvzozh3b5yubhe52b`, hosted on `https://phlogiston.social`; handle/DNS and eight schema record readbacks are accepted campaign evidence |
 | `phlogiston.social` | Separately active controlled ATProto PDS | Protocol, repository/account custody and hosted-handle namespace; no public registration, required identity migration or comprehensive recovery promise is inferred |
@@ -16,7 +16,7 @@ The static explainer in `public/prelaunch/` is retained source/rollback material
 
 ## One participant origin and account context
 
-`https://phlogiston.app` is the canonical participant origin. The selected `community-live` runtime already owns `/`, `/oauth/login`, `/oauth/callback` and `/oauth-client-metadata.json`. The unified shell extends this application rather than adding a second server or OAuth client over those same routes. My Labels and the Cabinet belong to the same participant navigation and restored account context. The deployed successor adds authenticated `/home`, `/labels` and `/settings`, with signed-in Home, Collection, My Labels, Settings and My submissions navigation. The default OAuth landing becomes `/home` while an explicit permalink return is preserved; these are deployed source behavior; canonical signed-in acceptance remains separately recorded. My Labels uses the qualified read-only Labelwatch query interface; that consumer's exact release/configuration and refusal semantics are bound in the successor's own evidence.
+`https://phlogiston.app` is the canonical participant origin. The selected `community-live` runtime owns `/`, `/oauth/login`, `/oauth/callback` and `/oauth-client-metadata.json`. Reader, feeds, Community/Cabinet and My Labels share that navigation and restored account context. Exact current routes and their qualification are located through the [operational handoff](P0-IMPLEMENTATION-HANDOFF.md), rather than a frozen route inventory here. My Labels uses the qualified read-only Labelwatch query interface; that consumer's exact release/configuration and refusal semantics are bound in its own evidence.
 
 Anonymous Cabinet browsing and pasteable discussion links remain public. Personal observations and participant-private submission status remain session-bound. Sign-in does not confer the moderator role or authority over another account. Read-only label observations do not admit/remove community posts, publish labels, mutate repositories or turn testimony into policy. Unknown observation is not an empty result.
 
@@ -30,9 +30,9 @@ The retained product `web/` operator/status application is not publicly routed a
 
 This instruction does not reactivate a legacy status-web unit, change its cookie/client contract, or claim that an earlier standalone/plugin spike qualifies the new shell. No new operator `/admin/` entitlement or operational control surface is implied by participant authentication.
 
-## Operational boundaries and exact current baseline
+## Operational boundaries and current baseline locator
 
-The current participant shell web source is `7851bcbff5f8e96d23a9573575b23695a3d43142`, selected by the managed `community-live.service` drop-in and a fresh immutable web generation. Authority/observer code, Node24 and dependency closure remain the `3bf402e4cf4974b5319d2f2ce0ffd76476b61b28` base generation. All four services are boot-enabled; controls were restored open after canonical lifecycle and boundary qualification. Durable web-only shell deployment `ffd5ea53-0cb0-4d3c-8e66-4e91ee7b38e4` passed with collection/metadata/CSS/seed200 and anonymous Home/Labels/Settings401. Only web restarted; the exact b5a7ed8 managed drop-in and source are retained for rollback, and config/state/open controls and other service identities were preserved. Independent canonical signed-in acceptance remains separate. See [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md) for exact paths, records, tests and bounded web rollback.
+The [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md) is the current baseline locator for exact source, service configuration, receipts and bounded web rollback. This page records public role and authority boundaries; it does not duplicate a version-specific deployment ledger. A web-only successor must preserve authority/observer services, private state, credentials and rollback custody. Independent canonical signed-in acceptance remains separate from source checks and a deployment terminal.
 
 The existing Docker `caddy` owns canonical TLS/routing, through a single-file bind of the host Caddyfile. `phlogiston.app` routes to loopback3211; community query remains loopback8081. A web-only source successor needs no Caddy/DNS/PDS route change. Preserve the authority socket/principals, credential/private state custody, provider configuration, other service identities and existing PDS/Constellation operational boundaries.
 
