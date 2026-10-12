@@ -1,229 +1,59 @@
 # Phlogiston product architecture
 
-> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+Updated 2026-10-12 under the owner's explicit instruction to implement and deploy the integrated signed-in Phlogiston application, with **My Labels first**. This instruction supersedes the earlier operator-only surface restriction, plugin-first PD-E sequencing and demand-trial prerequisite for building the participant application. It does not relabel historical trials or spikes as successful. The deployed Cabinet remains available while the shell successor is implemented and qualified.
 
+## Product and participant path
 
-Status: **product-direction record**. This document consolidates an approved
-composition decision and sequencing. It does not by itself authorize
-deployment, activation, DNS changes, account enrollment, or relay ingestion;
-those remain gated by [INTEGRATION-ROADMAP.md](INTEGRATION-ROADMAP.md),
-[PRE-Q2-ACTIVATION-READINESS.md](PRE-Q2-ACTIVATION-READINESS.md), and the
-owning components' own campaign procedures.
+Phlogiston is one participant application at `https://phlogiston.app`. Its authenticated shell composes personal ATProto tools and bounded community exhibitions. A participant signs in with an existing supported ATProto account, then uses My Labels and the Cabinet from the same application navigation. My Labels is the first personal utility; the Cabinet remains a human-curated collection of author-custodied public posts, browsable without sign-in. It is an exhibition within Phlogiston rather than the definition of the entire product.
 
-## Product thesis
+The product owns navigation, account context, presentation, disclosure and qualified component composition. Integration does not merge service authority. Personal label observations do not admit or remove community posts; admission does not turn a label into a verdict or distribution policy. Labels retain their source and meaning as testimony.
 
-Phlogiston is a **community-centered ATProto product**: bounded, inspectable
-communities over author-custodied posts, composed at the product surface
-(`phlogiston.app`), with a personal
-attention-policy engine (atproto-acl / quench) and observatory-grade
-provenance (labelwatch / weatherwatch / driftwatch) as first-class product
-surfaces.
+Existing ordinary Bluesky accounts and explicitly supported Phlogiston-hosted accounts work without identity migration. `phlogiston.social` is separately live PDS infrastructure, not the participant application origin or a requirement to move an account. Public PDS registration is not offered by this application. Juche is excluded from the public profile and is never a provider fallback.
 
-Current initial integration uses participants' existing ATProto accounts;
-Phlogiston is not currently a PDS, has zero real users and makes no PDS
-continuity promise. The operator PDS below is deferred infrastructure, not a
-participant prerequisite. Host-loss reconstruction is the current operational
-requirement; total-site-loss recovery is outside this envelope. Juche supplies
-implementation mechanics only, never product or durability requirements.
+## Unified authenticated shell
 
-The [public explainer](https://phlogiston.app/) describes invite-only
-early access. [Private invitations](EARLY-ACCESS-INVITES.md) are a bounded future
-enrollment mechanism, not public signup or a first-integration dependency.
+The current participant server is the qualified `community-live` application. The owner-authorized successor adds the Phlogiston shell and the bounded Labelwatch consumer there; it does not route the retained legacy `web/` operator application over the same OAuth endpoints.
 
-The composition order the architecture serves:
+The shell uses the existing OAuth/session boundary and the restored session DID as the account context. My Labels presents bounded read-only observations for that account through the released Labelwatch query contract. Exact consumer configuration, transport, coverage interpretation and source revision must be bound in its implementation and deployment receipts. This direction record does not claim that the pending successor is already released or that a particular observation is complete.
 
-```text
-community creates a bounded social context
-    ↓
-feeds decide what can be surfaced there
-    ↓
-quench understands lineage / exposure
-    ↓
-ACL lets the participant express policy over that exposure
-```
+Missing, stale, unavailable or unqualified acquisition is shown as unknown/refused, not as an empty result or permission to act. Label source, target and available provenance remain legible. No label publication, account mutation, community authority or operator entitlement follows from viewing My Labels. Existing minimal community submission consent remains separate from those read-only observations; any later capability requiring additional consent must use its own explicit contract.
 
-Phlogiston owns **composition, product surface, and pinning**. Each component
-remains an independent instrument with its own repository, qualification, and
-release surface. Integration changes are made inside the owning component;
-phlogiston pins the qualified revision.
+Signed-in navigation brings the personal surface and Cabinet together. Anonymous users can continue to browse the Cabinet; participant-private pages retain their session requirement. Submission still concerns an existing public post owned by the submitting account. Its public submission record, private decline and community visibility remain distinct. The UI cannot make a public submission private or delete the author's source post.
 
-## Exploratory contextual-overlay lane (not currently scheduled)
+## Component roles and authority boundaries
 
-[Typed contextual overlays](TYPED-CONTEXTUAL-OVERLAYS-RESEARCH.md) records a
-separate exploratory direction: provenance-bearing contextual assertions about
-an ATProto object, beginning with coarse voluntary place context as a worked
-example. It is not a schema, service, feed-ranking proposal, or Phase 2/3
-commitment. The document first tests whether existing ATProto records, labels,
-and community conventions already provide sufficient substrate.
-
-## Component roles
-
-| Component | Role in product | Boundary |
+| Component | Product role | Boundary |
 | --- | --- | --- |
-| Deferred operator PDS (`phlogiston.social`) | Possible later account/repo/blob hosting; stock externally supplied PDS software | Not currently hosting Phlogiston users or required for initial integration; no continuity promise |
-| phlogiston-web (`web/`) | Operator/status/account surface: DID/OAuth login, read-only community mirror, later policy editor and provenance/status cards. Not publicly routed in Phase 2 | Application-local state keyed by DID |
-| `src/phlogiston_appview/` | Render, receipt, operator, community, recovery modules | Bounded application view; **not** a network-scale AppView |
-| atproto-community | Community semantics: `communityd` sole authority writer; `communitywatch` verified read-only projection; `community-live` OAuth app | Pinned revision; its AGENTS.md invariants are inherited here |
-| atproto-acl | Personal policy compiler/evaluator, preview, receipts; quench vocabulary when qualified | Policy effects are user-authored and receipted; observation never becomes authority |
-| atproto-feeds | Feed-generator machinery template (Jetstream → rank → `getFeedSkeleton` → publish) | Community feed generators derive from this pattern in their own repo |
-| labelwatch / weatherwatch / driftwatch | Provenance, network-conditions, and operational-standing read surfaces | Read-only consumption; testimony, not verdicts |
-| Constellation | Read-only governed-operations projection; later one-use operations under a released profile | No remote authority federation |
+| Phlogiston participant shell | Unified navigation, signed-in account context, My Labels first, Cabinet exhibition | Application-local session state keyed by verified DID; no authority merely from composition |
+| `community-live` | Current participant runtime and owner-authorized shell implementation location | OAuth terminates here; authenticated community actions use the socket-attested authority contract |
+| `communityd` | Sole community authority writer | Only the configured moderator can admit/decline/remove; protected private decisions and uncertain operations stay with the authority journal |
+| `communitywatch` and query service | Verified read-only community observation | No participant/moderator credentials, no authority writes; candidate coverage is not an admission decision |
+| Labelwatch | Personal label/provenance observations for My Labels through its released read contract | Read-only consumer; testimony is not judgment, policy or community membership |
+| atproto-acl / quench | Personal policy tools composed only through their qualified contracts | Policy effects and consent remain user-authored and receipted; My Labels does not implement them implicitly |
+| atproto-feeds | Feed-generator component | Qualified feed behavior is separately owned; shell navigation is not a feed release |
+| weatherwatch / driftwatch | Potential further observed-condition surfaces | No released UI or completeness guarantee inferred from this direction |
+| `phlogiston.social` PDS | Controlled account/repository hosting | Independent protocol and private custody boundary; comprehensive restore/migration qualification remains deferred |
+| Constellation | Existing operational observation and governed operations supporting ATProto | Generic tooling does not absorb PDS-specific deployment/configuration or participant authority |
+| Legacy `web/` and synthetic renderer | Retained historical/operator or local qualification artifacts | Not the canonical participant runtime; no competing public OAuth origin is reactivated by this change |
 
-Public hostnames and their roles are fixed in
-[PUBLIC-SURFACES.md](PUBLIC-SURFACES.md): `phlogiston.app` is the
-participant origin (served by `community-live` from the PCV0 kit),
-`phlogiston.social` is protocol-only, `community.phlogiston.app` is the DNS-only authority for the product-owned
-`app.phlogiston.community.*` Lexicons. neutral.zone is no longer canonical
-Phlogiston authority. phlogiston-web is an
-operator tool that is not publicly routed in Phase 2.
+The configured community and sole moderator are `did:plc:yrdhg6whfezek67fchtrmqgu`. The dedicated publisher is `did:plc:a3fsoszyvzozh3b5yubhe52b`, with `lexicon.phlogiston.app` handle and DNS-only Lexicon authority at `community.phlogiston.app`. The accepted publication binds eight unchanged schema structures. See [public surfaces](PUBLIC-SURFACES.md) and the [operational handoff](P0-IMPLEMENTATION-HANDOFF.md) for exact deployment identities and receipts.
 
-Generic `app.bsky` read views are delegated to existing external AppViews. A
-network-scale relay-consuming AppView remains a deferred frontier per the
-integration roadmap.
+## Current sequencing and explicit supersessions
 
-## Sequencing
+1. Keep the active Cabinet, qualified community authority and public source/permalink behavior working.
+2. Implement, qualify and deploy the unified authenticated Phlogiston shell and **My Labels first** using the existing session and released read-only Labelwatch interface. The owner has explicitly authorized this implementation and deployment now; it does not wait for a recruited cohort, another moderator, a notification room, a community feed generator or an Impro plugin.
+3. Compose additional personal tools when their owning component contract and actual participant utility justify them. Do not create a generic client, policy engine, new acquisition service or operational management framework merely to populate navigation.
 
-Revised 2026-09-24 after the workspace user-path critique
-(`atproto-nutrition/USER-CRITIQUE-PHLOGISTON-PLAN-2026-09-24.md`) and the
-cohesion survey (`SURVEY-WORKSPACE-COHESION-2026-09-24.md`). Both stay in
-place as receipts of how this sequencing changed. The composition decision
-above is unchanged; what changed is what Phase 2 measures and what must be
-true before it starts.
+The earlier Phase-2/Phase-3 trial order and standalone/operator-only restriction are superseded as scheduling constraints for this owner-authorized participant application. [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md), earlier readiness documents and component PD-E/PD-E0 records remain historical evidence of their stated scopes. A plugin spike does not require today's participant tools to live in another client, and is not proof that the current unified shell was tested. No plugin, feed generator, notification worker or historical host bridge is reintroduced solely to preserve that old sequence.
 
-0. **Composition baseline (pre-Q2-close).** One canonical source line (this
-   repository, `main`); this document; spike-branch dispositions
-   ([SPIKE-DISPOSITIONS.md](SPIKE-DISPOSITIONS.md)). Done.
-1. **Activate infrastructure (post-Q2).** Lexicon namespace publication
-   (`app.phlogiston.community.*`); PCV0 integration identities; the PCV0 kit's
-   community services, including the `phlogiston.app` Caddy site that routes
-   to `community-live`; the inert phlogiston-web release (installed, not
-   routed). Nothing here is on a participant's path beyond
-   `https://phlogiston.app` itself: participants bring their own ATProto
-   account. Corrected 2026-09-25: the
-   community actor is a Bluesky-hosted account
-   (`did:plc:b53udqv47g2dayvpstzdefpq`), not a `phlogiston.social` account.
-   The `phlogiston.social` PDS, its TLS and the Horizon 0 cross-version
-   restore are separately activated operator infrastructure, not required
-   for Phase 2 (see [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment
-   topology").
-2. **One legible public community: a demand experiment.** The PCV0 social
-   loop deployed for a single, deliberately chosen community, run as the
-   experiment specified in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md). Its
-   preconditions, all pre-Q2-safe and listed there, are: one participation
-   URL (`community-live` at `https://phlogiston.app`), an anonymous pasteable
-   permalink, a visible
-   submission lifecycle with the room notified on admission, existing-post
-   submission with the public-post consequence stated, a named cohort and
-   activity, and the behavioral success criteria below.
-   `submit → admit → visible → audit entry` remains the technical
-   verification of the deployment. It is not the product gate.
-   **Hard gate:** the trial's interpretation rule decides whether Phase 3
-   opens, the trial extends once, or work stops to reassess. Disinterest is
-   never answered with more substrate.
-3. **Community feed generator (S2).** The one community-lane addition that
-   is legible at trial scale: an `app.bsky.feed.generator` over the
-   committed admission projection, reverse-chronological, every item linking
-   to the community permalink, subscribable from any ordinary Bluesky
-   client. Authorized through atproto-community's BUILD.md amendment
-   process; the generator record is emitted through `communityd`. This also
-   closes the discovery gap: the community appears where participants
-   already are. Quench and `author_exposure_decay` are **not** part of this
-   phase; see "Attention-policy lane" below.
-4. **Standalone surfaces that earn their existence.** phlogiston-web (at a
-   distinct hostname, never sharing the participant origin) grows only where
-   standalone is the right shape: the operator surface, service
-   status and recovery standing, provenance and network-condition cards
-   (labelwatch, weatherwatch, driftwatch, Constellation read-only), and
-   personal attention-policy editing with preview and receipts (the
-   atproto-acl host bridge). It does not become a generic Bluesky client;
-   timelines, threads, profiles, notifications, and media stay with the
-   client the participant already uses. See "Client surface disposition".
-5. **Hardening and wider composition.** Observer-convergence measurement of
-   phlogiston's own stack (lifecyclewatch's design applied inward); one
-   governed operation under an applicable Constellation profile;
-   allowlisted public evidence surface; recurring cross-version restore
-   rehearsal.
+The retained operator `web/` cannot simply share `/`, `/oauth/*` or client metadata with the active participant server. One canonical application owns those routes. This supersedes the operator-only product decision while preserving the real route/session collision boundary.
 
-### Attention-policy lane (parallel, own evidence gate)
+## Integration ownership and verification
 
-Thread-origin quench and per-reader exposure decay answer firehose-scale
-attention problems. A human-curated community of a few dozen items has no
-such problem: everything visible was admitted by a person. Quench acts on
-the reader's own timeline via `app.bsky.graph.muteThread`, which works in
-every client and has nothing community-specific about it. Both therefore
-dogfood on instantinternet.news and real attention-pressure surfaces, under
-their own evidence gate, in atproto-acl and atproto-feeds. They compose into
-phlogiston later only if real use shows the need. Nothing in the community
-lane waits on them.
+Product architecture, public surfaces and deployment composition remain product-owned. UI/session/consumer integration changes land in the owning participant runtime. Community semantics and journals remain atproto-community-owned; Labelwatch query semantics and availability remain Labelwatch-owned; personal policy and feed releases remain their components' responsibility. PDS-specific configuration/procedures/adapters stay ATProto-owned. No generic Constellation change is authorized or needed by this participant shell.
 
-### Client surface disposition (PD-E)
+The current deployed web front door is `b5a7ed8183385c4bf2d4c185c36bf30cc71e301a`; authority, observer, Node24 and dependency closure remain the `3bf402e4cf4974b5319d2f2ce0ffd76476b61b28` base generation. The shell successor must have its own tested source and durable deployment receipt; this document is not that receipt. Reuse the bounded web-only generation switch and preserve credentials, private state, open controls, other service identities and rollback custody.
 
-atproto-community's `PRODUCT-DIRECTION.md` PD-E records that the preferred
-reader-facing vehicle is a plugin inside the Impro Bluesky client, and that
-its PD-E0 spike disproved the need for a standalone read-only frontend
-(steps 1–5 passed; the write-half bridge, step 6, was never attempted and
-remains gated on OQ-4). That result is not overridden here:
+Qualification checks the restored-account boundary, bounded read transport/parser behavior, truthful unknown/refusal, Cabinet continuity, anonymous/private route separation and actual canonical rendering. Independent acceptance is separate from source tests, a producer terminal and a lane completion notice. Historical demand evidence remains a separate claim; controlled operator identities do not demonstrate independent-human demand. Missing evidence never becomes a released guarantee.
 
-- For Phase 2 the participation surface is `community-live` at
-  `https://phlogiston.app`, because it is the only surface with the
-  authorized write half (OAuth-terminated, socket-attested requests to
-  `communityd`). The Impro plugin has no write path and is not required for
-  the trial.
-- phlogiston-web is an operator tool. It is not routed publicly in Phase 2
-  (it would collide with community-live on `/` and `/oauth/*` at the same
-  origin; see [PUBLIC-SURFACES.md](PUBLIC-SURFACES.md)). When it returns, at
-  a distinct hostname, it is constrained to what genuinely benefits from
-  being standalone (Phase 4 list), must never be required for participation
-  and never duplicates community-live.
-- An Impro (or other host-client) plugin remains the preferred vehicle for a
-  richer *read* experience if trial evidence shows people will not visit a
-  standalone page. That decision is taken on evidence from Phase 2, not
-  before.
-
-## Where integration changes land
-
-- **This repository**: product-surface modules, architecture/disposition
-  records, deploy composition.
-- **atproto-community**: S2 feed-generator door and (later) S14 membership
-  records, each authorized by BUILD.md amendment; admission projection is the
-  feed membership source; reverse-chron canonical projection unchanged
-  ("ranking is view policy").
-- **atproto-community** (Phase 2 preconditions): PCV2 in its BUILD.md —
-  anonymous permalink, submission lifecycle visibility, the single room
-  webhook (`community-notify`), existing-post submission and honest copy.
-- **atproto-acl** (attention-policy lane): quench policy section, evaluator
-  extension, `muteThread` adapter, reply-lineage retention in feed-exposure
-  acquisition, exposure-decay vocabulary.
-- **atproto-feeds**: generalized multi-feed dispatch as the community feedgen
-  template; `root_uri` lineage exposure (attention-policy lane).
-- **Watch systems and Constellation**: no modification; read-only consumption
-  under their published contracts.
-
-## Guardrails (inherited, non-negotiable)
-
-- Observation ≠ judgment ≠ distribution policy; labels are testimony.
-- `communitywatch` holds no credentials; `communityd` is the sole community
-  authority writer.
-- Early access is invite-only and owner-issued; public registration is not offered.
-- Missing acquisition means unknown/refuse, not allow.
-- Semantic discourse inference is not part of any enforcement path.
-- Removal from a community never deletes or mutates the author's record.
-
-## Verification anchors
-
-- Canonical line builds clean; 42 Python tests and 17 web tests pass;
-  typecheck clean (verified 2026-09-24 on `main` at the
-  community-integration merge).
-- If hosting user state or promising durability is proposed later, qualify the
-  corresponding PDS/user-data recovery objective then. Existing restore evidence
-  is useful hardening, not an initial-integration gate.
-- Phase-2 technical verification: external-cohort submit → admit → visible,
-  with audit entry, in the single spearhead community.
-- Phase-2 product evidence: the behavioral observations and interpretation
-  rule in [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md).
-- Phase-3 evidence: one community feed generator serving `getFeedSkeleton`
-  with admitted-set parity against the projection, subscribed from an
-  ordinary client.
-- Attention-policy lane evidence (separate): a quenched thread origin
-  suppressed for that user, receipted and reversible; ACL preview
-  behavior-hash parity between CLI and web.
+Exploratory contextual overlays remain recorded in [TYPED-CONTEXTUAL-OVERLAYS-RESEARCH.md](TYPED-CONTEXTUAL-OVERLAYS-RESEARCH.md), outside this shell implementation. Host-loss, total-site-loss, uncertain-write recovery and comprehensive PDS migration/restore claims retain their existing bounded qualification limits.
