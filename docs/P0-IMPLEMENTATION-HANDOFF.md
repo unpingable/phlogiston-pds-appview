@@ -2,6 +2,14 @@
 
 The accepted public product is the self-service Cabinet at `https://phlogiston.app`, using existing community-live, read-only communitywatch and sole authority writer communityd. One consenting operator moderates; no recruited-user, additional moderator or notification room gate. Canonical work item: https://github.com/unpingable/atproto-community/issues/8.
 
+## Current participant web generation — 2026-10-12
+
+Current web is `2ae386ba39a03a7fd7eaede8c89401b412af39ce` at `/opt/phlogiston-app/web-releases/2ae386ba39a03a7fd7eaede8c89401b412af39ce/community-live`: the composable feed-first client, preserving anonymous Cabinet and community authority. See [product architecture](PRODUCT-ARCHITECTURE.md). Older web identities below describe historical milestones, not the current runtime.
+
+Durable deployment `93a481d9-b70f-435e-9dbc-c516ebd93485` completed terminal0; public BEFORE/AFTER/TERMINAL receipts are in the launch-readiness packet with that identity. Only web restarted; open controls, private state and other services stayed unchanged. Exact FEED_QUIET metadata and both static workspace script hashes passed canonical checks. Source228unit/13browser/typecheck passed; unchanged Python1486/Ruff remains separately bound. First4e canonical workspace journey64b2 passed; final context-copy readback and root acceptance are separate records.
+
+Immediate rollback is4e7e154: restore the packet's saved exact managed web drop-in, daemon-reload and restart only community-live, then check canonical endpoints. Do not delete or migrate local quiet SQLite state. Retain4e until next accepted release or root review2026-10-19; retain5f preworkspace rollback and25a281 current dependency provider. New web generations link directly to25 node_modules; authority/observer and direct Node24 remain3bf402e. New generations and public packets total2,023,424 allocated remote bytes, dependency copy0; final free sample77,835,796,480 bytes. Historical receipts remain immutable.
+
 ## Actual identity and hosting contract
 
 Community and sole moderator are curator `did:plc:yrdhg6whfezek67fchtrmqgu` on exact `https://phlogiston.social`. External Bluesky participant is `did:plc:b53udqv47g2dayvpstzdefpq` (atprotowaffle). Dedicated publisher is `did:plc:a3fsoszyvzozh3b5yubhe52b` on Phlogiston, with approved `lexicon.phlogiston.app` handle/DNS custody managed by root; `community.phlogiston.app` remains DNS-only Lexicon authority. Participation supports ordinary Bluesky accounts without migration, plus explicitly selected Phlogiston hosting. Juche is excluded from the public profile, never a fallback.
