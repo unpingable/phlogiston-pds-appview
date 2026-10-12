@@ -18,7 +18,7 @@ The shell uses the existing OAuth/session boundary and the restored session DID 
 
 Missing, stale, unavailable or unqualified acquisition is shown as unknown/refused, not as an empty result or permission to act. Label source, target and available provenance remain legible. No label publication, account mutation, community authority or operator entitlement follows from viewing My Labels. Existing minimal community submission consent remains separate from those read-only observations; any later capability requiring additional consent must use its own explicit contract.
 
-Signed-in navigation brings the personal surface and Cabinet together. Anonymous users can continue to browse the Cabinet; participant-private pages retain their session requirement. Submission still concerns an existing public post owned by the submitting account. Its public submission record, private decline and community visibility remain distinct. The UI cannot make a public submission private or delete the author's source post.
+Signed-in navigation brings the personal surface and Cabinet together. The authorized shell introduces account Home, My Labels and Settings; the anonymous root continues to show the Cabinet. Session actions move to Settings in the P0 profile. The default post-OAuth landing is account Home, while explicit return links retain their destination. Anonymous users can continue to browse the Cabinet; participant-private pages retain their session requirement. Submission still concerns an existing public post owned by the submitting account. Its public submission record, private decline and community visibility remain distinct. The UI cannot make a public submission private or delete the author's source post.
 
 ## Component roles and authority boundaries
 
