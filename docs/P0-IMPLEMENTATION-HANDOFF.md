@@ -2,7 +2,17 @@
 
 Current product direction is defined in [PRODUCT-ARCHITECTURE.md](PRODUCT-ARCHITECTURE.md): an ATProto social client with composable feeds, attention/context and governed communities. The Cabinet remains the public collection. The live app is atproto-community `apps/community-live`; this document is the current runtime and rollback locator. No recruited-user, additional moderator or notification-room prerequisite applies.
 
-## Current participant web generation — 2026-10-14 (CC2)
+## Current participant web generation — 2026-10-14 (CC3)
+
+Current web is `4a71a9648718d55ff2847d8c9ec434fd623c8baf` at `/opt/phlogiston-app/web-releases/4a71a9648718d55ff2847d8c9ec434fd623c8baf/community-live`. CC3 folds the P0 moderator removal form into a "Moderator actions" disclosure after the public conversation; same command, moderator-only. Release `2e1bb6a0-1ee0-4c95-9877-16d6d7dc38c4`, unit `phlogiston-cc3-2e1bb6a0`, invocation `2ebeb13a1fd0400397caf00b2a1530c8`, terminal 0; drop-in SHA256 `54e06912f9786222695f1d84d5e5c084ca074310cb193e3d9197e7e17e4727a8`; served `app.css` matched the manifest. Source passed typecheck, 284 unit, 16 browser, 1486 Python and Ruff. Live smoke: no moderator form signed out; for the moderator, folded after the conversation; nothing submitted.
+
+**Rollback is rehearsed.** Durable unit `phlogiston-cc3-rehearsal-2e1bb6a0` restored the saved CC2 drop-in (`/var/lib/phlogiston-campaign/20261012/cc3-release-2e1bb6a0-1ee0-4c95-9877-16d6d7dc38c4/previous-dropin.conf`), restarted only community-live and verified CC2 served in 3.0 s (working directory and `app.css` `3e7f9316…`). It then restored the CC3 drop-in and verified CC3 in 3.1 s. Authority and observer invocations were unchanged; the record is `ROLLBACK-REHEARSAL.json` in that leaf. To roll back: confirm the live drop-in hash above, restore that file, daemon-reload, restart only community-live.
+
+**Retention (owner-directed, 2026-10-14).** Web generations kept: CC3 `4a71a96` (live), CC2 `ad3d9dc` (rollback) and the dependency closure `25a2816811d6fe6551fa910b853d1a130c8bfa61`, whose `node_modules` both use. Ten older generations were removed after checks that none was live, referenced by a unit or used as a link target: `24699146`, `2ae386ba`, `4e7e1547`, `56d9b32a`, `5f03ac57`, `7851bcbf`, `9d974f51`, `9da6fd3`, `b5a7ed81`, `ef68384`. **The rollback paths recorded below for AG1, CC1, FD2 and earlier no longer work**: their saved drop-ins name removed generations, whose `ConditionPathExists` would stop the unit. Use only the CC2 rollback above. The base `3bf402e4` tree under `/opt/phlogiston-app/releases` is untouched. Campaign receipts are kept.
+
+The CC2 qualification reply was deleted by its author account on 2026-10-14 after qualification; screenshots and receipts are kept in the reply-qualification leaf.
+
+## Prior participant web generation — 2026-10-14 (CC2)
 
 Current web is `ad3d9dca2675fb1c81331454ccdeab5576505d74` at `/opt/phlogiston-app/web-releases/ad3d9dca2675fb1c81331454ccdeab5576505d74/community-live` (atproto-community `implementation/phlogiston-pds-20261011`, pushed). CC2 (#28) shows signed-out readers an admitted post's public replies through one unauthenticated, bounded, 30-second-cached public AppView read of the exact admitted root URI, under Bluesky's default moderation (author signed-out opt-outs honoured). No credentials, scopes, ingestion, storage or proxy route added.
 
