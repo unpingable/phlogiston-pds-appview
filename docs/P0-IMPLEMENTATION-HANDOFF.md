@@ -2,7 +2,15 @@
 
 Current product direction is defined in [PRODUCT-ARCHITECTURE.md](PRODUCT-ARCHITECTURE.md): an ATProto social client with composable feeds, attention/context and governed communities. The Cabinet remains the public collection. The live app is atproto-community `apps/community-live`; this document is the current runtime and rollback locator. No recruited-user, additional moderator or notification-room prerequisite applies.
 
-## Current participant web generation — 2026-10-14 (AG1)
+## Current participant web generation — 2026-10-14 (CC1)
+
+Current web is `9da6fd3cc8759f106946f98e7d7d4d381eb2a528` at `/opt/phlogiston-app/web-releases/9da6fd3cc8759f106946f98e7d7d4d381eb2a528/community-live` (atproto-community `implementation/phlogiston-pds-20261011`, pushed). CC1 (#28) shows an admitted post's public Bluesky replies on its community page through the viewer's existing reader grant, labelled as not reviewed or admitted; exact admitted URI/CID only, removed admissions read nothing, changed posts withhold the newer conversation, and conversations of admitted posts link back to the community. S18 ingestion is not implemented; no authority, scopes, writers or observer changes.
+
+Separate web-only release `b56fad08-5ec2-4cc3-ad14-93014a8be6cf`, unit `phlogiston-cc1-b56fad08`, invocation `2a1187d8d09744bd9d3c475a6f79f361`, terminal 0, same producer. New drop-in SHA256 `eccd4b53648a56f1dcbae02251272d51ea8244532b6dd684b113bb0c5175838c`. Served static assets matched the manifest. Source passed typecheck, 275 unit, 16 browser, 1486 Python and Ruff. Live smoke passed signed-out discussion with sign-in return, signed-in public conversation section, thread link-back, Following, 390px discussion without overflow and sign-out, no page errors.
+
+Immediate rollback is AG1 `ef68384dea4007a6734aa319102ab9702bec60a9`: confirm the live drop-in hashes as above, restore `/var/lib/phlogiston-campaign/20261012/cc1-release-b56fad08-5ec2-4cc3-ad14-93014a8be6cf/previous-dropin.conf` (SHA256 `eb1246369be8b63389bbbfe2d83a4950e55b462e30f2372777868fbee724c234`), daemon-reload, restart only community-live. Retain ef68384 and 24699146 until root review 2026-10-19.
+
+## Prior participant web generation — 2026-10-14 (AG1)
 
 Current web is `ef68384dea4007a6734aa319102ab9702bec60a9` at `/opt/phlogiston-app/web-releases/ef68384dea4007a6734aa319102ab9702bec60a9/community-live`, from atproto-community `implementation/phlogiston-pds-20261011` (pushed). AG1 (#27) states, for each page, how many received posts are shown and why the rest are not, by who decided; separates blocked, not-found and unreadable conversations; discloses bounded conversations; and replaces page counts with a refresh notice after Quiet here/Undo/Restore. No scopes, stores, writers or community authority changed.
 
