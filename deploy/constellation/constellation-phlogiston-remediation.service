@@ -1,0 +1,20 @@
+[Unit]
+Description=Phlogiston isolated Constellation local consumer
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+TimeoutStartSec=600
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+ReadOnlyPaths=/etc/constellation-phlogiston
+ReadWritePaths=/var/lib/constellation-phlogiston /run/constellation-phlogiston-nq
+LimitCORE=0
+TasksMax=64
+MemoryMax=512M
+ExecStart=/usr/bin/constellation-remediation-consumer --config /etc/constellation-phlogiston/consumer.toml

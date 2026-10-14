@@ -1,8 +1,16 @@
 services:
   phlogiston-pds:
     container_name: phlogiston-pds
-    image: ghcr.io/bluesky-social/pds@sha256:d155af1c906d7848e7dea9d59a8a7def065a04b77aa98ae56ea05a8d4eadb63a
+    image: ghcr.io/bluesky-social/pds@sha256:74c650cd620eee2e6e0272b4cb76036a0271523b1742f61f813b79dc5a8b5273
     restart: unless-stopped
+    cpus: 1.0
+    mem_limit: 1g
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "127.0.0.1:3002:3000"
     volumes:

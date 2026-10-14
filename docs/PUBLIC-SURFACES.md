@@ -1,110 +1,41 @@
-# Public surfaces — current Phlogiston identity
+# Public surfaces — Phlogiston participant application
 
-Updated 2026-10-03 by owner instruction. Phlogiston owns its vocabulary:
-`app.phlogiston.community.*`, not Juche or neutral.zone. The eight schema
-structures remain unchanged; document IDs, digests, collection paths and OAuth
-scopes move together before canonical publication. Old prototype records and
-frozen evidence remain untouched, with no new compatibility promise.
+Updated 2026-10-12. Phlogiston is one ATProto social client for ordinary participation, composable feeds, intelligible attention/context and governed communities. The Cabinet remains its public exhibition; My Labels is one bounded contextual surface. The live participant implementation is atproto-community `apps/community-live`; this product repository owns deployment composition and documentation. The [product architecture](PRODUCT-ARCHITECTURE.md) states current direction and the [operational handoff](P0-IMPLEMENTATION-HANDOFF.md) identifies exact deployed source, runtime and rollback. Earlier static-prelaunch, operator-only and PD-E/plugin-first sequencing is historical, not a current gate.
+
+## Host and route ownership
 
 | Hostname | Current role | Boundary |
 | --- | --- | --- |
-| `phlogiston.app` | Static pre-launch explainer; intended future `community-live` participant origin | No signup, OAuth endpoint, community service or PDS activated by the explainer. At admitted integration, replace the complete static Caddy block with the PCV0 app block at the same origin |
-| `community.phlogiston.app` | DNS-only authority for `app.phlogiston.community.*` | `_lexicon.community.phlogiston.app TXT did=<dedicated authority DID>`; no HTTP service or account inferred |
-| `lexicon.phlogiston.app` | Proposed dedicated schema publisher handle | `_atproto.lexicon.phlogiston.app` custom-handle binding after approved enrollment on existing Bluesky hosting; actual assigned DID/PDS recorded mechanically |
-| `phlogiston.social` | Same static pre-launch explainer; deferred operator PDS infrastructure | No PDS, account or enrollment activated. Keep this separate static block during .app integration; change it only at separately authorized PDS activation |
-| `community.neutral.zone` | Superseded prototype namespace/site | No canonical Phlogiston publication or new runtime compatibility obligation |
+| `phlogiston.app` | Active participant client: public Cabinet and signed-in reader, feeds, conversation, account context and personal tools | One application owns public navigation, OAuth client endpoints and participant sessions; anonymous Cabinet browse remains available |
+| `community.phlogiston.app` | DNS-only authority for `app.phlogiston.community.*` | `_lexicon.community.phlogiston.app` TXT identifies the dedicated publisher; it is not a separate HTTP application or account provider |
+| `lexicon.phlogiston.app` | Published schema authority's custom handle | Dedicated publisher `did:plc:a3fsoszyvzozh3b5yubhe52b`, hosted on `https://phlogiston.social`; handle/DNS and eight schema record readbacks are accepted campaign evidence |
+| `phlogiston.social` | Separately active controlled ATProto PDS | Protocol, repository/account custody and hosted-handle namespace; no public registration, required identity migration or comprehensive recovery promise is inferred |
+| `community.neutral.zone` | Superseded prototype namespace/site | No canonical Phlogiston publication or current runtime compatibility obligation |
 
-The pre-launch static site is source-controlled in `public/prelaunch/index.html`;
-`deploy/prelaunch/Caddyfile.fragment` selects only `/` and `/index.html` on both
-`phlogiston.app` and `phlogiston.social`, using separate marked site blocks.
-The `.social` explainer remains when the `.app` block is replaced at admitted integration.
-Application, OAuth and protocol routes refuse. The page makes no user,
-registration, PDS hosting, availability or durability promise.
+The static explainer in `public/prelaunch/` is retained source/rollback material; it is no longer the active `.app` or PDS service. Canonical activation and static routing rollback/reapply were actually performed. Preserve historical receipts instead of relabeling them as shell qualification.
 
-## Retained topology mechanics
+## One participant origin and account context
 
-The earlier September topology inspection below supplies implementation
-mechanics only. Its old neutral namespace and planned PDS continuity wording
-are superseded by this current identity and zero-user product scope.
+`https://phlogiston.app` is the canonical participant origin. The selected `community-live` runtime owns `/`, `/oauth/login`, `/oauth/callback` and `/oauth-client-metadata.json`. Reader, feeds, Community/Cabinet and My Labels share that navigation and restored account context. Exact current routes and their qualification are located through the [operational handoff](P0-IMPLEMENTATION-HANDOFF.md), rather than a frozen route inventory here. My Labels uses the qualified read-only Labelwatch query interface; that consumer's exact release/configuration and refusal semantics are bound in its own evidence.
 
-## Why phlogiston.app
+Anonymous Cabinet browsing and pasteable discussion links remain public. Personal observations and participant-private submission status remain session-bound. Sign-in does not confer the moderator role or authority over another account. Read-only label observations do not admit/remove community posts, publish labels, mutate repositories or turn testimony into policy. Unknown observation is not an empty result.
 
-The protocol facts rule out the root of `phlogiston.social`: it is owned by
-the PDS (routes, well-known documents, OAuth authorization server, handle
-domain), and the wildcard is the hosted-handle and on-demand TLS namespace.
-A front door there would put the OAuth client on the same name as an OAuth
-authorization server, which looks like an account provider, and would need
-fragile path allow-listing that breaks on any PDS upgrade.
+Participants can use existing ordinary Bluesky accounts or the explicitly supported Phlogiston-hosted accounts without moving identity. The public profile excludes Juche and provider fallback. PDS-hosted account creation, credentials and protocol authorization remain independent of the application shell. My Labels does not create an additional registration requirement. Its fixed public Labelwatch source is `https://labelwatch.neutral.zone`; the released `recent_product` contract at source `f693a067e2957b395f970e2cdeb72b01e3945eee` uses `/exports?did=<restored-session-DID>&days=7` followed by `/exports?cursor=<returned-cursor>`. The `labelwatch.public-observations.v1` account/manifest, observation window and coverage are preserved; historical observed application/removal is not current effective label state. No OAuth credentials are sent to Labelwatch, and the retired404 front-door endpoint is not a fallback.
 
-Between the remaining candidates the owner chose the application's own
-brand. `phlogiston.app` already resolves to the host, has no protocol role,
-and needs no front-door DNS change. Lexicon authority is DNS-only and does not
-need an HTTP site at `community.phlogiston.app`. The earlier noun-count
-argument for `neutral` was already weakened by the consent-page inspection:
-the participant's own PDS (oauth-provider-ui 0.10.3) shows the permission as
-"Repository · Publish changes" and names the `app.phlogiston.community`
-collection only in a details dialog. What a participant now meets: one site
-name (`phlogiston.app`), one client name (the community's own, per
-`COMMUNITY_NAME`), and Bluesky.
+The community and sole moderator are `did:plc:yrdhg6whfezek67fchtrmqgu`, on `https://phlogiston.social`. Existing participant integration identities are separately scoped; they are not recruited-human usability evidence. The dedicated publisher identity does not inherit community moderation authority.
 
-Once a real person has consented, the origin is sticky: moving it changes the
-`client_id` (everyone re-consents) and breaks every permalink already pasted
-in the room. The decision is taken before the first invitation.
+## Legacy operator surface and supersession
 
-## phlogiston-web is withdrawn from public routing for Phase 2
+The retained product `web/` operator/status application is not publicly routed at the participant origin. Its historical withdrawal still describes a real collision: two applications cannot independently own the same root and OAuth endpoints. The prior inference that participant tools must therefore remain operator-only, use another hostname or wait for an Impro plugin is explicitly superseded by the owner's integrated application direction. The deployed implementation location is the existing participant runtime, with one session boundary.
 
-`phlogiston-web` (this repository's `web/`, the operator/status/account app
-on `127.0.0.1:8092`) was routed at `phlogiston.app`. It cannot share that
-origin with `community-live`: both claim `/`, and both use `/oauth/login`,
-`/oauth/callback` and `/oauth-client-metadata.json`, so the OAuth client
-identity would be ambiguous. For Phase 2 it is therefore withdrawn from
-public routing:
+This instruction does not reactivate a legacy status-web unit, change its cookie/client contract, or claim that an earlier standalone/plugin spike qualifies the new shell. No new operator `/admin/` entitlement or operational control surface is implied by participant authentication.
 
-- the code and its tests stay (`web/`, 23 tests);
-- `deploy/production/phlogiston-web.service` is header-marked withdrawn;
-- `deploy/production/Caddyfile.fragment` defines no site block (comment
-  only, explaining that the PCV0 kit owns `phlogiston.app`);
-- `deploy-inert.sh` installs the release and unit file but enables the unit
-  and runs the Caddy transaction only with `--with-status-web` (default off);
-- `preflight.py` refuses if the kit fragment defines a `phlogiston.app` site;
-- `PHLOGISTON_COMMUNITY_URL` stays optional and is unused: phlogiston.app
-  itself is the community.
+## Operational boundaries and current baseline locator
 
-Bringing it back needs one of two things, neither of which is a Phase 2
-task: a distinct hostname with its own site block, its own certificate and
-its own OAuth `client_id` (for example a status subdomain of `phlogiston.app`;
-never `phlogiston.social` or `*.phlogiston.social`), or a path-mounted
-rewrite under `phlogiston.app` with the app's public URL, cookie path and
-OAuth redirect all rebased to that prefix, which the app does not support
-today. The `/admin/` surface remains outside either option until an operator
-authentication bridge is authorized.
+The [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md) is the current baseline locator for exact source, service configuration, receipts and bounded web rollback. This page records public role and authority boundaries; it does not duplicate a version-specific deployment ledger. A web-only successor must preserve authority/observer services, private state, credentials and rollback custody. Independent canonical signed-in acceptance remains separate from source checks and a deployment terminal.
 
-## Route ownership (facts retained from the inspection)
+The existing Docker `caddy` owns canonical TLS/routing, through a single-file bind of the host Caddyfile. `phlogiston.app` routes to loopback3211; community query remains loopback8081. A web-only source successor needs no Caddy/DNS/PDS route change. Preserve the authority socket/principals, credential/private state custody, provider configuration, other service identities and existing PDS/Constellation operational boundaries.
 
-- Caddy exact-host sites win over the `*.phlogiston.social` wildcard, and an
-  exact-host site must use ordinary ACME: the on-demand ask is dispatched to
-  the PDS `/tls-check`, which refuses any name without an account.
-- `community-live` sets `Strict-Transport-Security … includeSubDomains` on
-  its origin. At `phlogiston.app` that binds only `*.phlogiston.app`, which
-  has no other use; at a `phlogiston.social` name it would have bound every
-  hosted handle.
-- The community DID (`did:plc:b53udqv47g2dayvpstzdefpq`) is independent of
-  any hostname. The current scope is `repo:app.phlogiston.community.submit`; old grants cannot
-  authorize this renamed collection.
-- `community.neutral.zone` currently has an A record to GitHub Pages
-  (185.199.109.153) and no `_lexicon` TXT. This old namespace will not receive canonical Phlogiston publication; see [DNS-CUTOVER-PREP.md](DNS-CUTOVER-PREP.md).
+`phlogiston.social` remains a protocol origin; it is not an alternate participant frontend. Existing exact hosted-handle routes and TLS custody are PDS-owned. DNS-only Lexicon authority and publisher handle records do not create extra public applications. A later origin/client change requires its own identity/consent/permalink analysis; no such change is part of the unified shell.
 
-## Consequences
-
-- atproto-community: `COMMUNITY_PUBLIC_URL`, the PCV0 `Caddyfile.fragment`
-  site line, `community-notify.toml` `public_base_url`,
-  `campaign.example.json` `publicOrigin`, the deployment validator's
-  `PUBLIC_ORIGIN` and the test fixtures move to `https://phlogiston.app`
-  (done in that repository's Phase 2 freeze lane). `LEXICON_DNS_NAME` and
-  the publisher contract move to `community.phlogiston.app`.
-- No DNS change for the front door. The `_lexicon` TXT is published at
-  lexicon publication, as already planned.
-- `community-live`'s OAuth `client_name` follows `COMMUNITY_NAME`, so the
-  consent page shows the community's own name.
-- The full per-path collision analysis is retained in the tranche closeout
-  at the workspace root.
+Source qualification, durable producer results, immutable lane notices and independent root acceptance remain distinct. The campaign registry is `phlogiston-launch-readiness-20261012`; successors get new run identities. Current implementation authorization is explicit, so historical recruitment, notification-room, plugin or operator-only sequencing does not introduce a new approval gate.

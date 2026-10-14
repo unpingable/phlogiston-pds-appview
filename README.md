@@ -1,12 +1,14 @@
-# Phlogiston PDS/AppView — bounded synthetic qualification
+# Phlogiston
 
-[Public project explainer](https://phlogiston.app/): communities first on ATProto,
-preparing for invite-only early access. Invitations are issued directly by the
-project owner; no public signup is offered. The static explainer does not
-activate the community application.
+[Phlogiston](https://phlogiston.app/) is an ATProto social client for constructing and inhabiting one's social environment. The live participant application is implemented in atproto-community's `apps/community-live`. Reading, private feed curation and community submissions are live; native reply/like composition and a read-only Observe grant remain future work. Feeds, attention/context and the governed Cabinet belong to one client without merging their authority. This repository owns product direction and deployment composition, rather than a second participant runtime.
 
-[Private invite enrollment](docs/EARLY-ACCESS-INVITES.md) is a bounded future
-design, after initial integration, with identity and consent checked separately.
+Use existing supported Bluesky or Phlogiston-hosted accounts without identity migration. The controlled `phlogiston.social` PDS is separately live, with public registration closed. My Labels consumes read-only Labelwatch observations; it does not publish labels, decide community membership or report complete current label state. PDS-specific deployment/custody remains ATProto-owned; no generic Constellation change follows from the participant shell.
+
+Current direction and boundaries are in [PRODUCT-ARCHITECTURE.md](docs/PRODUCT-ARCHITECTURE.md) and [PUBLIC-SURFACES.md](docs/PUBLIC-SURFACES.md). Exact deployed source, receipts and rollback are in the [operational handoff](docs/P0-IMPLEMENTATION-HANDOFF.md). Earlier invite-only, operator-only and plugin-first sequencing is historical, not a current implementation gate.
+
+## Retained local qualification and historical packages
+
+The remaining renderer/earlier campaign sections describe their original bounded source surfaces, not the current live app or PDS status.
 
 This is **not** a network AppView, PDS, firehose consumer, identity service, or
 deployment of `phlogiston.app` or `phlogiston.social`.
@@ -35,7 +37,7 @@ sibling receipt. The v2 receipt binds raw input bytes, renderer implementation
 bytes/revision, claimed source revision, and the exact output-member hashes.
 Its output contains no live endpoint, credential, or mutable action.
 
-## Community integration candidate
+## Historical community integration candidate
 
 The `campaign/community-integration-20260922` line adds a bounded application,
 OAuth enrollment, and operator surface over the existing `atproto-community`
@@ -44,11 +46,7 @@ authority and projection interfaces. See [the integration map](docs/COMMUNITY-IN
 and [integrated recovery contract](docs/INTEGRATED-RECOVERY.md). It is not
 activated or deployed.
 
-Product direction and sequencing live in
-[docs/PRODUCT-ARCHITECTURE.md](docs/PRODUCT-ARCHITECTURE.md); the first
-external trial is specified as a demand experiment in
-[docs/PHASE-2-TRIAL.md](docs/PHASE-2-TRIAL.md) with its unfilled
-[participant packet](docs/PHASE-2-PARTICIPANT-PACKET.md).
+Current product direction lives in [docs/PRODUCT-ARCHITECTURE.md](docs/PRODUCT-ARCHITECTURE.md). The earlier [trial](docs/PHASE-2-TRIAL.md) and [participant packet](docs/PHASE-2-PARTICIPANT-PACKET.md) retain historical scope; they are not prerequisites for current owner-authorized work.
 
 ## Authority boundary
 

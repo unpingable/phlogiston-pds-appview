@@ -1,5 +1,8 @@
 # Frozen Phlogiston deployment handoff (2026-10-03)
 
+> **P0 successor, owner-approved for implementation 2026-10-11:** see [P0 implementation handoff](P0-IMPLEMENTATION-HANDOFF.md). The historical recruited-cohort, second-human and notification-room prerequisites below are superseded for P0, not passed. Existing frozen receipts remain historical. No production activation is authorized.
+
+
 **DO NOT DEPLOY. Credential enrollment and deployment MUST NOT occur until all
 three remaining hard gates are satisfied:**
 
