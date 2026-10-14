@@ -2,7 +2,15 @@
 
 Current product direction is defined in [PRODUCT-ARCHITECTURE.md](PRODUCT-ARCHITECTURE.md): an ATProto social client with composable feeds, attention/context and governed communities. The Cabinet remains the public collection. The live app is atproto-community `apps/community-live`; this document is the current runtime and rollback locator. No recruited-user, additional moderator or notification-room prerequisite applies.
 
-## Current participant web generation — 2026-10-14 (CC1)
+## Current participant web generation — 2026-10-14 (CC2)
+
+Current web is `ad3d9dca2675fb1c81331454ccdeab5576505d74` at `/opt/phlogiston-app/web-releases/ad3d9dca2675fb1c81331454ccdeab5576505d74/community-live` (atproto-community `implementation/phlogiston-pds-20261011`, pushed). CC2 (#28) shows signed-out readers an admitted post's public replies through one unauthenticated, bounded, 30-second-cached public AppView read of the exact admitted root URI, under Bluesky's default moderation (author signed-out opt-outs honoured). No credentials, scopes, ingestion, storage or proxy route added.
+
+Before CC2, CC1 was qualified live against one real labelled reply by qualification identity `author-a-20261011.phlogiston.social` (`at://did:plc:vc6gikbcc5xon4f3euxyroyr/app.bsky.feed.post/3mxspaxvblk22`) on the coffee seed; it remains public as evidence and may be deleted by that account. Separate web-only release `87ea09b7-6210-4b7f-92ac-84ac8a922744`, unit `phlogiston-cc2-87ea09b7`, invocation `134a42e93bfe4689b826f0f7e8bbc021`, terminal 0. New drop-in SHA256 `6e5461a68e7c2980efdfaeb7ce57cd9fa77a57fcdf26215efa5d13d80e036693`. Source passed typecheck, 283 unit, 16 browser, 1486 Python and Ruff. Live smoke: signed-out reply at 1280/390 with Bluesky-only links and no overflow, other seeds report no replies, sign-in returns to the page, signed-in reply with reader links, Following regression, no page errors.
+
+Immediate rollback is CC1 `9da6fd3cc8759f106946f98e7d7d4d381eb2a528`: confirm the live drop-in hashes as above, restore `/var/lib/phlogiston-campaign/20261012/cc2-release-87ea09b7-6210-4b7f-92ac-84ac8a922744/previous-dropin.conf` (SHA256 `eccd4b53648a56f1dcbae02251272d51ea8244532b6dd684b113bb0c5175838c`), daemon-reload, restart only community-live.
+
+## Prior participant web generation — 2026-10-14 (CC1)
 
 Current web is `9da6fd3cc8759f106946f98e7d7d4d381eb2a528` at `/opt/phlogiston-app/web-releases/9da6fd3cc8759f106946f98e7d7d4d381eb2a528/community-live` (atproto-community `implementation/phlogiston-pds-20261011`, pushed). CC1 (#28) shows an admitted post's public Bluesky replies on its community page through the viewer's existing reader grant, labelled as not reviewed or admitted; exact admitted URI/CID only, removed admissions read nothing, changed posts withhold the newer conversation, and conversations of admitted posts link back to the community. S18 ingestion is not implemented; no authority, scopes, writers or observer changes.
 
