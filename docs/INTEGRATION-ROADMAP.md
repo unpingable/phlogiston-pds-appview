@@ -29,7 +29,11 @@ These roles stay separate:
 ## Inspected basis
 
 This roadmap was derived from source and released contracts, not project
-names. The inspected local revisions were:
+names. The revisions below are a historical snapshot as inspected around
+2026-09-21. They are deliberately not kept in sync for components with no
+active Phlogiston integration (everything here except Labelwatch's read
+contract, which `PRODUCT-ARCHITECTURE.md` pins separately). The inspected
+local revisions were:
 
 | Source | Revision / contract | Relevant implemented fact |
 | --- | --- | --- |
