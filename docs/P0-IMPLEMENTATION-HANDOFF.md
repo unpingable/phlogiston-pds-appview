@@ -2,7 +2,30 @@
 
 Current product direction is defined in [PRODUCT-ARCHITECTURE.md](PRODUCT-ARCHITECTURE.md): an ATProto social client with composable feeds, attention/context and governed communities. The Cabinet remains the public collection. The live app is atproto-community `apps/community-live`; this document is the current runtime and rollback locator. No recruited-user, additional moderator or notification-room prerequisite applies.
 
-## Current participant web generation — 2026-10-14 (CC3)
+## Current participant web generation — 2026-10-16 (L0)
+
+Current web is `43053e416f508c2e1c109c97e2116edbfb739691`. It is the public snapshot at https://github.com/unpingable/phlogiston, published from private atproto-community `25cbb2e`, whose history is not public. It lives at `/opt/phlogiston-app/web-releases/43053e4…/community-live`.
+
+L0 adds:
+- the public `/about`, `/privacy` and `/terms` pages, and a footer linking them;
+- sign-out that revokes provider tokens;
+- Settings → Delete my Phlogiston data;
+- an hourly retention sweep (`src/retention.ts`).
+
+Release details:
+- release `619d1c9b-070b-4526-b83e-839ddbc4fd98`;
+- producer unchanged from CC3;
+- unit `phlogiston-l0-619d1c9b`, TERMINAL exit 0.
+
+The live smoke used author-a and passed (BROWSER-TERMINAL.json in the campaign leaf).
+
+**Rollback:** restore `/var/lib/phlogiston-campaign/20261012/l0-release-619d1c9b-070b-4526-b83e-839ddbc4fd98/previous-dropin.conf` (CC3) to `/etc/systemd/system/community-live.service.d/20-frontdoor-generation.conf`, then `daemon-reload` and restart only community-live.
+
+**Retention:** kept L0 `43053e4`, CC3 `4a71a96` and closure `25a2816…`. Removed CC2 `ad3d9dc`.
+
+**Publication:** each release is cut as a new commit on the public repository from the private tree, with `tests/fixtures/mst-empty-intermediate` (real signed repository bytes) left out. The About page links the running commit, read from the release directory name.
+
+## Previous participant web generation — 2026-10-14 (CC3)
 
 Current web is `4a71a9648718d55ff2847d8c9ec434fd623c8baf` at `/opt/phlogiston-app/web-releases/4a71a9648718d55ff2847d8c9ec434fd623c8baf/community-live`. CC3 folds the P0 moderator removal form into a "Moderator actions" disclosure after the public conversation; same command, moderator-only. Release `2e1bb6a0-1ee0-4c95-9877-16d6d7dc38c4`, unit `phlogiston-cc3-2e1bb6a0`, invocation `2ebeb13a1fd0400397caf00b2a1530c8`, terminal 0; drop-in SHA256 `54e06912f9786222695f1d84d5e5c084ca074310cb193e3d9197e7e17e4727a8`; served `app.css` matched the manifest. Source passed typecheck, 284 unit, 16 browser, 1486 Python and Ruff. Live smoke: no moderator form signed out; for the moderator, folded after the conversation; nothing submitted.
 

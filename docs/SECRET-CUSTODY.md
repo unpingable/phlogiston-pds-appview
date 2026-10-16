@@ -9,6 +9,16 @@ account rather than a `phlogiston.social` one. The `communityd` row below is
 retained as the phlogiston-unit record; it is not the Phase 2 custody. See
 [PHASE-2-TRIAL.md](PHASE-2-TRIAL.md) "Deployment topology".
 
+Note (2026-10-16, L0): the live web app runs from `/var/lib/community-web-p0`
+with environment in `/etc/atproto-community-p0/community-web{,-secret}.env`.
+Its OAuth scope is the reader set in `apps/community-live/src/p0.ts`, not
+`atproto` alone. `COMMUNITY_SNAPSHOT_SECRET` is an HMAC secret for activity
+snapshots. Sign-out and Disconnect revoke the provider tokens and end every
+session of the account. A retention sweep deletes expired sessions, sign-ins
+abandoned for more than 1 h, and token sets idle for more than 8 h (revoked
+first). The rows below describe the earlier `/var/lib/phlogiston` plan; the
+user-facing statement of current behaviour is https://phlogiston.app/privacy.
+
 This is a custody map, not secret material and not activation authority.
 
 | Material | Owner / consumer | Scope and generation | Storage and modes | Rotation / revocation | Backup |
