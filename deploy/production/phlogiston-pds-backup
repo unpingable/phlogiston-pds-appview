@@ -1,0 +1,25 @@
+#!/bin/bash
+# Nightly stopped-state backup of the phlogiston.social PDS (atproto-community #10, #50).
+# The container is stopped for well under a second while the data directory is archived; the archive is encrypted
+# on the way out to the age recipient in /etc/phlogiston/backup.recipient (public key only: this host cannot
+# decrypt). crow pulls the newest copy and test-decrypts it with the private key, which never comes here.
+set -euo pipefail
+umask 077
+out=/var/backups/phlogiston; keep=7
+recipient=$(cat /etc/phlogiston/backup.recipient)
+t=$(date -u +%Y%m%dT%H%M%SZ); f=$out/pds-$t.age
+install -d -m 0700 "$out"
+started=0
+restart() { [ "$started" = 1 ] || docker start phlogiston-pds >/dev/null; started=1; }
+trap restart EXIT
+docker stop -t 30 phlogiston-pds >/dev/null
+tar -C / -cf - var/lib/phlogiston-pds etc/phlogiston/pds.env etc/phlogiston/phlogiston-pds.compose.yaml \
+  | age -r "$recipient" > "$f.tmp"
+restart
+sync "$f.tmp"; mv "$f.tmp" "$f"
+sha=$(sha256sum "$f" | cut -d' ' -f1)
+printf '{"schema":"phlogiston.pds-backup/v1","file":"%s","bytes":%s,"sha256":"%s","created_at":"%s"}\n' \
+  "$(basename "$f")" "$(stat -c %s "$f")" "$sha" "$t" > "$out/.LATEST.json.tmp"
+mv "$out/.LATEST.json.tmp" "$out/LATEST.json"
+ls -1t "$out"/pds-2*.age | tail -n +$((keep + 1)) | xargs -r rm --
+echo "backup $(basename "$f") $sha"

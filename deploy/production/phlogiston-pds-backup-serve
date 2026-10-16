@@ -1,0 +1,9 @@
+#!/bin/bash
+# Forced command for crow's pull key (authorized_keys command=...,restrict): writes the newest backup's metadata
+# line, then the ciphertext, to stdout. Read-only; serves nothing else.
+set -euo pipefail
+out=/var/backups/phlogiston
+latest=$(python3 -I -c 'import json,sys;print(json.load(open(sys.argv[1]))["file"])' "$out/LATEST.json")
+case "$latest" in pds-2*.age) ;; *) echo "bad LATEST" >&2; exit 1;; esac
+head -c 4096 "$out/LATEST.json"
+cat "$out/$latest"
