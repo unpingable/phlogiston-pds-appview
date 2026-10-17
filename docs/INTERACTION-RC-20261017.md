@@ -1,5 +1,10 @@
 # Interaction release handoff — proposed
 
+**Current status:** the exact frozen client is deployed and canonical acceptance
+passed after the owner's single permission correction. See the
+[shipped release handoff](INTERACTION-RELEASE-20261017.md). The preparation record
+below remains historical; it does not describe current production status.
+
 The final engineering slice for [#51](https://github.com/unpingable/atproto-community/issues/51)
 is prepared on isolated branches. Runtime implementation lives in
 `atproto-community/apps/community-live`, while this repository owns the composed

@@ -1,5 +1,13 @@
 # One proposed interaction release candidate
 
+**Deployment status:** this exact candidate shipped on October 17 after one
+owner-authorized permission correction. Run this unchanged public-source producer
+with explicit `UMask=0022` so its release directories are `0755`; retain private
+staging `0700` and protected receipt files `0600`. `UMask=0077` caused the first
+attempt's CHDIR failure and verified rollback. See the
+[release and rollback handoff](../../../docs/INTERACTION-RELEASE-20261017.md).
+The original preparation record below is retained for provenance.
+
 **Prepared only. Do not execute without owner release authorization.**
 
 Runtime source: private `bf10f79f49643999146b80a6c4e3f732b975a99e`.
