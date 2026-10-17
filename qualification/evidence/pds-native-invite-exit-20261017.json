@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "run_id": "b185f9c0-e973-4bdf-89e7-860621f2ecb3",
+  "recorded_at": "2026-10-17T04:59:06.579060+00:00",
+  "source_base": "0720d40312249966a9632fce347f4931b1b60888",
+  "purpose": "authorized PDS invitation and bounded data-export/import qualification; independent of client release and not authorization for real-user invitations",
+  "provider_version": "0.4.5037",
+  "native_invites": {
+    "used": "refused: The invite code is not valid",
+    "disabled": "refused: The invite code is not valid",
+    "missing": "form requires invitation; XRPC400 InvalidInviteCode No invite code provided",
+    "unsupported_expiresAt_counterexample": {
+      "admin_input": "expiresAt=2000-01-01T00:00:00Z alongside useCount=1",
+      "native_result": "account created; unsupported expiry input ignored",
+      "schema_expiry_column": false,
+      "conclusion": "native short-lived invitation guarantee unavailable; require explicit accepted mechanism/disposition, never advertise expiry from useCount"
+    }
+  },
+  "xrpc_invites": {
+    "already_used": {
+      "status": 400,
+      "error": "InvalidInviteCode"
+    },
+    "disabled": {
+      "status": 400,
+      "error": "InvalidInviteCode"
+    },
+    "one_use_concurrent": {
+      "requests": 2,
+      "successful_accounts": 1,
+      "success_status": 200,
+      "other_status": 400,
+      "other_error": "InvalidInviteCode",
+      "database_use_count": 1,
+      "limit": "bounded local account/use result, not all concurrent histories or absence of orphaned PLC history"
+    }
+  },
+  "record_only_import": {
+    "activation_refusal": {
+      "request": "POST without body, as required by upstream",
+      "result": {
+        "error": "InvalidRequest",
+        "message": "Server rotation key not included in PLC DID data"
+      },
+      "status": 400
+    },
+    "activation_request_schema_refusal": {
+      "result": {
+        "error": "InvalidRequest",
+        "message": "A request body was provided when none was expected"
+      },
+      "status": 400
+    },
+    "deactivated_write_refusal": {
+      "result": {
+        "error": "AccountDeactivated",
+        "message": "Account is deactivated"
+      },
+      "status": 401
+    },
+    "destination": "http://127.0.0.1:3003",
+    "destination_after_import": {
+      "http_status": 200,
+      "state": {
+        "activated": false,
+        "expectedBlobs": 0,
+        "importedBlobs": 0,
+        "indexedRecords": 1,
+        "privateStateValues": 0,
+        "repoBlocks": 3,
+        "repoCommit": "bafyreie46pqtxbnz3vj6gob5hgooqsjvxiehhwhni4ojaxa6zb2kddx6fi",
+        "repoRev": "3my2c635mjc2s",
+        "validDid": false
+      }
+    },
+    "destination_create": {
+      "did": "did:plc:zvktyqu3cqetvya2lklneqcd",
+      "handle": "migrated-b185f9.migration-b185f9c0.test",
+      "reconciliation": "same-intent createSession; createAccount not repeated",
+      "status": 200
+    },
+    "destination_final_state": {
+      "activated": false,
+      "expectedBlobs": 0,
+      "importedBlobs": 0,
+      "indexedRecords": 1,
+      "privateStateValues": 0,
+      "repoBlocks": 3,
+      "repoCommit": "bafyreie46pqtxbnz3vj6gob5hgooqsjvxiehhwhni4ojaxa6zb2kddx6fi",
+      "repoRev": "3my2c635mjc2s",
+      "validDid": false
+    },
+    "destination_initial_status": {
+      "http_status": 200,
+      "state": {
+        "activated": false,
+        "expectedBlobs": 0,
+        "importedBlobs": 0,
+        "indexedRecords": 0,
+        "privateStateValues": 0,
+        "repoBlocks": 2,
+        "repoCommit": "bafyreibgmssosd35mqjy7m22ckvr44dok73jcxgp4k6tboinicrjb7hw4q",
+        "repoRev": "3my2c5cywwk2s",
+        "validDid": false
+      }
+    },
+    "destination_record_readback": {
+      "cid": "bafyreiexfb7yktbokwhfhyt4j65tkc3c7u2cbrksxezmg4i335uvepsxaa",
+      "error": null,
+      "exact_value_match": true,
+      "message": null,
+      "status": 200,
+      "uri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3xumcmdbbszxs"
+    },
+    "finished_at": "2026-10-17T04:51:41.124804+00:00",
+    "full_migration_proven": false,
+    "import": {
+      "result": {},
+      "status": 200
+    },
+    "remaining": [
+      "email challenge and signed PLC/service/handle cutover",
+      "destination public TLS/DNS and identity binding",
+      "activation, client grant/app-password, relay continuity and rollback",
+      "blob transfer (zero source blobs)"
+    ],
+    "scope": "deactivated destination data import, exact record correspondence and refusal only; no PLC/handle/DNS/crawler cutover",
+    "source": "https://phlogiston.social",
+    "source_commit_unchanged": true,
+    "source_did": "did:plc:zvktyqu3cqetvya2lklneqcd",
+    "source_export": {
+      "blob_count": 0,
+      "blob_limitation": "zero blobs; blob transfer not exercised",
+      "car_bytes": 626,
+      "car_sha256": "c71f99be95d90c9b957d8c079c5f7cbb7cb8d81dc41ff58249bb4fbfce6ec278",
+      "latest_after": {
+        "cid": "bafyreie46pqtxbnz3vj6gob5hgooqsjvxiehhwhni4ojaxa6zb2kddx6fi",
+        "rev": "3my2bylsrnc2b"
+      },
+      "latest_before": {
+        "cid": "bafyreie46pqtxbnz3vj6gob5hgooqsjvxiehhwhni4ojaxa6zb2kddx6fi",
+        "rev": "3my2bylsrnc2b"
+      },
+      "repeated_export_exact": true,
+      "verification": {
+        "records": [
+          {
+            "cid": "bafyreiexfb7yktbokwhfhyt4j65tkc3c7u2cbrksxezmg4i335uvepsxaa",
+            "uri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3xumcmdbbszxs",
+            "value": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2026-10-17T04:48:14.345306Z",
+              "text": "[Phlogiston disposable qualification: pds-exit-b185f9] This is a test fixture; no real-user content."
+            }
+          }
+        ],
+        "root": "bafyreie46pqtxbnz3vj6gob5hgooqsjvxiehhwhni4ojaxa6zb2kddx6fi",
+        "signature_verified": true,
+        "signing_key": "did:key:zQ3shrtJFbyVSAfuyE1dnkWnGeEpyna1Dc93F6H4gvhX4YjFr"
+      }
+    },
+    "source_pds_service_unchanged": true,
+    "started_at": "2026-10-17T04:50:51.193307+00:00"
+  },
+  "blob_preference_import": {
+    "cid_representation_note": "CAR DAG-JSON CID objects use /; HTTP lexicon JSON uses $link. Compare equivalent decoded CID references and exact record CID, without altering contents.",
+    "finished_at": "2026-10-17T04:55:23.353548+00:00",
+    "full_migration_proven": false,
+    "scope": "tiny disposable blob and private preference export/import on still-deactivated destination; no client media composition feature",
+    "source_blob_record": {
+      "cid": "bafyreic3qlcd5rgq7tu6cbu5zyucf56bfla33fa4r2kq64js5pm5tipx4u",
+      "error": null,
+      "message": null,
+      "status": 200,
+      "uri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3k6n6eavwyyfp"
+    },
+    "source_blob_upload": {
+      "blob": {
+        "$type": "blob",
+        "mimeType": "image/png",
+        "ref": {
+          "$link": "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q"
+        },
+        "size": 68
+      },
+      "reconciled_via": "exact content-addressed blob row; upload not repeated",
+      "status": 200
+    },
+    "source_commit_unchanged": true,
+    "source_did": "did:plc:zvktyqu3cqetvya2lklneqcd",
+    "source_export": {
+      "blob_cids": [
+        "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q"
+      ],
+      "car_bytes": 1096,
+      "car_sha256": "5b82f357d19e982d184df80178042f17f130696c82ed9d14bb50b8cd1d5b95bd",
+      "commit": {
+        "cid": "bafyreietn6txsuu7j6q7ebeh57oxdvrzhczqcyr7lrhdxxfrpm4al5p3n4",
+        "rev": "3my2cdv4n522b"
+      },
+      "downloaded_blob_bytes": 68,
+      "downloaded_blob_sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "repeated_export_exact": true,
+      "verification": {
+        "records": [
+          {
+            "cid": "bafyreic3qlcd5rgq7tu6cbu5zyucf56bfla33fa4r2kq64js5pm5tipx4u",
+            "uri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3k6n6eavwyyfp",
+            "value": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2026-10-17T04:54:33.579012Z",
+              "embed": {
+                "$type": "app.bsky.embed.images",
+                "images": [
+                  {
+                    "alt": "Disposable one-pixel PDS migration fixture",
+                    "aspectRatio": {
+                      "height": 1,
+                      "width": 1
+                    },
+                    "image": {
+                      "$type": "blob",
+                      "mimeType": "image/png",
+                      "ref": {
+                        "/": "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q"
+                      },
+                      "size": 68
+                    }
+                  }
+                ]
+              },
+              "text": "[Phlogiston disposable qualification pds-exit-blob-b185f9] Tiny PDS migration fixture."
+            }
+          },
+          {
+            "cid": "bafyreiexfb7yktbokwhfhyt4j65tkc3c7u2cbrksxezmg4i335uvepsxaa",
+            "uri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3xumcmdbbszxs",
+            "value": {
+              "$type": "app.bsky.feed.post",
+              "createdAt": "2026-10-17T04:48:14.345306Z",
+              "text": "[Phlogiston disposable qualification: pds-exit-b185f9] This is a test fixture; no real-user content."
+            }
+          }
+        ],
+        "root": "bafyreietn6txsuu7j6q7ebeh57oxdvrzhczqcyr7lrhdxxfrpm4al5p3n4",
+        "signature_verified": true,
+        "signing_key": "did:key:zQ3shrtJFbyVSAfuyE1dnkWnGeEpyna1Dc93F6H4gvhX4YjFr"
+      }
+    },
+    "source_pds_service_unchanged": true,
+    "source_preferences_export": {
+      "preferences": [
+        {
+          "$type": "app.bsky.actor.defs#threadViewPref",
+          "prioritizeFollowedUsers": false,
+          "sort": "oldest"
+        }
+      ]
+    },
+    "source_preferences_put": {
+      "result": {},
+      "status": 200
+    },
+    "started_at": "2026-10-17T04:54:33.572693+00:00",
+    "target_all_record_cid_values_match": true,
+    "target_before_blob_upload": {
+      "state": {
+        "activated": false,
+        "expectedBlobs": 1,
+        "importedBlobs": 0,
+        "indexedRecords": 2,
+        "privateStateValues": 0,
+        "repoBlocks": 4,
+        "repoCommit": "bafyreietn6txsuu7j6q7ebeh57oxdvrzhczqcyr7lrhdxxfrpm4al5p3n4",
+        "repoRev": "3my2cdvw6jc2s",
+        "validDid": false
+      },
+      "status": 200
+    },
+    "target_blob_readback": {
+      "authenticated_owner_readback": true,
+      "exact_bytes_match": true,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec",
+      "status": 200
+    },
+    "target_blob_upload": {
+      "blob": {
+        "$type": "blob",
+        "mimeType": "image/png",
+        "ref": {
+          "$link": "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q"
+        },
+        "size": 68
+      },
+      "error": null,
+      "message": null,
+      "status": 200
+    },
+    "target_final_state": {
+      "state": {
+        "activated": false,
+        "expectedBlobs": 1,
+        "importedBlobs": 1,
+        "indexedRecords": 2,
+        "privateStateValues": 0,
+        "repoBlocks": 4,
+        "repoCommit": "bafyreietn6txsuu7j6q7ebeh57oxdvrzhczqcyr7lrhdxxfrpm4al5p3n4",
+        "repoRev": "3my2cdvw6jc2s",
+        "validDid": false
+      },
+      "status": 200
+    },
+    "target_import": {
+      "result": {},
+      "status": 200
+    },
+    "target_missing_blobs_after": {
+      "result": {
+        "blobs": []
+      },
+      "status": 200
+    },
+    "target_missing_blobs_before": {
+      "result": {
+        "blobs": [
+          {
+            "cid": "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q",
+            "recordUri": "at://did:plc:zvktyqu3cqetvya2lklneqcd/app.bsky.feed.post/3k6n6eavwyyfp"
+          }
+        ],
+        "cursor": "bafkreidlcbeprjwubowawkkuygh67jamj2t2syja7qxfjnzrpqhehqv35q"
+      },
+      "status": 200
+    },
+    "target_preference_storage": {
+      "columns": [
+        "id",
+        "name",
+        "valueJson"
+      ],
+      "rows": 1,
+      "table_present": true
+    },
+    "target_preferences_put": {
+      "result": {},
+      "status": 200
+    },
+    "target_preferences_readback": {
+      "exact_match": true,
+      "status": 200
+    },
+    "target_public_blob_refusal": {
+      "exact_bytes_match": false,
+      "status": 400
+    }
+  },
+  "isolation": {
+    "container_id": "c2f5c5816dfcd3e133d3f28171e625e80dab4ddf109bed8c7c51d18a48236b59",
+    "image_id": "sha256:3cd1bfb3bd89fa51293fcbc867cd4dbec40cc14d8c2bea8a751682ccc5ce96cd",
+    "privileged": false,
+    "cgroup_namespace": "private",
+    "cap_drop": [
+      "ALL"
+    ],
+    "rootfs_readonly": true,
+    "mounts": [
+      {
+        "source": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/destination-data",
+        "destination": "/pds",
+        "rw": true
+      }
+    ],
+    "ports": {
+      "3000/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "3003"
+        }
+      ]
+    },
+    "root_allocated_bytes": 1204224,
+    "available_bytes": 67436003328,
+    "free_inodes": 8959735,
+    "crawlers_empty": true,
+    "no_production_mounts": true,
+    "no_public_route": true,
+    "health_correction": "initial6-second cold startup probe ended before healthy; same container later health200; never restarted"
+  },
+  "remote_closeout": {
+    "account_retirements": [
+      {
+        "account_row_absent": true,
+        "actor_directory_absent": "/var/lib/phlogiston-pds/actors/8c/did:plc:jqlwmqvhdfgyrzsry5o3i6lr",
+        "actor_private_key_retired": "/var/lib/phlogiston-pds/actors/8c/did:plc:jqlwmqvhdfgyrzsry5o3i6lr/key",
+        "actor_row_absent": true,
+        "did": "did:plc:jqlwmqvhdfgyrzsry5o3i6lr",
+        "handle": "race-b-b185f9.phlogiston.social",
+        "signin_refusal": 401,
+        "upstream_admin_delete_status": 200
+      },
+      {
+        "account_row_absent": true,
+        "actor_directory_absent": "/var/lib/phlogiston-pds/actors/cd/did:plc:zvktyqu3cqetvya2lklneqcd",
+        "actor_private_key_retired": "/var/lib/phlogiston-pds/actors/cd/did:plc:zvktyqu3cqetvya2lklneqcd/key",
+        "actor_row_absent": true,
+        "did": "did:plc:zvktyqu3cqetvya2lklneqcd",
+        "handle": "native-b185f9c0.phlogiston.social",
+        "signin_refusal": 401,
+        "upstream_admin_delete_status": 200
+      },
+      {
+        "account_row_absent": true,
+        "actor_directory_absent": "/var/lib/phlogiston-pds/actors/b2/did:plc:h7pj3qc7urbcrh4a5xiwkzzv",
+        "actor_private_key_retired": "/var/lib/phlogiston-pds/actors/b2/did:plc:h7pj3qc7urbcrh4a5xiwkzzv/key",
+        "actor_row_absent": true,
+        "did": "did:plc:h7pj3qc7urbcrh4a5xiwkzzv",
+        "handle": "rc-7164e26d.phlogiston.social",
+        "signin_refusal": 401,
+        "upstream_admin_delete_status": 200
+      }
+    ],
+    "all_scoped_container_and_remote_private_substrate_retired": true,
+    "container_id_removed": "c2f5c5816dfcd3e133d3f28171e625e80dab4ddf109bed8c7c51d18a48236b59",
+    "exact_fixture_invites_disabled": 4,
+    "expected_scoped_root_bytes_reclaimed": 1204224,
+    "generated_destination_keys_retired": {
+      "actor_key": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/destination-data/actors/cd/did:plc:zvktyqu3cqetvya2lklneqcd/key",
+      "configuration": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/destination.env",
+      "lifetime": "created for this loopback import only, retired after exact receipts off-host",
+      "owner": "pds-readiness lane",
+      "private_bytes_disclosed": false,
+      "rotation_public_key": "did:key:zQ3shoz5etGQa4mGiMrurJ9hqGgt4nNjnC5CEv7G1JZVA9L1w",
+      "signing_public_key": "did:key:zQ3shStt7Sg9EWKPTgRGwU7pHqBKvq9hkTD9p9JhiQSsqv6w5"
+    },
+    "hard_reserve_bytes": 64424509440,
+    "host_delta_attribution": "shared concurrent host allocation; global free-space difference not attributed to this cleanup",
+    "negative_account_rows_absent": [
+      "race-a-b185f9.phlogiston.social",
+      "used-b185f9.phlogiston.social",
+      "disabled-b185f9.phlogiston.social",
+      "n-used-b185f9.phlogiston.social",
+      "n-disabled-b185f9.phlogiston.social"
+    ],
+    "no_dns_plc_or_production_config_change": true,
+    "no_new_ssh_keys_or_agents": true,
+    "original_rc_local_secret": "parent must independently retire /tmp/phlogiston-interaction-rc-private/account.json; remote deletion does not prove local removal",
+    "race_invite_use_count": 1,
+    "remaining_margin_bytes": 3012415488,
+    "remote_private_paths_retired": [
+      {
+        "bytes": 346,
+        "path": "/etc/phlogiston/test-accounts/rc-20261017-7164e26d.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/disabled-refusal.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/invites.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/race-b.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/blob-record-intent.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/destination-account.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/used-refusal.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/race-a.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/blob-intent.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/preferences-intent.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/refusal-intent.json"
+      },
+      {
+        "path": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0/native-account.json"
+      }
+    ],
+    "retired_exact_test_root": "/var/lib/phlogiston-campaign/pds-invite-b185f9c0",
+    "root_available_after": 67436924928,
+    "root_available_before": 67435249664,
+    "root_free_inodes_after": 8959827,
+    "root_free_inodes_before": 8959730,
+    "run_id": "b185f9c0-e973-4bdf-89e7-860621f2ecb3",
+    "scope_limitation": "PDS account/records/blob/native sessions removed locally through upstream; PLC identity history and prior externally propagated records are not globally deleted",
+    "source_accounts_after": 4,
+    "source_accounts_before": 7,
+    "test_directory_allocated_before": 1204224,
+    "time": "2026-10-17T04:57:59.883486+00:00"
+  },
+  "local_private_retirement": {
+    "retired": [
+      {
+        "path": "/tmp/phlogiston-pds-invite-b185f9c0/native-used.json",
+        "bytes": 265,
+        "allocated_bytes": 4096
+      },
+      {
+        "path": "/tmp/phlogiston-pds-invite-b185f9c0/native-disabled.json",
+        "bytes": 273,
+        "allocated_bytes": 4096
+      },
+      {
+        "path": "/tmp/phlogiston-pds-invite-b185f9c0/invites.json",
+        "bytes": 176,
+        "allocated_bytes": 4096
+      },
+      {
+        "path": "/tmp/phlogiston-pds-invite-b185f9c0/native-account.json",
+        "bytes": 342,
+        "allocated_bytes": 4096
+      }
+    ],
+    "root_absent": true,
+    "parent_rc_local_copy_untouched": "/tmp/phlogiston-interaction-rc-private/account.json"
+  },
+  "replay_inputs": {
+    "pds-exit-b185f9-record-only.car": {
+      "bytes": 626,
+      "sha256": "c71f99be95d90c9b957d8c079c5f7cbb7cb8d81dc41ff58249bb4fbfce6ec278"
+    },
+    "pds-exit-b185f9-with-blob.car": {
+      "bytes": 1096,
+      "sha256": "5b82f357d19e982d184df80178042f17f130696c82ed9d14bb50b8cd1d5b95bd"
+    },
+    "pds-exit-b185f9-blob.png": {
+      "bytes": 68,
+      "sha256": "6b1048f8a6d40bac0b2954c18fefa40c4ea7a96120fc2e54b7317c0e43c2bbec"
+    }
+  },
+  "diagnostic_source_sha256": {
+    "resume-export-import.py": "96f8971b4e515a322f848644f06115f177ba7dcc28856c015060e9b3b62de248",
+    "native-invitation-cases.py": "357cb5b80db673a1a733043c0c827ef1668f6233626a76ad25cd307b7bfe9920",
+    "resume-blob-preferences.py": "d420a33d7c15a8723e93dcd9c445827545c3930b755f9beaea1940b6d8fd6e6f",
+    "finish-export-import.py": "ecada27c5a79c6ee546e0eb590c69bde81bcc00c0b1293bc38086c9753d3c343",
+    "finish-blob-preferences.py": "2db694185c0a676a43e2f8634a004c279df18cf5c501ccb1b648f00d8425c347",
+    "invitation-provider-cases.py": "5722f5b88ccafcd50fe5e8d8760f5250f37ca7c30154cdfde7f6c031f63108bb",
+    "qualify-export-import.py": "08c1156bc99ff0ae09ea818a1618cda2d1a6640aa975557dedacc54c25fa3674",
+    "qualify-blob-preferences.py": "e36f928b8a8b8f4f0b00670e6beb965efa4ebe8fd83b2abb4958350ca9c28d68",
+    "check-activation-refusal.py": "9aee3589e862e4c44d0aea48499109f575db6968b374ee6f2539193a05653bc3",
+    "teardown-fixtures.py": "fdac822ad412f05af29690c3b405434e277a0fc12eb40c40c63c92cc75b640e1",
+    "prepare-isolated-destination.py": "aae74864a121525d88f54da61d88313bdcf8abe06e845d902f96af49f7bfcc71"
+  },
+  "diagnostic_custody": "/data/git/atproto-nutrition/portfolio-private/campaigns/phlogiston-pds-20261011/invite-exit-b185f9c0-e973-4bdf-89e7-860621f2ecb3",
+  "diagnostic_corrections": [
+    "initial6-second cold health observation ended before same container later healthy; no restart",
+    "upstream verifier emits informational JSON and older verified records omit value; decoded verified CAR leaves instead",
+    "corrected initial/progressive receipt publication modes; target creation and blob upload reconciled, not repeated",
+    "used actual expectedBlobs/importedBlobs fields; no missingBlobs field assumed",
+    "bodyless activateAccount request replaced schema-refused fixture; both observations preserved",
+    "deactivated public blob read refuses; exact authenticated owner read succeeds",
+    "CAR CID / representation normalized to HTTP $link for value comparison; exact record CIDs retained"
+  ],
+  "full_migration_qualified": false,
+  "real_user_onboarding_ready": false,
+  "remaining": [
+    "outbound SMTP, confirmed mailbox, actual verification/password/email-recovery/deletion qualification",
+    "hosted policy/support discoverability and accepted consent/cap/reserve/exit disposition",
+    "unsupported native invite expiry, remaining cap and interrupted/partial creation outcomes",
+    "separately authorized public destination/handle TLS and DNS/PLC signed cutover; no production rotation-key use",
+    "activation, grant/app-password consequences, relay/client continuity, interruption and rollback qualification",
+    "cross-version restore only when a genuinely newer published image exists",
+    "explicit owner real-user activation; no public registration or invitations before holds clear"
+  ]
+}
