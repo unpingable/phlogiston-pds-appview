@@ -78,6 +78,19 @@ def test_provision_custodies_before_effect_and_recovers_unknown(tmp_path, monkey
         with pytest.raises(ValueError): ops.origin(base)
 
 
+@pytest.mark.parametrize("username", ["ab", "a" * 19, "ends-with-", "-starts-with"])
+def test_provision_refuses_invalid_service_username_before_intent(tmp_path, monkeypatch, username):
+    env = tmp_path / "env"
+    ops.configure(env, Path(__file__).resolve().parents[1] / "deploy/production/phlogiston-pds.env.example")
+    custody = tmp_path / "account.json"
+    def unexpected_request(*args, **kwargs):
+        pytest.fail("invalid username must not create an invite or account")
+    monkeypatch.setattr(ops, "request", unexpected_request)
+    with pytest.raises(ValueError, match="3..18"):
+        ops.provision(env, custody, username + ".phlogiston.social", "fixture@example.invalid", "https://phlogiston.social")
+    assert not custody.exists()
+
+
 def test_stopped_encrypted_whole_state_restore_and_no_overwrite(tmp_path, monkeypatch):
     data, env, compose, identity, recipient = fixture(tmp_path, monkeypatch)
     archive = tmp_path / "backup.age"

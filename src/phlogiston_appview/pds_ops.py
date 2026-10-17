@@ -150,8 +150,11 @@ def request(base: str, method: str, body: dict, admin: str | None = None) -> dic
 def provision(env: Path, custody: Path, handle: str, email: str, base: str) -> dict:
     configuration = read_env(env)
     origin(base)
-    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,61}\.phlogiston\.social", handle) or "@" not in email:
-        raise ValueError("disposable hosted handle and email required")
+    # The stock PDS restricts a service-domain username to 3..18 characters,
+    # even though DNS permits longer labels. Refuse before creating an invite
+    # or an account intent; a provider refusal otherwise leaves uncertain custody.
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,16}[a-z0-9]\.phlogiston\.social", handle) or "@" not in email:
+        raise ValueError("disposable hosted handle (3..18 character username) and email required")
     if custody.exists():
         state = json.loads(private_file(custody).read_text())
         if state.get("handle") != handle or state.get("origin") != base or state.get("email") != email:
