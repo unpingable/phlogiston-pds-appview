@@ -1,5 +1,12 @@
 # Phlogiston PDS operations
 
+Current hosted-account readiness and the verified stock signup/account-management
+entry point are recorded in [the 2026-10-17 native onboarding report](../../docs/PDS-NATIVE-ONBOARDING-20261017.md).
+The accepted #50 same-version blank-host restore and daily encrypted/off-host
+verified backups supersede the historical snapshot-only recovery description
+below. Real hosted-user onboarding remains held for the separate #10/#40 gates
+and explicit owner activation; existing-account client delivery is independent.
+
 This kit operates the stock Bluesky PDS at `https://phlogiston.social`. Public registration stays closed. It does not modify Juche, migrate real users, or change other host services. Root's campaign checkpoint records exact host, source revision, digest, credential custody, retained artifacts and currently active producers. Read and reconcile it before operations; do not duplicate a producer after losing supervision.
 
 The current reviewed remote kit is selected by a root-owned symlink to an exact source-revision directory under `/opt/phlogiston-pds/current`; verify each executor hash against its lane/source receipt before use. Preserve an exact source receipt when staging a later version. Runtime paths are `/etc/phlogiston/pds.env`, `/etc/phlogiston/phlogiston-pds.compose.yaml`, `/var/lib/phlogiston-pds`, unit `phlogiston-pds.service`, container `phlogiston-pds`, private listener `127.0.0.1:3002`. Verify actual host/machine identity and capacity against root's checkpoint. Admit allocation before image pulls or recovery copies: both the shared host and this runtime host have a 60 GiB unallocated reserve; root owns aggregate accounting. Do not apply another host's capacity sample here.
@@ -46,6 +53,12 @@ Never regenerate or overwrite this environment after accounts exist. Preserve th
 ```
 
 The same command supports `curator-20261011` and `author-b-20261011` with distinct private custody files. A completed checkpoint is reused; an uncertain account effect checks the same already-custodied password instead of repeating account creation. If reconciliation fails, retain the checkpoint and inspect account state through the authorized admin interface. Do not delete it and blindly start over. Passwords/tokens/invites belong only in protected runtime custody, never shell arguments, source, screenshots or ordinary receipts. Normal account APIs publish records; admin APIs are only provisioning/control, not record-writing credentials.
+
+The hosted username (before `.phlogiston.social`) must contain 3–18 letters,
+digits or hyphens, starting and ending with a letter or digit. The kit checks
+this before publishing an account intent or issuing an invite. Upstream may
+still refuse reserved names, unavailable handles or unsupported email addresses;
+preflight validation is not account-creation success.
 
 DNS and Caddy must resolve/serve the exact authorized hosted handles. The current campaign uses these explicit TLS hostnames:
 
